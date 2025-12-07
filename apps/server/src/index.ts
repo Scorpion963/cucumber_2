@@ -29,6 +29,5 @@ io.on("connection", (socket) => {
 });
 
 server.listen(port, async () => {
-  const data = await db.query.usersTable.findMany();
-  console.log(data);
+  console.log("The server is running")
 });
