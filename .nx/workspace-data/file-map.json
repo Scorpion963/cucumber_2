@@ -1,0 +1,112 @@
+{
+  "version": "6.0",
+  "nxVersion": "22.1.3",
+  "pathMappings": {},
+  "nxJsonPlugins": [],
+  "fileMap": {
+    "projectFileMap": {
+      "telegram-client": [
+        {
+          "file": "apps/telegram-client/.gitignore",
+          "hash": "1867017717006394117"
+        },
+        {
+          "file": "apps/telegram-client/README.md",
+          "hash": "10766794746169900117"
+        },
+        {
+          "file": "apps/telegram-client/eslint.config.mjs",
+          "hash": "11456145150381806295"
+        },
+        {
+          "file": "apps/telegram-client/next.config.ts",
+          "hash": "17157214668998829023"
+        },
+        {
+          "file": "apps/telegram-client/package-lock.json",
+          "hash": "8601742776740037976"
+        },
+        {
+          "file": "apps/telegram-client/package.json",
+          "hash": "6726082081352196157",
+          "deps": [
+            "npm:@tailwindcss/postcss",
+            "npm:@types/node",
+            "npm:@types/react",
+            "npm:@types/react-dom",
+            "npm:eslint",
+            "npm:eslint-config-next",
+            "npm:tailwindcss",
+            "npm:typescript",
+            "npm:next",
+            "npm:react",
+            "npm:react-dom"
+          ]
+        },
+        {
+          "file": "apps/telegram-client/postcss.config.mjs",
+          "hash": "12094959087305894889"
+        },
+        {
+          "file": "apps/telegram-client/public/file.svg",
+          "hash": "15617830351863523835"
+        },
+        {
+          "file": "apps/telegram-client/public/globe.svg",
+          "hash": "9134466864871335697"
+        },
+        {
+          "file": "apps/telegram-client/public/next.svg",
+          "hash": "8300767200008744458"
+        },
+        {
+          "file": "apps/telegram-client/public/vercel.svg",
+          "hash": "3007623926711696394"
+        },
+        {
+          "file": "apps/telegram-client/public/window.svg",
+          "hash": "16677869292061012332"
+        },
+        {
+          "file": "apps/telegram-client/src/app/favicon.ico",
+          "hash": "9157999678830540297"
+        },
+        {
+          "file": "apps/telegram-client/src/app/globals.css",
+          "hash": "13803416617225302536"
+        },
+        {
+          "file": "apps/telegram-client/src/app/layout.tsx",
+          "hash": "3768300601413009371"
+        },
+        {
+          "file": "apps/telegram-client/src/app/page.tsx",
+          "hash": "14773234855831957016"
+        },
+        {
+          "file": "apps/telegram-client/tsconfig.json",
+          "hash": "5855035559254869289"
+        }
+      ]
+    },
+    "nonProjectFiles": [
+      {
+        "file": "package-lock.json",
+        "hash": "16072509969721243203"
+      },
+      {
+        "file": "package.json",
+        "hash": "3634614275202324227"
+      },
+      {
+        "file": "pnpm-lock.yaml",
+        "hash": "1908064094587978701"
+      },
+      {
+        "file": "pnpm-workspace.yaml",
+        "hash": "16406662452093338799"
+      }
+    ]
+  },
+  "externalNodesHash": "12733631926253130462"
+}
