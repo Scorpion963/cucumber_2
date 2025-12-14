@@ -1,7 +1,15 @@
-import { relations } from "drizzle-orm";
-import { pgTable, text, timestamp, boolean, index } from "drizzle-orm/pg-core";
+var __makeTemplateObject = (this && this.__makeTemplateObject) || function (cooked, raw) {
+    if (Object.defineProperty) { Object.defineProperty(cooked, "raw", { value: raw }); } else { cooked.raw = raw; }
+    return cooked;
+};
+import { relations, sql } from "drizzle-orm";
+import { pgTable, text, timestamp, boolean, uuid, index, } from "drizzle-orm/pg-core";
+import { chatMember } from "./chatMember";
+import { contact } from "./contact";
 export var user = pgTable("user", {
-    id: text("id").primaryKey(),
+    id: uuid("id")
+        .default(sql(templateObject_1 || (templateObject_1 = __makeTemplateObject(["pg_catalog.gen_random_uuid()"], ["pg_catalog.gen_random_uuid()"]))))
+        .primaryKey(),
     name: text("name").notNull(),
     email: text("email").notNull().unique(),
     emailVerified: boolean("email_verified").default(false).notNull(),
@@ -12,25 +20,13 @@ export var user = pgTable("user", {
         .$onUpdate(function () { /* @__PURE__ */ return new Date(); })
         .notNull(),
 });
-export var session = pgTable("session", {
-    id: text("id").primaryKey(),
-    expiresAt: timestamp("expires_at").notNull(),
-    token: text("token").notNull().unique(),
-    createdAt: timestamp("created_at").defaultNow().notNull(),
-    updatedAt: timestamp("updated_at")
-        .$onUpdate(function () { /* @__PURE__ */ return new Date(); })
-        .notNull(),
-    ipAddress: text("ip_address"),
-    userAgent: text("user_agent"),
-    userId: text("user_id")
-        .notNull()
-        .references(function () { return user.id; }, { onDelete: "cascade" }),
-}, function (table) { return [index("session_userId_idx").on(table.userId)]; });
 export var account = pgTable("account", {
-    id: text("id").primaryKey(),
+    id: uuid("id")
+        .default(sql(templateObject_2 || (templateObject_2 = __makeTemplateObject(["pg_catalog.gen_random_uuid()"], ["pg_catalog.gen_random_uuid()"]))))
+        .primaryKey(),
     accountId: text("account_id").notNull(),
     providerId: text("provider_id").notNull(),
-    userId: text("user_id")
+    userId: uuid("user_id")
         .notNull()
         .references(function () { return user.id; }, { onDelete: "cascade" }),
     accessToken: text("access_token"),
@@ -46,7 +42,9 @@ export var account = pgTable("account", {
         .notNull(),
 }, function (table) { return [index("account_userId_idx").on(table.userId)]; });
 export var verification = pgTable("verification", {
-    id: text("id").primaryKey(),
+    id: uuid("id")
+        .default(sql(templateObject_3 || (templateObject_3 = __makeTemplateObject(["pg_catalog.gen_random_uuid()"], ["pg_catalog.gen_random_uuid()"]))))
+        .primaryKey(),
     identifier: text("identifier").notNull(),
     value: text("value").notNull(),
     expiresAt: timestamp("expires_at").notNull(),
@@ -59,17 +57,10 @@ export var verification = pgTable("verification", {
 export var userRelations = relations(user, function (_a) {
     var many = _a.many;
     return ({
-        sessions: many(session),
         accounts: many(account),
-    });
-});
-export var sessionRelations = relations(session, function (_a) {
-    var one = _a.one;
-    return ({
-        user: one(user, {
-            fields: [session.userId],
-            references: [user.id],
-        }),
+        memberships: many(chatMember),
+        contacts: many(contact),
+        contactsOf: many(contact)
     });
 });
 export var accountRelations = relations(account, function (_a) {
@@ -81,3 +72,4 @@ export var accountRelations = relations(account, function (_a) {
         }),
     });
 });
+var templateObject_1, templateObject_2, templateObject_3;

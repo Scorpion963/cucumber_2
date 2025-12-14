@@ -23,5 +23,10 @@ export const auth = betterAuth({
 		delete: async (key) => {
 			await redis.del(key);
 		}
-    }
+    },
+	advanced: {
+		database: {
+			generateId: "uuid"
+		}
+	}
 });
