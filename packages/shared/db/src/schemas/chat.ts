@@ -9,6 +9,7 @@ import {
 } from "drizzle-orm/pg-core";
 import { chatMember } from "./chatMember";
 import { createdAt, updatedAt } from "../schemaUtils";
+import { message } from "./message";
 
 export const CHAT_TYPES = ["private", "group"] as const;
 export type ChatType = (typeof CHAT_TYPES)[number];
@@ -25,4 +26,5 @@ export const chats = pgTable("chats", {
 
 export const chatRelations = relations(chats, ({ many }) => ({
   chatMember: many(chatMember),
+  messages: many(message),
 }));

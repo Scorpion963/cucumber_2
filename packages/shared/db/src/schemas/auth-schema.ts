@@ -9,6 +9,7 @@ import {
 } from "drizzle-orm/pg-core";
 import { chatMember } from "./chatMember";
 import { contact } from "./contact";
+import { message, reaction } from "./message";
 
 export const user = pgTable("user", {
   id: uuid("id")
@@ -48,7 +49,7 @@ export const account = pgTable(
       .$onUpdate(() => /* @__PURE__ */ new Date())
       .notNull(),
   },
-  (table) => [index("account_userId_idx").on(table.userId)],
+  (table) => [index("account_userId_idx").on(table.userId)]
 );
 
 export const verification = pgTable(
@@ -66,14 +67,16 @@ export const verification = pgTable(
       .$onUpdate(() => /* @__PURE__ */ new Date())
       .notNull(),
   },
-  (table) => [index("verification_identifier_idx").on(table.identifier)],
+  (table) => [index("verification_identifier_idx").on(table.identifier)]
 );
 
 export const userRelations = relations(user, ({ many }) => ({
   accounts: many(account),
   memberships: many(chatMember),
   contacts: many(contact),
-  contactsOf: many(contact)
+  contactsOf: many(contact),
+  messages: many(message),
+  reactions: many(reaction),
 }));
 
 export const accountRelations = relations(account, ({ one }) => ({
