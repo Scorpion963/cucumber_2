@@ -6,6 +6,8 @@ import { relations, sql } from "drizzle-orm";
 import { pgTable, text, timestamp, boolean, uuid, index, } from "drizzle-orm/pg-core";
 import { chatMember } from "./chatMember";
 import { contact } from "./contact";
+import { message } from "./message/message";
+import { reaction } from "./message/reaction";
 export var user = pgTable("user", {
     id: uuid("id")
         .default(sql(templateObject_1 || (templateObject_1 = __makeTemplateObject(["pg_catalog.gen_random_uuid()"], ["pg_catalog.gen_random_uuid()"]))))
@@ -60,7 +62,9 @@ export var userRelations = relations(user, function (_a) {
         accounts: many(account),
         memberships: many(chatMember),
         contacts: many(contact),
-        contactsOf: many(contact)
+        contactsOf: many(contact),
+        messages: many(message),
+        reactions: many(reaction),
     });
 });
 export var accountRelations = relations(account, function (_a) {

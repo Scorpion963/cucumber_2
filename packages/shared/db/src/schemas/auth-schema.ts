@@ -9,7 +9,8 @@ import {
 } from "drizzle-orm/pg-core";
 import { chatMember } from "./chatMember";
 import { contact } from "./contact";
-import { message, reaction } from "./message";
+import { message } from "./message/message";
+import { reaction } from "./message/reaction";
 
 export const user = pgTable("user", {
   id: uuid("id")

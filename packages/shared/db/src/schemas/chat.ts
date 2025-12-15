@@ -9,7 +9,7 @@ import {
 } from "drizzle-orm/pg-core";
 import { chatMember } from "./chatMember";
 import { createdAt, updatedAt } from "../schemaUtils";
-import { message } from "./message";
+import { message } from "./message/message";
 
 export const CHAT_TYPES = ["private", "group"] as const;
 export type ChatType = (typeof CHAT_TYPES)[number];

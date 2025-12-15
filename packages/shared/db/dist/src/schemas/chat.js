@@ -2,6 +2,7 @@ import { relations } from "drizzle-orm";
 import { pgEnum, pgTable, text, uuid, varchar, } from "drizzle-orm/pg-core";
 import { chatMember } from "./chatMember";
 import { createdAt, updatedAt } from "../schemaUtils";
+import { message } from "./message/message";
 export var CHAT_TYPES = ["private", "group"];
 export var ChatTypeEnum = pgEnum("chat_type", CHAT_TYPES);
 export var chats = pgTable("chats", {
@@ -16,5 +17,6 @@ export var chatRelations = relations(chats, function (_a) {
     var many = _a.many;
     return ({
         chatMember: many(chatMember),
+        messages: many(message),
     });
 });

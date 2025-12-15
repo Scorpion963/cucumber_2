@@ -466,6 +466,8 @@ export declare const userRelations: import("drizzle-orm").Relations<"user", {
     memberships: import("drizzle-orm").Many<"chat_member">;
     contacts: import("drizzle-orm").Many<"contacts">;
     contactsOf: import("drizzle-orm").Many<"contacts">;
+    messages: import("drizzle-orm").Many<"messages">;
+    reactions: import("drizzle-orm").Many<"reactions">;
 }>;
 export declare const accountRelations: import("drizzle-orm").Relations<"account", {
     user: import("drizzle-orm").One<"user", true>;

@@ -1,13 +1,10 @@
-export declare const CHAT_TYPES: readonly ["private", "group"];
-export type ChatType = (typeof CHAT_TYPES)[number];
-export declare const ChatTypeEnum: import("drizzle-orm/pg-core").PgEnum<["private", "group"]>;
-export declare const chats: import("drizzle-orm/pg-core").PgTableWithColumns<{
-    name: "chats";
+export declare const message: import("drizzle-orm/pg-core").PgTableWithColumns<{
+    name: "messages";
     schema: undefined;
     columns: {
         id: import("drizzle-orm/pg-core").PgColumn<{
             name: "id";
-            tableName: "chats";
+            tableName: "messages";
             dataType: "string";
             columnType: "PgUUID";
             data: string;
@@ -22,28 +19,28 @@ export declare const chats: import("drizzle-orm/pg-core").PgTableWithColumns<{
             identity: undefined;
             generated: undefined;
         }, {}, {}>;
-        type: import("drizzle-orm/pg-core").PgColumn<{
-            name: "type";
-            tableName: "chats";
+        chatId: import("drizzle-orm/pg-core").PgColumn<{
+            name: "chat_id";
+            tableName: "messages";
             dataType: "string";
-            columnType: "PgEnumColumn";
-            data: "private" | "group";
+            columnType: "PgUUID";
+            data: string;
             driverParam: string;
             notNull: true;
             hasDefault: false;
             isPrimaryKey: false;
             isAutoincrement: false;
             hasRuntimeDefault: false;
-            enumValues: ["private", "group"];
+            enumValues: undefined;
             baseColumn: never;
             identity: undefined;
             generated: undefined;
         }, {}, {}>;
-        name: import("drizzle-orm/pg-core").PgColumn<{
-            name: "name";
-            tableName: "chats";
+        senderId: import("drizzle-orm/pg-core").PgColumn<{
+            name: "sender_id";
+            tableName: "messages";
             dataType: "string";
-            columnType: "PgVarchar";
+            columnType: "PgUUID";
             data: string;
             driverParam: string;
             notNull: false;
@@ -51,16 +48,48 @@ export declare const chats: import("drizzle-orm/pg-core").PgTableWithColumns<{
             isPrimaryKey: false;
             isAutoincrement: false;
             hasRuntimeDefault: false;
-            enumValues: [string, ...string[]];
+            enumValues: undefined;
             baseColumn: never;
             identity: undefined;
             generated: undefined;
-        }, {}, {
-            length: 100;
-        }>;
-        imageUrl: import("drizzle-orm/pg-core").PgColumn<{
-            name: "image_url";
-            tableName: "chats";
+        }, {}, {}>;
+        replyToMessageId: import("drizzle-orm/pg-core").PgColumn<{
+            name: "reply_to_message_id";
+            tableName: "messages";
+            dataType: "string";
+            columnType: "PgUUID";
+            data: string;
+            driverParam: string;
+            notNull: false;
+            hasDefault: false;
+            isPrimaryKey: false;
+            isAutoincrement: false;
+            hasRuntimeDefault: false;
+            enumValues: undefined;
+            baseColumn: never;
+            identity: undefined;
+            generated: undefined;
+        }, {}, {}>;
+        forwardedFromMessageId: import("drizzle-orm/pg-core").PgColumn<{
+            name: "forwarded_from_message_id";
+            tableName: "messages";
+            dataType: "string";
+            columnType: "PgUUID";
+            data: string;
+            driverParam: string;
+            notNull: false;
+            hasDefault: false;
+            isPrimaryKey: false;
+            isAutoincrement: false;
+            hasRuntimeDefault: false;
+            enumValues: undefined;
+            baseColumn: never;
+            identity: undefined;
+            generated: undefined;
+        }, {}, {}>;
+        text: import("drizzle-orm/pg-core").PgColumn<{
+            name: "text";
+            tableName: "messages";
             dataType: "string";
             columnType: "PgText";
             data: string;
@@ -77,7 +106,7 @@ export declare const chats: import("drizzle-orm/pg-core").PgTableWithColumns<{
         }, {}, {}>;
         createdAt: import("drizzle-orm/pg-core").PgColumn<{
             name: "createdAt";
-            tableName: "chats";
+            tableName: "messages";
             dataType: "date";
             columnType: "PgTimestamp";
             data: Date;
@@ -94,7 +123,7 @@ export declare const chats: import("drizzle-orm/pg-core").PgTableWithColumns<{
         }, {}, {}>;
         updatedAt: import("drizzle-orm/pg-core").PgColumn<{
             name: "updatedAt";
-            tableName: "chats";
+            tableName: "messages";
             dataType: "date";
             columnType: "PgTimestamp";
             data: Date;
@@ -112,7 +141,13 @@ export declare const chats: import("drizzle-orm/pg-core").PgTableWithColumns<{
     };
     dialect: "pg";
 }>;
-export declare const chatRelations: import("drizzle-orm").Relations<"chats", {
-    chatMember: import("drizzle-orm").Many<"chat_member">;
-    messages: import("drizzle-orm").Many<"messages">;
+export declare const messageRelations: import("drizzle-orm").Relations<"messages", {
+    attachments: import("drizzle-orm").Many<"message_media">;
+    chat: import("drizzle-orm").One<"chats", true>;
+    sender: import("drizzle-orm").One<"user", false>;
+    replies: import("drizzle-orm").Many<"messages">;
+    replyTo: import("drizzle-orm").One<"messages", false>;
+    forwardedFrom: import("drizzle-orm").One<"messages", false>;
+    forwards: import("drizzle-orm").Many<"messages">;
+    reactions: import("drizzle-orm").Many<"reactions">;
 }>;
