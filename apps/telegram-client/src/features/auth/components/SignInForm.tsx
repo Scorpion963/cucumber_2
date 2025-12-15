@@ -2,7 +2,6 @@
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -12,7 +11,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import z from "zod";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import {
@@ -20,7 +19,8 @@ import {
   FieldGroup,
   FieldSeparator,
 } from "@/components/ui/field";
-import { FaApple, FaGithub, FaGoogle } from "react-icons/fa";
+import { FaGithub, FaGoogle } from "react-icons/fa";
+import { authClient } from "@/lib/auth-client";
 
 const signInFormSchema = z.object({
   email: z.email(),
@@ -57,7 +57,7 @@ export default function SignInForm() {
                     control={form.control}
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Username</FormLabel>
+                        <FormLabel>Email</FormLabel>
                         <FormControl>
                           <Input placeholder="m@example.com" {...field} />
                         </FormControl>
@@ -78,27 +78,22 @@ export default function SignInForm() {
                         </div>
 
                         <FormControl>
-                          <Input placeholder="" {...field} />
+                          <Input type="password" placeholder="" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
                 </div>
-                <Button className="w-full">Login</Button>
+                <Button className="w-full cursor-pointer">Login</Button>
                 <FieldSeparator className="*:data-[slot=field-separator-content]:bg-card">
                   Or continue with
                 </FieldSeparator>
-                <div className="grid grid-cols-3 gap-4">
+                <div className="grid grid-cols-2 gap-4">
                   <Button
-                    type="button"
-                    variant={"outline"}
-                    className="w-auto cursor-pointer"
-                  >
-                    <FaApple />
-                    <p className="sr-only">Sign in with Apple</p>
-                  </Button>
-                  <Button
+                    onClick={async () =>
+                      await authClient.signIn.social({ provider: "google" })
+                    }
                     type="button"
                     variant={"outline"}
                     className="w-auto cursor-pointer"
@@ -107,6 +102,9 @@ export default function SignInForm() {
                     <p className="sr-only">Sign in with Google</p>
                   </Button>
                   <Button
+                    onClick={async () =>
+                      await authClient.signIn.social({ provider: "github" })
+                    }
                     type="button"
                     variant={"outline"}
                     className="w-auto cursor-pointer"

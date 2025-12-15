@@ -1,4 +1,4 @@
-import SignInForm from "./components/SignInForm";
+import SignInForm from "@/features/auth/components/SignInForm";
 
 export default async function Page() {
   return (
