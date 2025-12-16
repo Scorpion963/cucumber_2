@@ -1,6 +1,3 @@
-import { Avatar } from "@/components/ui/avatar";
-import { Input } from "@/components/ui/input";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import ChatHeader from "./components/ChatHeader";
 import ChatContent from "./components/ChatContent";
 import ChatInput from "./components/ChatInput";

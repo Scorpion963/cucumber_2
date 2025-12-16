@@ -11,20 +11,24 @@ import { io } from "socket.io-client";
 
 export default async function Home() {
   return (
-    <div className="w-full h-screen ">
-      <ResizablePanelGroup
-        direction="horizontal"
-        className="min-h-[200px]  rounded-lg border w-full"
-      >
-        <ResizablePanel minSize={15} maxSize={30} defaultSize={20}>
-          <Sidebar />
-        </ResizablePanel>
-        <ResizableHandle />
-        <ResizablePanel defaultSize={80}>
-          <Chat />
-        </ResizablePanel>
-      </ResizablePanelGroup>
+    <div className="w-full h-screen">
+      <div className="hidden lg:block w-full h-full">
+        <ResizablePanelGroup
+          direction="horizontal"
+          className="min-h-[200px]  rounded-lg border w-full "
+        >
+          <ResizablePanel minSize={15} maxSize={30} defaultSize={20}>
+            <Sidebar />
+          </ResizablePanel>
+          <ResizableHandle />
+          <ResizablePanel defaultSize={80}>
+            <Chat />
+          </ResizablePanel>
+        </ResizablePanelGroup>
+      </div>
+      <div className="block lg:hidden">
+        <Sidebar />
+      </div>
     </div>
   );
 }
-
