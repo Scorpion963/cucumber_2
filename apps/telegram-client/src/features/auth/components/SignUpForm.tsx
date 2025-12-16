@@ -7,9 +7,9 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { useForm } from "react-hook-form";
+import { FieldValues, useForm, UseFormReturn } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import z from "zod";
+import z, { keyof } from "zod";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import Link from "next/link";
@@ -19,25 +19,32 @@ import {
   FieldGroup,
   FieldSeparator,
 } from "@/components/ui/field";
-import { FaGithub, FaGoogle } from "react-icons/fa";
 import { authClient } from "@/lib/auth-client";
+import { useRouter } from "next/navigation";
+import GoogleButton from "./shared/GoogleButton";
+import GithubButton from "./shared/GithubButton";
+import { handleFieldErrors } from "../utils/handleFieldErrors";
+import { handleSocialSignIn } from "../utils/handleSocialSignIn";
+
+// TO DO: add auth errors handling
 
 const signUpFormSchema = z
   .object({
     email: z.email(),
-    password: z.string().min(6),
-    passwordCheck: z.string().min(6),
+    name: z.string().trim().min(1),
+    password: z.string().trim().min(9),
+    passwordCheck: z.string().trim().min(9),
   })
   .superRefine((val, ctx) => {
     if (val.password.trim() !== val.passwordCheck.trim()) {
       ctx.addIssue({
-        code: 'custom',
+        code: "custom",
         message: "Passwords must match!",
         path: ["password"],
       });
 
       ctx.addIssue({
-        code: 'custom',
+        code: "custom",
         message: "Passwords must match!",
         path: ["passwordCheck"],
       });
@@ -45,16 +52,30 @@ const signUpFormSchema = z
   });
 
 export default function SignUpForm() {
+  const router = useRouter();
   const form = useForm<z.infer<typeof signUpFormSchema>>({
     resolver: zodResolver(signUpFormSchema),
     defaultValues: {
       email: "",
       password: "",
       passwordCheck: "",
+      name: "",
     },
   });
-
-  function onSubmit() {}
+  async function onSubmit(formData: z.infer<typeof signUpFormSchema>) {
+    const { data, error } = await authClient.signUp.email(
+      {
+        email: formData.email,
+        password: formData.password,
+        callbackURL: "/",
+        name: formData.name,
+      },
+      { onError: (ctx) => console.log(ctx.error) }
+    );
+    if (error?.code && error?.message) {
+      handleFieldErrors({ code: error.code, message: error.message }, form);
+    } else router.replace("/");
+  }
 
   return (
     <div className="w-[400px]">
@@ -70,6 +91,21 @@ export default function SignUpForm() {
                   </p>
                 </div>
                 <div className="flex flex-col gap-4">
+
+                  <FormField
+                    name="name"
+                    control={form.control}
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Name</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Elvis Presley" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
                   <FormField
                     name="email"
                     control={form.control}
@@ -83,6 +119,7 @@ export default function SignUpForm() {
                       </FormItem>
                     )}
                   />
+
                   <FormField
                     name="password"
                     control={form.control}
@@ -116,37 +153,22 @@ export default function SignUpForm() {
                     )}
                   />
                 </div>
-                <Button className="w-full cursor-pointer">Login</Button>
+                {form.formState.errors.root && <p className="text-destructive text-sm text-center">{form.formState.errors.root.message}</p>}
+
+                <Button className="w-full cursor-pointer">Sign up</Button>
+
                 <FieldSeparator className="*:data-[slot=field-separator-content]:bg-card">
                   Or continue with
                 </FieldSeparator>
+
                 <div className="grid grid-cols-2 gap-4">
-                  <Button
-                    onClick={async () =>
-                      await authClient.signIn.social({ provider: "google" })
-                    }
-                    type="button"
-                    variant={"outline"}
-                    className="w-auto cursor-pointer"
-                  >
-                    <FaGoogle />
-                    <p className="sr-only">Sign in with Google</p>
-                  </Button>
-                  <Button
-                    onClick={async () =>
-                      await authClient.signIn.social({ provider: "github" })
-                    }
-                    type="button"
-                    variant={"outline"}
-                    className="w-auto cursor-pointer"
-                  >
-                    <FaGithub />
-                    <p className="sr-only">Sign in with Github</p>
-                  </Button>
+                  <GoogleButton onClick={() => handleSocialSignIn("google", form)} />
+                  <GithubButton onClick={() => handleSocialSignIn("github", form)} />
                 </div>
+
                 <FieldDescription className="text-center">
-                  Don&apos;t have an account?{" "}
-                  <Link href={"/sign-up"}>Sign up</Link>
+                  Already have an account?{" "}
+                  <Link href={"/sign-in"}>Sign in</Link>
                 </FieldDescription>
               </FieldGroup>
             </form>

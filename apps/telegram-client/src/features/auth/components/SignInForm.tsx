@@ -21,13 +21,21 @@ import {
 } from "@/components/ui/field";
 import { FaGithub, FaGoogle } from "react-icons/fa";
 import { authClient } from "@/lib/auth-client";
+import GoogleButton from "./shared/GoogleButton";
+import GithubButton from "./shared/GithubButton";
+import { handleFieldErrors } from "../utils/handleFieldErrors";
+import { useRouter } from "next/navigation";
+import { handleSocialSignIn } from "../utils/handleSocialSignIn";
 
 const signInFormSchema = z.object({
   email: z.email(),
   password: z.string().min(6),
 });
 
+// TO DO: add auth errors handling
+
 export default function SignInForm() {
+  const router = useRouter();
   const form = useForm<z.infer<typeof signInFormSchema>>({
     resolver: zodResolver(signInFormSchema),
     defaultValues: {
@@ -36,7 +44,19 @@ export default function SignInForm() {
     },
   });
 
-  function onSubmit() {}
+  async function onSubmit(formData: z.infer<typeof signInFormSchema>) {
+    const { data, error } = await authClient.signIn.email(
+      {
+        email: formData.email,
+        password: formData.password,
+        callbackURL: "/",
+      },
+      { onError: (ctx) => console.log(ctx.error) }
+    );
+    if (error?.code && error?.message) {
+      handleFieldErrors({ code: error.code, message: error.message }, form);
+    } else router.replace("/");
+  }
 
   return (
     <div className="w-[400px]">
@@ -85,33 +105,22 @@ export default function SignInForm() {
                     )}
                   />
                 </div>
+                {form.formState.errors.root && (
+                  <p className="text-destructive text-sm text-center">
+                    {form.formState.errors.root.message}
+                  </p>
+                )}
                 <Button className="w-full cursor-pointer">Login</Button>
                 <FieldSeparator className="*:data-[slot=field-separator-content]:bg-card">
                   Or continue with
                 </FieldSeparator>
                 <div className="grid grid-cols-2 gap-4">
-                  <Button
-                    onClick={async () =>
-                      await authClient.signIn.social({ provider: "google" })
-                    }
-                    type="button"
-                    variant={"outline"}
-                    className="w-auto cursor-pointer"
-                  >
-                    <FaGoogle />
-                    <p className="sr-only">Sign in with Google</p>
-                  </Button>
-                  <Button
-                    onClick={async () =>
-                      await authClient.signIn.social({ provider: "github" })
-                    }
-                    type="button"
-                    variant={"outline"}
-                    className="w-auto cursor-pointer"
-                  >
-                    <FaGithub />
-                    <p className="sr-only">Sign in with Github</p>
-                  </Button>
+                  <GoogleButton
+                    onClick={() => handleSocialSignIn("google", form)}
+                  />
+                  <GithubButton
+                    onClick={() => handleSocialSignIn("github", form)}
+                  />
                 </div>
                 <FieldDescription className="text-center">
                   Don&apos;t have an account?{" "}
