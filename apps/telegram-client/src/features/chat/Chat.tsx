@@ -1,27 +1,22 @@
-import { Avatar } from "@/components/ui/avatar"
+import { Avatar } from "@/components/ui/avatar";
+import { Input } from "@/components/ui/input";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import ChatHeader from "./components/ChatHeader";
+import ChatContent from "./components/ChatContent";
+import ChatInput from "./components/ChatInput";
 
 export default function Chat() {
-    return <div>
-        <ChatHeader />
-        <ChatContent />
-        <ChatInput />
+  return (
+    <div className="w-full h-full">
+      <ChatHeader />
+      <ChatContent />
+      <ChatInput />
     </div>
+  );
 }
 
-function ChatHeader() {
-    return <div className="w-full flex gap-2 px-4  items-center py-1 border-b">
-        <div className="size-9 rounded-full bg-white"></div>
-        <div className="">
-            <div className="text-ellipsis">Egor</div>
-            <div className="text-sm text-muted-foreground text-ellipsis">last seen 39 minutes ago</div>
-        </div>
-    </div>
-}
 
-function ChatContent() {
-    return <div></div>
-}
 
-function ChatInput() {
-    return <div></div>
-}
+
+
+
