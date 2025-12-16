@@ -7,9 +7,9 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { FieldValues, useForm, UseFormReturn } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import z, { keyof } from "zod";
+import z from "zod";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import Link from "next/link";
@@ -26,7 +26,6 @@ import GithubButton from "./shared/GithubButton";
 import { handleFieldErrors } from "../utils/handleFieldErrors";
 import { handleSocialSignIn } from "../utils/handleSocialSignIn";
 
-// TO DO: add auth errors handling
 
 const signUpFormSchema = z
   .object({

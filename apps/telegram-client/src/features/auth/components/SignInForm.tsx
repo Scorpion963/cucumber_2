@@ -19,7 +19,6 @@ import {
   FieldGroup,
   FieldSeparator,
 } from "@/components/ui/field";
-import { FaGithub, FaGoogle } from "react-icons/fa";
 import { authClient } from "@/lib/auth-client";
 import GoogleButton from "./shared/GoogleButton";
 import GithubButton from "./shared/GithubButton";
@@ -32,7 +31,6 @@ const signInFormSchema = z.object({
   password: z.string().min(6),
 });
 
-// TO DO: add auth errors handling
 
 export default function SignInForm() {
   const router = useRouter();
