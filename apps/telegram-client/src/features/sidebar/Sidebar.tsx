@@ -10,7 +10,7 @@ export default function Sidebar() {
         <IoIosSearch size={20} className="absolute left-3" />
         <Input className="rounded-full pl-10" />
       </div>
-      <ScrollArea className="h-full w-full">
+      <ScrollArea className="h-full w-full overflow-hidden">
         <Contact />
         <Contact />
         <Contact />
