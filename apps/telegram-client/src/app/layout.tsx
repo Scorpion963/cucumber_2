@@ -1,7 +1,12 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { UserStoreProvider } from "@/providers/user-store-provider";
+import {
+  ResizableHandle,
+  ResizablePanel,
+  ResizablePanelGroup,
+} from "@/components/ui/resizable";
+import Sidebar from "@/features/sidebar/Sidebar";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -28,7 +33,24 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased dark`}
       >
-        <UserStoreProvider>{children}</UserStoreProvider>
+        {" "}
+        <div className="w-full h-screen">
+          <div className="hidden lg:block w-full h-full">
+            <ResizablePanelGroup
+              direction="horizontal"
+              className="rounded-lg border w-full "
+            >
+              <ResizablePanel minSize={15} maxSize={30} defaultSize={20}>
+                <Sidebar />
+              </ResizablePanel>
+              <ResizableHandle />
+              <ResizablePanel defaultSize={80}>{children}</ResizablePanel>
+            </ResizablePanelGroup>
+          </div>
+          <div className="block lg:hidden">
+            <Sidebar />
+          </div>
+        </div>
       </body>
     </html>
   );

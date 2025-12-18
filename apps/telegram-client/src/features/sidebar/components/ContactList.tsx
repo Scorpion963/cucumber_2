@@ -1,17 +1,22 @@
 "use client";
 
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { useUserStore } from "@/providers/user-store-provider";
 import Contact from "./Contact";
+import { useSearchStore } from "../providers/search-store-provider";
 
 export default function ContactList() {
-  const { users } = useUserStore((state) => state);
+  const { usersFound, searchValue } = useSearchStore((state) => state);
 
-  console.log("Users: ", users);
+  if (usersFound.length === 0 && searchValue.trim().length !== 0)
+    return (
+      <div className="flex items-center justify-center w-full h-full">
+        <p>User not found</p>
+      </div>
+    );
 
   return (
     <ScrollArea className="h-full w-full overflow-hidden">
-      {users.map((user) => (
+      {usersFound.map((user) => (
         <Contact key={user.id} name={user.name}></Contact>
       ))}
     </ScrollArea>
