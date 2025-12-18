@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-export default function Contact() {
+export default function Contact({name}: {name: string}) {
   return (
     <Link
       href={"/"}
@@ -9,7 +9,7 @@ export default function Contact() {
       <div className="flex items-center gap-2 flex-initial overflow-hidden">
         <div className="size-10 flex-none rounded-full bg-gray-500"></div>
         <div className="min-w-0">
-          <div className="font-semibold text-sm">Name</div>
+          <div className="font-semibold text-sm">{name}</div>
           <div className="text-sm text-muted-foreground truncate w-full max-w-[500px] inline-block whitespace-nowrap overflow-hidden">
             This is my last message This is my last message This is my last
             message This is my last message

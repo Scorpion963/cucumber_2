@@ -9,7 +9,10 @@ export async function GET(request: NextRequest) {
   const session = await auth.api.getSession({ headers: await headers() });
   console.log(session);
   if (session === null)
-    return NextResponse.json({ message: "You must be logged in to search users!" }, { status: 401 });
+    return NextResponse.json(
+      { message: "You must be logged in to search users!" },
+      { status: 401 }
+    );
 
   const params = request.nextUrl.searchParams;
   const { data, success } = z.string().safeParse(params.get("query"));
@@ -17,12 +20,10 @@ export async function GET(request: NextRequest) {
   if (!success)
     return NextResponse.json({ message: "Invalid Request" }, { status: 400 });
 
-  const chats = await findUserDB(data)
-
-  return NextResponse.json({ data: chats }, { status: 200 });
+  const users = await findUserDB(data);
+  return NextResponse.json({ data: users }, { status: 200 });
 }
 
-
 async function findUserDB(username: string) {
-    return db.query.user.findMany({where: ilike(user.name, `%${username}%`)})
+  return db.query.user.findMany({ where: ilike(user.name, `%${username}%`) });
 }
