@@ -25,6 +25,7 @@ export const user = pgTable("user", {
     .defaultNow()
     .$onUpdate(() => /* @__PURE__ */ new Date())
     .notNull(),
+  username: text("username").notNull().unique(),
 });
 
 export const account = pgTable(
@@ -74,8 +75,8 @@ export const verification = pgTable(
 export const userRelations = relations(user, ({ many }) => ({
   accounts: many(account),
   memberships: many(chatMember),
-  contacts: many(contact),
-  contactsOf: many(contact),
+  contacts: many(contact, {relationName: "owners"}),
+  contactsOf: many(contact, {relationName: "contacts"}),
   messages: many(message),
   reactions: many(reaction),
 }));

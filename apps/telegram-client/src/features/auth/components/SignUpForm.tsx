@@ -25,6 +25,7 @@ import GoogleButton from "./shared/GoogleButton";
 import GithubButton from "./shared/GithubButton";
 import { handleFieldErrors } from "../utils/handleFieldErrors";
 import { handleSocialSignIn } from "../utils/handleSocialSignIn";
+import { auth } from "@/lib/auth";
 
 
 const signUpFormSchema = z
@@ -33,6 +34,7 @@ const signUpFormSchema = z
     name: z.string().trim().min(1),
     password: z.string().trim().min(9),
     passwordCheck: z.string().trim().min(9),
+    username: z.string().trim()
   })
   .superRefine((val, ctx) => {
     if (val.password.trim() !== val.passwordCheck.trim()) {
@@ -50,6 +52,7 @@ const signUpFormSchema = z
     }
   });
 
+
 export default function SignUpForm() {
   const router = useRouter();
   const form = useForm<z.infer<typeof signUpFormSchema>>({
@@ -59,8 +62,10 @@ export default function SignUpForm() {
       password: "",
       passwordCheck: "",
       name: "",
+      username: "",
     },
   });
+
   async function onSubmit(formData: z.infer<typeof signUpFormSchema>) {
     const { data, error } = await authClient.signUp.email(
       {
@@ -68,6 +73,7 @@ export default function SignUpForm() {
         password: formData.password,
         callbackURL: "/",
         name: formData.name,
+        username: formData.username
       },
       { onError: (ctx) => console.log(ctx.error) }
     );
@@ -99,6 +105,20 @@ export default function SignUpForm() {
                         <FormLabel>Name</FormLabel>
                         <FormControl>
                           <Input placeholder="Elvis Presley" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    name="username"
+                    control={form.control}
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Username</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Elvis123" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>

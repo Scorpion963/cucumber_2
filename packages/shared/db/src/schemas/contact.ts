@@ -25,10 +25,12 @@ export const contactRelations = relations(contact, ({ one }) => ({
   owner: one(user, {
     fields: [contact.ownerId],
     references: [user.id],
+    relationName: "owners"
   }),
 
   contact: one(user, {
     fields: [contact.contactId],
     references: [user.id],
+    relationName: "contacts"
   }),
 }));

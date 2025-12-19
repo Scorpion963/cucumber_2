@@ -2,7 +2,7 @@
 
 import Search from "@/components/Search";
 import useDebouncedValue from "@/hooks/useDebouncedValue";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useSearchStore } from "../providers/search-store-provider";
 
 // TODO: handle errors
@@ -33,8 +33,8 @@ export default function SearchContacts() {
 
         const data = await res.json();
         setUsers(data.data);
-      } catch {
-        console.log("Error Happened");
+      } catch (error) {
+        console.log("Error Happened: ", error);
       }
     }
 

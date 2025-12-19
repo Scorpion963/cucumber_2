@@ -21,6 +21,7 @@ export var user = pgTable("user", {
         .defaultNow()
         .$onUpdate(function () { /* @__PURE__ */ return new Date(); })
         .notNull(),
+    username: text("username").notNull().unique(),
 });
 export var account = pgTable("account", {
     id: uuid("id")
@@ -61,8 +62,8 @@ export var userRelations = relations(user, function (_a) {
     return ({
         accounts: many(account),
         memberships: many(chatMember),
-        contacts: many(contact),
-        contactsOf: many(contact),
+        contacts: many(contact, { relationName: "owners" }),
+        contactsOf: many(contact, { relationName: "contacts" }),
         messages: many(message),
         reactions: many(reaction),
     });
