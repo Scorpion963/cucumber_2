@@ -27,14 +27,13 @@ import { handleFieldErrors } from "../utils/handleFieldErrors";
 import { handleSocialSignIn } from "../utils/handleSocialSignIn";
 import { auth } from "@/lib/auth";
 
-
 const signUpFormSchema = z
   .object({
     email: z.email(),
     name: z.string().trim().min(1),
     password: z.string().trim().min(9),
     passwordCheck: z.string().trim().min(9),
-    username: z.string().trim()
+    username: z.string().trim(),
   })
   .superRefine((val, ctx) => {
     if (val.password.trim() !== val.passwordCheck.trim()) {
@@ -52,6 +51,7 @@ const signUpFormSchema = z
     }
   });
 
+// TODO: Handle username already exists in db
 
 export default function SignUpForm() {
   const router = useRouter();
@@ -73,11 +73,12 @@ export default function SignUpForm() {
         password: formData.password,
         callbackURL: "/",
         name: formData.name,
-        username: formData.username
+        username: formData.username,
       },
       { onError: (ctx) => console.log(ctx.error) }
     );
     if (error?.code && error?.message) {
+      console.log("status text: ")
       handleFieldErrors({ code: error.code, message: error.message }, form);
     } else router.replace("/");
   }
@@ -96,7 +97,6 @@ export default function SignUpForm() {
                   </p>
                 </div>
                 <div className="flex flex-col gap-4">
-
                   <FormField
                     name="name"
                     control={form.control}
@@ -172,7 +172,11 @@ export default function SignUpForm() {
                     )}
                   />
                 </div>
-                {form.formState.errors.root && <p className="text-destructive text-sm text-center">{form.formState.errors.root.message}</p>}
+                {form.formState.errors.root && (
+                  <p className="text-destructive text-sm text-center">
+                    {form.formState.errors.root.message}
+                  </p>
+                )}
 
                 <Button className="w-full cursor-pointer">Sign up</Button>
 
@@ -181,8 +185,12 @@ export default function SignUpForm() {
                 </FieldSeparator>
 
                 <div className="grid grid-cols-2 gap-4">
-                  <GoogleButton onClick={() => handleSocialSignIn("google", form)} />
-                  <GithubButton onClick={() => handleSocialSignIn("github", form)} />
+                  <GoogleButton
+                    onClick={() => handleSocialSignIn("google", form)}
+                  />
+                  <GithubButton
+                    onClick={() => handleSocialSignIn("github", form)}
+                  />
                 </div>
 
                 <FieldDescription className="text-center">
