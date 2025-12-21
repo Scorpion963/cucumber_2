@@ -34,23 +34,23 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased dark`}
       >
         {" "}
-        <div className="w-full h-screen">
-          <div className="hidden lg:block w-full h-full">
-            <ResizablePanelGroup
-              direction="horizontal"
-              className="rounded-lg border w-full "
-            >
-              <ResizablePanel minSize={15} maxSize={30} defaultSize={20}>
-                <Sidebar />
-              </ResizablePanel>
-              <ResizableHandle />
-              <ResizablePanel defaultSize={80}>{children}</ResizablePanel>
-            </ResizablePanelGroup>
+          <div className="w-full h-screen">
+            <div className="hidden lg:block w-full h-full">
+              <ResizablePanelGroup
+                direction="horizontal"
+                className="rounded-lg border w-full "
+              >
+                <ResizablePanel minSize={15} maxSize={30} defaultSize={20}>
+                  <Sidebar />
+                </ResizablePanel>
+                <ResizableHandle />
+                <ResizablePanel defaultSize={80}>{children}</ResizablePanel>
+              </ResizablePanelGroup>
+            </div>
+            <div className="block lg:hidden">
+              <Sidebar />
+            </div>
           </div>
-          <div className="block lg:hidden">
-            <Sidebar />
-          </div>
-        </div>
       </body>
     </html>
   );

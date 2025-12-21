@@ -1,10 +1,12 @@
 import Chat from "@/features/chat/Chat";
+import { ChatStoreProvider } from "@/features/chat/providers/chatStoreProvider";
+import { MessageStoreProvider } from "@/features/chat/providers/messageStoreProvider";
 import handleChatFetch from "@/features/chat/server/getChatBasedOnPrefix";
 import { auth } from "@/lib/auth";
+import { db, message } from "db";
+import { eq } from "drizzle-orm";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
-
-// TODO: use usernames instead of ids
 
 export default async function Page({
   params,
@@ -17,5 +19,17 @@ export default async function Page({
 
   if (!chat.canAccess) redirect("/");
 
-  return <Chat />;
+  const messages: (typeof message.$inferSelect)[] = chat.chat
+    ? await db.query.message.findMany({
+        where: eq(message.id, chat.chat.id),
+      })
+    : [];
+
+  return (
+    <ChatStoreProvider value={chat.chat}>
+      <MessageStoreProvider value={messages}>
+        <Chat />
+      </MessageStoreProvider>
+    </ChatStoreProvider>
+  );
 }
