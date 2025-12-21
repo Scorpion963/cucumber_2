@@ -17,7 +17,7 @@ export default function ContactList() {
   return (
     <ScrollArea className="h-full w-full overflow-hidden">
       {usersFound.map((user) => (
-        <Contact id={user.username} key={user.id} name={user.name}></Contact>
+        <Contact imageUrl={user.image} id={user.username} key={user.id} name={user.name}></Contact>
       ))}
     </ScrollArea>
   );
