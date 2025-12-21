@@ -1,9 +1,11 @@
 import { auth } from "@/lib/auth";
 import { db, user } from "db";
-import { ilike } from "drizzle-orm";
+import { ilike, or } from "drizzle-orm";
 import { headers } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 import z from "zod";
+
+// TODO: Add @ query based on if user is looking for usernames
 
 export async function GET(request: NextRequest) {
   const session = await auth.api.getSession({ headers: await headers() });
@@ -25,5 +27,5 @@ export async function GET(request: NextRequest) {
 }
 
 async function findUserDB(username: string) {
-  return db.query.user.findMany({ where: ilike(user.name, `%${username}%`) });
+  return db.query.user.findMany({ where: or(ilike(user.username, `%${username}%`), ilike(user.name, `${username}`)) });
 }

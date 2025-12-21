@@ -32,6 +32,7 @@ export default function SearchContacts() {
         }
 
         const data = await res.json();
+        console.log(data.data)
         setUsers(data.data);
       } catch (error) {
         console.log("Error Happened: ", error);

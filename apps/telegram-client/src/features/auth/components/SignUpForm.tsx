@@ -25,7 +25,6 @@ import GoogleButton from "./shared/GoogleButton";
 import GithubButton from "./shared/GithubButton";
 import { handleFieldErrors } from "../utils/handleFieldErrors";
 import { handleSocialSignIn } from "../utils/handleSocialSignIn";
-import { auth } from "@/lib/auth";
 
 const signUpFormSchema = z
   .object({
@@ -51,7 +50,6 @@ const signUpFormSchema = z
     }
   });
 
-// TODO: Handle username already exists in db
 
 export default function SignUpForm() {
   const router = useRouter();

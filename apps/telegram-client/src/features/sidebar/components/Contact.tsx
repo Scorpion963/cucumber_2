@@ -1,9 +1,9 @@
 import Link from "next/link";
 
-export default function Contact({name, id}: {name: string, id: string}) {
+export default function Contact({ name, id }: { name: string; id: string }) {
   return (
     <Link
-      href={`/${id}`}
+      href={`/@${id}`}
       className="w-full rounded-lg flex justify-between items-center hover:bg-card/90 p-3 transition-colors duration-300 @container"
     >
       <div className="flex items-center gap-2 flex-initial overflow-hidden">
