@@ -1,9 +1,8 @@
 import z from "zod";
 import getGroupChat from "./db/getGroupChat";
-import getSingleChat from "./db/getSingleChat";
 import { chats } from "db";
-import getUserFromUserName from "./db/getUserFromUserName";
-import getContact from "./db/getContact";
+import { getUserWithContactSingle } from "./db/getUserWithContactDB";
+import getSingleChat from "./db/getSingleChat";
 
 const prefixSchema = z.union([z.literal("@"), z.literal("-")]);
 type PrefixType = z.infer<typeof prefixSchema>;
@@ -37,17 +36,16 @@ export default async function handleChatFetch(
       };
     }
     case "@": {
-      const chatter = await getUserFromUserName(slicedId);
+      const chatter = await getUserWithContactSingle(slicedId, currentUserId);
       if (!chatter) return { canAccess: false, chat: null, chatInfo: null };
       const chat = await getSingleChat(chatter.id, currentUserId);
-      const contact = await getContact(chatter.id, currentUserId);
 
       return {
         canAccess: true,
         chat: chat?.chat ?? null,
         chatInfo: {
-          imageUrl: contact?.imageUrl ?? chatter.image,
-          name: contact?.name ?? chatter.name,
+          imageUrl: chatter.contactsOf[0]?.imageUrl ?? chatter.image,
+          name: chatter.contactsOf[0]?.name ?? chatter.name,
         },
       };
     }
