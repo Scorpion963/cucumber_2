@@ -18,7 +18,7 @@ export function SidebarRouterProvider({
   children,
   routes,
 }: SidebarRouterProviderProps) {
-    const [state] = useState(() => createSidebarRouterStore({routes: routes ?? []}))
+    const [state] = useState(() => createSidebarRouterStore({routes: routes ?? [], previousRoutes: []}))
 
   return (
     <SidebarRouterContext.Provider value={state}>{children}</SidebarRouterContext.Provider>

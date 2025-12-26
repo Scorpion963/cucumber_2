@@ -3,6 +3,7 @@ import { produce } from "immer";
 
 export type SidebarRouterState = {
   routes: string[];
+  previousRoutes: string[];
 };
 
 export type SidebarRouterActions = {
@@ -14,6 +15,7 @@ export type SidebarRouterStore = SidebarRouterState & SidebarRouterActions;
 
 export const SidebarInitState = {
   routes: [],
+  previousRoutes: [],
 };
 
 export function createSidebarRouterStore(
@@ -28,14 +30,17 @@ export function createSidebarRouterStore(
 
       set(
         produce((state: SidebarRouterState) => {
+          state.previousRoutes = [...state.routes];
           state.routes.pop();
         })
       );
       return last;
     },
+
     push: (route) => {
       set(
         produce((state: SidebarRouterState) => {
+          state.previousRoutes = [...state.routes];
           state.routes.push(route);
         })
       );

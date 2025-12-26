@@ -8,6 +8,8 @@ import {
 } from "@/components/ui/popover";
 import { Menu } from "lucide-react";
 
+// TODO: Fix the popover not dissapearing properly during the exit animation
+
 export default function UserMenu() {
   const {push} = useSidebarRouterStore(state => state)
   return (

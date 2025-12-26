@@ -3,6 +3,7 @@ import SidebarRouter from "@/components/SidebarRouter/SidebarRouter";
 import SearchSidebar from "./components/SearchSidebar/SearchSidebar";
 import UserProfileSidebar from "./components/UserProfileSidebar/UserProfileSidebar";
 import CustomizeUserSidebar from "./components/CustomizeUserSidebar/CustomizeUserSidebar";
+import SidebarAnimationWrapper from "./components/SidebarAnimationWrapper";
 
 const routes = {
   "/main": <SearchSidebar />,
@@ -12,7 +13,7 @@ const routes = {
 
 export default async function Sidebar() {
   return (
-    <SidebarRouterProvider routes={["/customize-user"]}>
+    <SidebarRouterProvider routes={["/main"]}>
       <SidebarRouter routesMap={routes} />
     </SidebarRouterProvider>
   );
