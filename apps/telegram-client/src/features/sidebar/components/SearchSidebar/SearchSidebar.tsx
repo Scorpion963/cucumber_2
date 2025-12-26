@@ -1,8 +1,8 @@
 import { auth } from "@/lib/auth";
-import ContactList from "./components/ContactList";
-import SearchContacts from "./components/SearchContacts";
-import UserMenu from "./components/UserMenu";
-import { SearchStoreProvider } from "./providers/search-store-provider";
+import ContactList from "./ContactList";
+import SearchContacts from "./SearchContacts";
+import UserMenu from "./UserMenu";
+import { SearchStoreProvider } from "../../providers/search-store-provider";
 import { headers } from "next/headers";
 import { chatMember, db } from "db";
 import { eq } from "drizzle-orm";

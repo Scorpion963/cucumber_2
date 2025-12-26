@@ -2,7 +2,7 @@
 
 import { ScrollArea } from "@/components/ui/scroll-area";
 import Contact from "./Contact";
-import { useSearchStore } from "../providers/search-store-provider";
+import { useSearchStore } from "../../providers/search-store-provider";
 
 export default function ContactList() {
   const { usersFound, searchValue } = useSearchStore((state) => state);
@@ -17,7 +17,12 @@ export default function ContactList() {
   return (
     <ScrollArea className="h-full w-full overflow-hidden">
       {usersFound.map((user) => (
-        <Contact imageUrl={user.image} id={user.username} key={user.id} name={user.name}></Contact>
+        <Contact
+          imageUrl={user.image}
+          id={user.username}
+          key={user.id}
+          name={user.name}
+        ></Contact>
       ))}
     </ScrollArea>
   );

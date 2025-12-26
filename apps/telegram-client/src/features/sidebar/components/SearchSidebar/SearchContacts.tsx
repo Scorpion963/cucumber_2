@@ -3,12 +3,13 @@
 import Search from "@/components/Search";
 import useDebouncedValue from "@/hooks/useDebouncedValue";
 import { useEffect } from "react";
-import { useSearchStore } from "../providers/search-store-provider";
+import { useSearchStore } from "../../providers/search-store-provider";
 
 // TODO: handle errors
 
 export default function SearchContacts() {
-  const { setUsers, setErrorMessage, searchValue, setSearchValue } = useSearchStore((state) => state);
+  const { setUsers, setErrorMessage, searchValue, setSearchValue } =
+    useSearchStore((state) => state);
   const debouncedValue = useDebouncedValue(searchValue, 300);
 
   useEffect(() => {
@@ -32,7 +33,7 @@ export default function SearchContacts() {
         }
 
         const data = await res.json();
-        console.log(data.data)
+        console.log(data.data);
         setUsers(data.data);
       } catch (error) {
         console.log("Error Happened: ", error);
@@ -44,5 +45,10 @@ export default function SearchContacts() {
     return () => controller.abort();
   }, [debouncedValue, setUsers, setErrorMessage]);
 
-  return <Search value={searchValue} onChange={(e) => setSearchValue(e.target.value)} />;
+  return (
+    <Search
+      value={searchValue}
+      onChange={(e) => setSearchValue(e.target.value)}
+    />
+  );
 }
