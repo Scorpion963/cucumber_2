@@ -1,16 +1,25 @@
-"use client";
-
-import { useSidebarRouterStore } from "@/components/SidebarRouter/providers/sidebar-routes-provider";
-import { Button } from "@/components/ui/button";
 import CustomizeUserForm from "./CustomizeUserForm";
 import SidebarHeader from "../SidebarHeader";
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
 
-export default function CustomizeUserSidebar() {
-  const { pop } = useSidebarRouterStore((state) => state);
+export default async function CustomizeUserSidebar() {
+  const currentUser = await auth.api.getSession({ headers: await headers() });
+  if (!currentUser) return <>You must be signed in</>;
+
+  console.log("Current user: ", currentUser.user)
+
   return (
     <div className="pr-2">
       <SidebarHeader title="Edit profile" />
-      <CustomizeUserForm defaultFields={{bio: "", firstName: "", lastName: "", username: ""}} />
+      <CustomizeUserForm
+        defaultFields={{
+          bio: currentUser.user.bio ?? "",
+          firstName: currentUser.user.name,
+          lastName: currentUser.user.lastName ?? "",
+          username: currentUser.user.username,
+        }}
+      />
     </div>
   );
 }

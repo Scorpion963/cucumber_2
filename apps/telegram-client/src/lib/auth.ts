@@ -53,6 +53,18 @@ export const auth = betterAuth({
         unique: true,
         defaultValue: () => crypto.randomUUID(),
       },
+      bio: {
+        type: "string",
+        required: false,
+        input: true,
+        unique: false,
+      },
+      lastName: {
+        type: "string",
+        required: false,
+        input: true,
+        unique: false,
+      },
     },
   },
   hooks: {

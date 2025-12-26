@@ -3,7 +3,7 @@ var __makeTemplateObject = (this && this.__makeTemplateObject) || function (cook
     return cooked;
 };
 import { relations, sql } from "drizzle-orm";
-import { pgTable, text, timestamp, boolean, uuid, index, } from "drizzle-orm/pg-core";
+import { pgTable, text, timestamp, boolean, uuid, index, varchar, } from "drizzle-orm/pg-core";
 import { chatMember } from "./chatMember";
 import { contact } from "./contact";
 import { message } from "./message/message";
@@ -22,6 +22,8 @@ export var user = pgTable("user", {
         .$onUpdate(function () { /* @__PURE__ */ return new Date(); })
         .notNull(),
     username: text("username").notNull().unique(),
+    bio: varchar({ length: 100 }),
+    lastName: varchar({ length: 100 })
 });
 export var account = pgTable("account", {
     id: uuid("id")

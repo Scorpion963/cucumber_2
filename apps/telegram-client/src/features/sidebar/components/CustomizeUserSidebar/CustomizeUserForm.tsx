@@ -1,3 +1,4 @@
+"use client";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -7,47 +8,57 @@ import {
   FormLabel,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { cn } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Check, Edit } from "lucide-react";
-import { useEffect } from "react";
-import { useForm, useWatch } from "react-hook-form";
+import { Edit } from "lucide-react";
+import { ReactNode, useState } from "react";
+import { useForm } from "react-hook-form";
 import z from "zod";
+import { customizeUserFormSchema } from "../../schemas/customizeUserSchema";
+import { authClient } from "@/lib/auth-client";
 
-const customizeUserFormSchema = z.object({
-  firstName: z.string().trim().min(1),
-  lastName: z.string().trim().min(1),
-  bio: z.string().trim().min(1),
-  username: z.string().trim(),
-});
+// TODO: Display username taken error
 
 export default function CustomizeUserForm({
   defaultFields,
 }: {
   defaultFields: z.infer<typeof customizeUserFormSchema>;
 }) {
+  const [defaultFieldState, setDefaultFieldState] = useState(defaultFields);
   const form = useForm<z.infer<typeof customizeUserFormSchema>>({
     resolver: zodResolver(customizeUserFormSchema),
     defaultValues: {
-      bio: defaultFields.bio,
-      firstName: defaultFields.firstName,
-      lastName: defaultFields.lastName,
-      username: defaultFields.firstName,
+      bio: defaultFieldState.bio,
+      firstName: defaultFieldState.firstName,
+      lastName: defaultFieldState.lastName,
+      username: defaultFieldState.username,
     },
-  });
-  const formChanged = useWatch({
-    compute: (data: z.infer<typeof customizeUserFormSchema>) => {
-      return JSON.stringify(data) !== JSON.stringify(defaultFields);
-    },
-    control: form.control,
   });
 
-  function onSubmit() {}
+  async function onSubmit(data: z.infer<typeof customizeUserFormSchema>) {
+    const result = await authClient.updateUser({
+      bio: data.bio.trim().length === 0 ? null : data.bio,
+      lastName: data.lastName.trim().length === 0 ? null : data.lastName,
+      name: data.firstName,
+      username: data.username,
+    });
+
+    if (result.data) {
+      form.reset({
+        bio: data.bio,
+        firstName: data.firstName,
+        lastName: data.lastName,
+        username: data.username,
+      });
+      setDefaultFieldState(data);
+    }
+  }
 
   return (
     <Form {...form}>
       <form
         className="relative h-full flex flex-col justify-between"
-        onSubmit={form.handleSubmit(onSubmit)}
+        onSubmit={form.handleSubmit((data) => onSubmit(data))}
       >
         <div>
           <div className="w-full flex items-center justify-center">
@@ -55,7 +66,7 @@ export default function CustomizeUserForm({
               <Edit className="size-16" />
             </div>
           </div>
-          <div className="p-6 space-y-4">
+          <FormSection>
             {" "}
             <FormField
               name="firstName"
@@ -94,11 +105,11 @@ export default function CustomizeUserForm({
               <div>Any details such as age, occupation or city.</div>
               <div>Example 23 y.o. desginer from San Francisco</div>
             </div>
-          </div>
+          </FormSection>
 
           <DarkLineBreak />
 
-          <div className="p-6  text-sm flex flex-col gap-4">
+          <FormSection className="text-sm">
             {" "}
             <FormField
               name="username"
@@ -118,12 +129,27 @@ export default function CustomizeUserForm({
               characters. <br /> This link opens a chat with you: <br />
               https://t.me/dimasik23123
             </p>
-          </div>
+          </FormSection>
         </div>
-        <Button className="m-6">Save</Button>
+
+        <FormSection>
+          <Button disabled={!form.formState.isDirty} className="w-full">
+            Save
+          </Button>
+        </FormSection>
       </form>
     </Form>
   );
+}
+
+function FormSection({
+  children,
+  className,
+}: {
+  children: ReactNode;
+  className?: string;
+}) {
+  return <div className={cn("p-6 space-y-4", className)}>{children}</div>;
 }
 
 function FloatingInput({

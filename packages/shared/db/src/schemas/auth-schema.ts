@@ -6,6 +6,7 @@ import {
   boolean,
   uuid,
   index,
+  varchar,
 } from "drizzle-orm/pg-core";
 import { chatMember } from "./chatMember";
 import { contact } from "./contact";
@@ -26,6 +27,8 @@ export const user = pgTable("user", {
     .$onUpdate(() => /* @__PURE__ */ new Date())
     .notNull(),
   username: text("username").notNull().unique(),
+  bio: varchar({length: 100}),
+  lastName: varchar({length: 100})
 });
 
 export const account = pgTable(
