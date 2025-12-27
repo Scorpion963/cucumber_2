@@ -1,13 +1,10 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import {
-  Form,
-  FormField,
-} from "@/components/ui/form";
+import { Form, FormField } from "@/components/ui/form";
 import { cn } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Edit } from "lucide-react";
-import { ReactNode, useState } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import z from "zod";
 import { customizeUserFormSchema } from "../../schemas/customizeUserSchema";
@@ -15,6 +12,7 @@ import { authClient } from "@/lib/auth-client";
 import FloatingInput from "./FloatingInput";
 import FormSection from "./FormSection";
 import DarkLineBreak from "./DarkLineBreak";
+import { handleFieldErrors } from "@/features/auth/utils/handleFieldErrors";
 
 // TODO: Display username taken error
 
@@ -34,6 +32,8 @@ export default function CustomizeUserForm({
     },
   });
 
+  
+
   async function onSubmit(data: z.infer<typeof customizeUserFormSchema>) {
     const result = await authClient.updateUser({
       bio: data.bio.trim().length === 0 ? null : data.bio,
@@ -41,6 +41,17 @@ export default function CustomizeUserForm({
       name: data.firstName,
       username: data.username,
     });
+
+    console.log("result: ", result)
+
+    if (result.error?.message && result.error.code) {
+      handleFieldErrors(
+        { code: result.error.code, message: result.error.message },
+        form
+      );
+    }
+
+    console.log(form.getFieldState("username"));
 
     if (result.data) {
       form.reset({
@@ -70,10 +81,11 @@ export default function CustomizeUserForm({
             <FormField
               name="firstName"
               control={form.control}
-              render={({ field }) => (
+              render={({ field, fieldState }) => (
                 <>
                   <FloatingInput
                     labelContent="First name (required)"
+                    fieldState={fieldState}
                     {...field}
                   />
                 </>
@@ -82,11 +94,12 @@ export default function CustomizeUserForm({
             <FormField
               name="lastName"
               control={form.control}
-              render={({ field }) => (
+              render={({ field, fieldState }) => (
                 <>
                   <FloatingInput
                     labelContent="Last name (optional)"
                     {...field}
+                    fieldState={fieldState}
                   />
                 </>
               )}
@@ -94,9 +107,9 @@ export default function CustomizeUserForm({
             <FormField
               name="bio"
               control={form.control}
-              render={({ field }) => (
+              render={({ field, fieldState }) => (
                 <>
-                  <FloatingInput labelContent="Bio" {...field} />
+                  <FloatingInput labelContent="Bio" {...field} fieldState={fieldState} />
                 </>
               )}
             />
@@ -113,9 +126,9 @@ export default function CustomizeUserForm({
             <FormField
               name="username"
               control={form.control}
-              render={({ field }) => (
+              render={({ field, fieldState }) => (
                 <>
-                  <FloatingInput labelContent="Username" {...field} />
+                  <FloatingInput labelContent="Username" {...field} fieldState={fieldState} />
                 </>
               )}
             />

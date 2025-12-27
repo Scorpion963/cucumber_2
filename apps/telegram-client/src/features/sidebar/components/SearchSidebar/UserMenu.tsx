@@ -9,7 +9,6 @@ import {
 import { Menu, UserIcon } from "lucide-react";
 import { useState } from "react";
 
-// TODO: Fix the popover not dissapearing properly during the exit animation
 
 export default function UserMenu() {
   const [isModalOpen, setIsModalOpen] = useState(false);

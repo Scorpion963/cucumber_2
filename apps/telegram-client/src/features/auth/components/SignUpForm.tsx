@@ -32,7 +32,7 @@ const signUpFormSchema = z
     name: z.string().trim().min(1),
     password: z.string().trim().min(9),
     passwordCheck: z.string().trim().min(9),
-    username: z.string().trim(),
+    username: z.string().trim().min(5),
   })
   .superRefine((val, ctx) => {
     if (val.password.trim() !== val.passwordCheck.trim()) {

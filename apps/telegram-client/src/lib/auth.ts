@@ -5,6 +5,7 @@ import { db, user } from "db";
 import { createAuthMiddleware } from "better-auth/api";
 import { eq } from "drizzle-orm";
 import { throwAPIError } from "./APIErrorFactory";
+import { headers } from "next/headers";
 
 // TODO: add middleware auth check
 
@@ -51,7 +52,6 @@ export const auth = betterAuth({
         required: true,
         input: true,
         unique: true,
-        defaultValue: () => crypto.randomUUID(),
       },
       bio: {
         type: "string",
@@ -69,30 +69,53 @@ export const auth = betterAuth({
   },
   hooks: {
     before: createAuthMiddleware(async (ctx) => {
-      if (ctx.path !== "/sign-up/email") return;
+      console.log("path: ", ctx.path);
+      console.log("Session: ", ctx.context.session);
 
-      if (ctx.body?.username.trim().length === 0) {
-        console.log("The username is 0");
-        return {
-          context: {
-            ...ctx,
-            body: {
-              ...ctx.body,
-              username: crypto.randomUUID(),
-            },
-          },
-        };
+      if (!(ctx.path === "/sign-up/email" || ctx.path === "/update-user"))
+        return;
+
+      switch (ctx.path) {
+        case "/sign-up/email":
+          if (ctx.body?.username.trim().length === 0) {
+            console.log("The username is 0");
+            return {
+              context: {
+                ...ctx,
+                body: {
+                  ...ctx.body,
+                  username: crypto.randomUUID(),
+                },
+              },
+            };
+          }
+
+          await handleUsernameExistsError(ctx.body?.username?.trim());
+          break;
+
+        case "/update-user":
+          const sessionUsername = await auth.api.getSession({
+            headers: await headers(),
+          });
+          const bodyUsername = ctx.body?.username?.trim();
+
+          if (sessionUsername === bodyUsername) return;
+
+          await handleUsernameExistsError(bodyUsername);
+          break;
       }
-
-      const usernameExists = await db.query.user.findFirst({
-        where: eq(user.username, ctx.body?.username),
-      });
-
-      if (usernameExists)
-        throwAPIError("CONFLICT", {
-          code: "USERNAME_TAKEN",
-          message: "Username taken",
-        });
     }),
   },
 });
+
+async function handleUsernameExistsError(username: string) {
+  const usernameExists = await db.query.user.findFirst({
+    where: eq(user.username, username),
+  });
+
+  if (usernameExists)
+    throwAPIError("CONFLICT", {
+      code: "USERNAME_TAKEN",
+      message: "Username taken",
+    });
+}

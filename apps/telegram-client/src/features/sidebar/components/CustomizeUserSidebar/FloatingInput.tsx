@@ -1,10 +1,12 @@
-import { FormControl, FormItem, FormLabel } from "@/components/ui/form";
+import { FormControl, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { ControllerFieldState } from "react-hook-form";
 
 export default function FloatingInput({
   labelContent,
+  fieldState,
   ...props
-}: React.ComponentProps<"input"> & { labelContent: string }) {
+}: React.ComponentProps<"input"> & { labelContent: string } & {fieldState: ControllerFieldState}) {
   return (
     <FormItem className="relative">
       <FormControl>
@@ -15,7 +17,7 @@ export default function FloatingInput({
         />
       </FormControl>
       <FormLabel className="peer-focus:bottom-9 text-[1rem] bottom-2 transition-all bg-background px-1 peer-focus:text-xs absolute left-4 peer-not-placeholder-shown:bottom-9 peer-not-placeholder-shown:text-xs text-muted-foreground">
-        {labelContent}
+        {!fieldState.invalid ? labelContent : <FormMessage className="text-xs" />}
       </FormLabel>
     </FormItem>
   );
