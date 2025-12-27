@@ -5,11 +5,12 @@ type ContactType = typeof contact.$inferSelect;
 type UserWithContactsOf = UserType & { contactsOf: ContactType[] };
 
 export default function mergeContactInfoWithUser(user: UserWithContactsOf) {
+  const firstContact = user.contactsOf[0];
+
   return {
     ...user,
-    image: user.contactsOf[0].imageUrl
-      ? user.contactsOf[0].imageUrl
-      : user.image,
-    name: user.contactsOf[0].name ? user.contactsOf[0].name : user.name,
+    image: firstContact?.imageUrl ?? user.image,
+    name: firstContact?.name ?? user.name,
   };
 }
+

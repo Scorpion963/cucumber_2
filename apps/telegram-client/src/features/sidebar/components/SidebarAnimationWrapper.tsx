@@ -27,7 +27,7 @@ export default function SidebarAnimationWrapper({
       initial={isBack ? "backInitial" : "forwardInitial"}
       animate={isBack ? "backAnimate" : "forwardAnimate"}
       exit={isBack ? "backExit" : "forwardExit"}
-      transition={{ duration: 0.2, ease: "easeOut" }}
+      transition={{ duration: 0.1, ease: "easeOut" }}
     >
       {children}
     </motion.div>

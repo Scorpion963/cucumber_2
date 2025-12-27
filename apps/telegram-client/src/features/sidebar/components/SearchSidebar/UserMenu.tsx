@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import { useSidebarRouterStore } from "@/components/SidebarRouter/providers/sidebar-routes-provider";
 import { Button } from "@/components/ui/button";
 import {
@@ -6,14 +6,16 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { Menu } from "lucide-react";
+import { Menu, UserIcon } from "lucide-react";
+import { useState } from "react";
 
 // TODO: Fix the popover not dissapearing properly during the exit animation
 
 export default function UserMenu() {
-  const {push} = useSidebarRouterStore(state => state)
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const { push } = useSidebarRouterStore((state) => state);
   return (
-    <Popover>
+    <Popover onOpenChange={(e) => setIsModalOpen(e)} open={isModalOpen}>
       <PopoverTrigger>
         <Menu />
       </PopoverTrigger>
@@ -22,13 +24,16 @@ export default function UserMenu() {
         sideOffset={16}
         className="w-56 flex flex-col p-0"
       >
-        <Button onClick={() => push("/user-profile")} className="rounded-t-lg rounded-b-none cursor-pointer">Hello</Button>
-        <Button className="rounded-none cursor-pointer">Hello</Button>
-        <Button className="rounded-none cursor-pointer">Hello</Button>
-        <Button className="rounded-none cursor-pointer">Hello</Button>
-        <Button className="rounded-none cursor-pointer">Hello</Button>
-        <Button className="rounded-none cursor-pointer">Hello</Button>
-        <Button className="rounded-b-lg rounded-t-none cursor-pointer">Hello</Button>
+        <Button
+          onClick={() => {setIsModalOpen(false);push("/user-profile")}}
+          variant={"ghost"}
+          className="rounded-t-lg rounded-lg cursor-pointer justify-start"
+        >
+          <span>
+            <UserIcon />
+          </span>
+          <span> My Profile</span>
+        </Button>
       </PopoverContent>
     </Popover>
   );

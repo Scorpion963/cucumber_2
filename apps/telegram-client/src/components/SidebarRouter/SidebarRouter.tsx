@@ -16,7 +16,7 @@ export default function SidebarRouter({
   console.log("Current: ", routes)
 
   return (
-    <div className="relative">
+    <div className="relative h-full w-full">
       <AnimatePresence mode="sync">
         <SidebarAnimationWrapper isBack={previousRoutes.length > routes.length} key={activeRoute}>
           {routesMap[activeRoute] ?? <div>Route was not found</div>}

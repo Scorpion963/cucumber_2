@@ -2,12 +2,8 @@
 import { Button } from "@/components/ui/button";
 import {
   Form,
-  FormControl,
   FormField,
-  FormItem,
-  FormLabel,
 } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Edit } from "lucide-react";
@@ -16,6 +12,9 @@ import { useForm } from "react-hook-form";
 import z from "zod";
 import { customizeUserFormSchema } from "../../schemas/customizeUserSchema";
 import { authClient } from "@/lib/auth-client";
+import FloatingInput from "./FloatingInput";
+import FormSection from "./FormSection";
+import DarkLineBreak from "./DarkLineBreak";
 
 // TODO: Display username taken error
 
@@ -140,40 +139,6 @@ export default function CustomizeUserForm({
       </form>
     </Form>
   );
-}
-
-function FormSection({
-  children,
-  className,
-}: {
-  children: ReactNode;
-  className?: string;
-}) {
-  return <div className={cn("p-6 space-y-4", className)}>{children}</div>;
-}
-
-function FloatingInput({
-  labelContent,
-  ...props
-}: React.ComponentProps<"input"> & { labelContent: string }) {
-  return (
-    <FormItem className="relative">
-      <FormControl>
-        <Input
-          placeholder="First Name"
-          className="peer dark:bg-background focus:bg-background placeholder:text-transparent p-5 rounded-lg dark:text-[1rem]"
-          {...props}
-        />
-      </FormControl>
-      <FormLabel className="peer-focus:bottom-9 text-[1rem] bottom-2 transition-all bg-background px-1 peer-focus:text-xs absolute left-4 peer-not-placeholder-shown:bottom-9 peer-not-placeholder-shown:text-xs text-muted-foreground">
-        {labelContent}
-      </FormLabel>
-    </FormItem>
-  );
-}
-
-function DarkLineBreak() {
-  return <div className="w-full h-2 bg-primary-foreground rounded-r-sm"></div>;
 }
 
 // <FormItem className="relative">
