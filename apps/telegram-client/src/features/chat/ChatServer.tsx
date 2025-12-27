@@ -8,6 +8,7 @@ import { ChatStoreProvider } from "./providers/chatStoreProvider";
 import { MessageStoreProvider } from "./providers/messageStoreProvider";
 import { headers } from "next/headers";
 import ChatClient from "./ChatClient";
+import EditContact from "./components/EditContact/EditContact";
 
 export async function ChatServer({ paramsId }: { paramsId: string }) {
   const user = await auth.api.getSession({ headers: await headers() });
