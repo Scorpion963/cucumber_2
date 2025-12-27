@@ -22,7 +22,7 @@ import {
 import { authClient } from "@/lib/auth-client";
 import GoogleButton from "./shared/GoogleButton";
 import GithubButton from "./shared/GithubButton";
-import { handleFieldErrors } from "../utils/handleFieldErrors";
+import { handleFieldErrors } from "../../../lib/errors/handleFieldErrors";
 import { useRouter } from "next/navigation";
 import { handleSocialSignIn } from "../utils/handleSocialSignIn";
 
@@ -30,7 +30,6 @@ const signInFormSchema = z.object({
   email: z.email(),
   password: z.string().min(6),
 });
-
 
 export default function SignInForm() {
   const router = useRouter();

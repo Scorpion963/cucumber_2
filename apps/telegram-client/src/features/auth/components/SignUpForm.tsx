@@ -23,7 +23,7 @@ import { authClient } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
 import GoogleButton from "./shared/GoogleButton";
 import GithubButton from "./shared/GithubButton";
-import { handleFieldErrors } from "../utils/handleFieldErrors";
+import { handleFieldErrors } from "../../../lib/errors/handleFieldErrors";
 import { handleSocialSignIn } from "../utils/handleSocialSignIn";
 
 const signUpFormSchema = z
@@ -50,7 +50,6 @@ const signUpFormSchema = z
     }
   });
 
-
 export default function SignUpForm() {
   const router = useRouter();
   const form = useForm<z.infer<typeof signUpFormSchema>>({
@@ -76,7 +75,7 @@ export default function SignUpForm() {
       { onError: (ctx) => console.log(ctx.error) }
     );
     if (error?.code && error?.message) {
-      console.log("status text: ")
+      console.log("status text: ");
       handleFieldErrors({ code: error.code, message: error.message }, form);
     } else router.replace("/");
   }

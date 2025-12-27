@@ -74,7 +74,7 @@ export const auth = betterAuth({
 
       if (!(ctx.path === "/sign-up/email" || ctx.path === "/update-user"))
         return;
-
+      
       switch (ctx.path) {
         case "/sign-up/email":
           if (ctx.body?.username.trim().length === 0) {
@@ -99,7 +99,7 @@ export const auth = betterAuth({
           });
           const bodyUsername = ctx.body?.username?.trim();
 
-          if (sessionUsername === bodyUsername) return;
+          if (sessionUsername?.user.username === bodyUsername) return;
 
           await handleUsernameExistsError(bodyUsername);
           break;

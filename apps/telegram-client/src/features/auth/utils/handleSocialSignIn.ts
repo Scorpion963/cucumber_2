@@ -1,6 +1,6 @@
 import { authClient } from "@/lib/auth-client";
 import { FieldValues, UseFormReturn } from "react-hook-form";
-import { handleFieldErrors } from "./handleFieldErrors";
+import { handleFieldErrors } from "../../../lib/errors/handleFieldErrors";
 
 export async function handleSocialSignIn<T extends FieldValues>(
   provider: "google" | "github",

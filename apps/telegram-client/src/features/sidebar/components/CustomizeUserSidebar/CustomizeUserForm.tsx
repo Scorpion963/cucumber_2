@@ -1,10 +1,8 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import { Form, FormField } from "@/components/ui/form";
-import { cn } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Edit } from "lucide-react";
-import { ReactNode, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import z from "zod";
 import { customizeUserFormSchema } from "../../schemas/customizeUserSchema";
@@ -12,7 +10,7 @@ import { authClient } from "@/lib/auth-client";
 import FloatingInput from "./FloatingInput";
 import FormSection from "./FormSection";
 import DarkLineBreak from "./DarkLineBreak";
-import { handleFieldErrors } from "@/features/auth/utils/handleFieldErrors";
+import { handleFieldErrors } from "@/lib/errors/handleFieldErrors";
 
 // TODO: Display username taken error
 
@@ -21,18 +19,15 @@ export default function CustomizeUserForm({
 }: {
   defaultFields: z.infer<typeof customizeUserFormSchema>;
 }) {
-  const [defaultFieldState, setDefaultFieldState] = useState(defaultFields);
   const form = useForm<z.infer<typeof customizeUserFormSchema>>({
     resolver: zodResolver(customizeUserFormSchema),
     defaultValues: {
-      bio: defaultFieldState.bio,
-      firstName: defaultFieldState.firstName,
-      lastName: defaultFieldState.lastName,
-      username: defaultFieldState.username,
+      bio: defaultFields.bio,
+      firstName: defaultFields.firstName,
+      lastName: defaultFields.lastName,
+      username: defaultFields.username,
     },
   });
-
-  
 
   async function onSubmit(data: z.infer<typeof customizeUserFormSchema>) {
     const result = await authClient.updateUser({
@@ -42,7 +37,7 @@ export default function CustomizeUserForm({
       username: data.username,
     });
 
-    console.log("result: ", result)
+    console.log("result: ", result);
 
     if (result.error?.message && result.error.code) {
       handleFieldErrors(
@@ -60,7 +55,6 @@ export default function CustomizeUserForm({
         lastName: data.lastName,
         username: data.username,
       });
-      setDefaultFieldState(data);
     }
   }
 
@@ -109,7 +103,11 @@ export default function CustomizeUserForm({
               control={form.control}
               render={({ field, fieldState }) => (
                 <>
-                  <FloatingInput labelContent="Bio" {...field} fieldState={fieldState} />
+                  <FloatingInput
+                    labelContent="Bio"
+                    {...field}
+                    fieldState={fieldState}
+                  />
                 </>
               )}
             />
@@ -128,7 +126,11 @@ export default function CustomizeUserForm({
               control={form.control}
               render={({ field, fieldState }) => (
                 <>
-                  <FloatingInput labelContent="Username" {...field} fieldState={fieldState} />
+                  <FloatingInput
+                    labelContent="Username"
+                    {...field}
+                    fieldState={fieldState}
+                  />
                 </>
               )}
             />

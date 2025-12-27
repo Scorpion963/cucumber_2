@@ -4,7 +4,7 @@ export const customizeUserFormSchema = z.object({
   firstName: z.string().trim().min(1),
   lastName: z.string().trim(),
   bio: z.string().trim(),
-  username: z.string().trim(),
+  username: z.string().trim().min(5),
 });
 
 export const customizeUserSchemaServer = z.object({
