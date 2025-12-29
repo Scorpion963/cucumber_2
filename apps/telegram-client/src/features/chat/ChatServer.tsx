@@ -8,7 +8,6 @@ import { ChatStoreProvider } from "./providers/chatStoreProvider";
 import { MessageStoreProvider } from "./providers/messageStoreProvider";
 import { headers } from "next/headers";
 import ChatClient from "./ChatClient";
-import EditContact from "./components/EditContact/EditContact";
 
 export async function ChatServer({ paramsId }: { paramsId: string }) {
   const user = await auth.api.getSession({ headers: await headers() });
@@ -20,10 +19,9 @@ export async function ChatServer({ paramsId }: { paramsId: string }) {
     ? await getMessagesDB(chat.chat.id)
     : [];
 
-  console.log("chatInfo", chat.chatInfo);
 
   return (
-    <ChatStoreProvider chat={chat.chat} chatInfo={chat.chatInfo}>
+    <ChatStoreProvider contact={chat.contact} chat={chat.chat}>
       <MessageStoreProvider value={messages}>
         <ChatClient />
       </MessageStoreProvider>

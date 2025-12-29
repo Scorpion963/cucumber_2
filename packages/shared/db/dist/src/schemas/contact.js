@@ -11,7 +11,9 @@ export var contact = pgTable("contacts", {
         .notNull()
         .references(function () { return user.id; }, { onDelete: "cascade" }),
     name: varchar("name", { length: 100 }),
+    lastName: varchar("lastName", { length: 100 }),
     imageUrl: text("image"),
+    notes: varchar("notes", { length: 100 }),
     createdAt: createdAt,
     updatedAt: updatedAt,
 }, function (table) { return [unique("contact_unique").on(table.ownerId, table.contactId)]; });

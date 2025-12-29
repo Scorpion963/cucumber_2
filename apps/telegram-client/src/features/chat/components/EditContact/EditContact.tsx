@@ -1,6 +1,5 @@
 import SidebarHeader from "@/components/Sidebar/SidebarHeader";
 import { UserImage } from "@/components/UserImage";
-import UserInfo from "@/features/sidebar/components/UserProfileSidebar/UserInfo";
 import EditContactForm from "./EditContactForm";
 
 export default function EditContact() {

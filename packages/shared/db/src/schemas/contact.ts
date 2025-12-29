@@ -14,7 +14,9 @@ export const contact = pgTable(
       .notNull()
       .references(() => user.id, { onDelete: "cascade" }),
     name: varchar("name", { length: 100 }),
+    lastName: varchar("lastName", {length: 100}),
     imageUrl: text("image"),
+    notes: varchar("notes", {length: 100}),
     createdAt,
     updatedAt,
   },

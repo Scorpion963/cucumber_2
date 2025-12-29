@@ -1,6 +1,6 @@
 "use client";
 import { createContext, ReactNode, useContext, useState } from "react";
-import { ChatStore, createChatStore } from "../stores/chatStore";
+import { ChatStore, chatterType, createChatStore } from "../stores/chatStore";
 import { useStore } from "zustand";
 import { chats } from "db";
 
@@ -13,15 +13,15 @@ export const ChatStoreContext = createContext<null | ChatStoreApi>(null);
 export type ChatStoreProviderProps = {
   children: ReactNode;
   chat: typeof chats.$inferSelect | null;
-  chatInfo: Pick<typeof chats.$inferSelect, "imageUrl" | "name"> | null;
+  contact: chatterType | null
 };
 
 export function ChatStoreProvider({
   children,
   chat,
-  chatInfo,
+  contact
 }: ChatStoreProviderProps) {
-  const [store] = useState(() => createChatStore({ chat, chatInfo }));
+  const [store] = useState(() => createChatStore({ chat, contact }));
 
   return (
     <ChatStoreContext.Provider value={store}>

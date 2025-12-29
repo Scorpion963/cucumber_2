@@ -1,16 +1,20 @@
-import { chats } from "db";
+import { chats, contact } from "db";
+import { produce } from "immer";
 import { createStore } from "zustand/vanilla";
+
+export type chatterType = Pick<
+  typeof contact.$inferSelect,
+  "id" | "imageUrl" | "lastName" | "name" | "notes"
+>;
 
 export type ChatState = {
   chat: typeof chats.$inferSelect | null;
-  chatInfo: Pick<typeof chats.$inferSelect, "imageUrl" | "name"> | null;
+  contact: null | chatterType;
 };
 
 export type ChatActions = {
   setChat: (chatToBeAdded: typeof chats.$inferSelect | null) => void;
-  setChatInfo: (
-    chatInfoToBeAdded: Pick<typeof chats.$inferSelect, "imageUrl" | "name"> | null
-  ) => void;
+  updateContactFields: (updatedContact: Omit<chatterType, "id">) => void;
 };
 
 export type ChatStore = ChatState & ChatActions;
@@ -21,6 +25,7 @@ export const defaultInitState = {
     imageUrl: null,
     name: null,
   },
+  contact: null,
 };
 
 export const createChatStore = (initState: ChatState = defaultInitState) => {
@@ -28,6 +33,13 @@ export const createChatStore = (initState: ChatState = defaultInitState) => {
     ...initState,
     setChat: (chatToBeAdded) =>
       set((state) => ({ ...state, chat: chatToBeAdded })),
-    setChatInfo: (chatInfo) => set((state) => ({ ...state, chatInfo })),
+    updateContactFields: (updatedContact) =>
+      set(
+        produce((state: ChatState) => {
+          if (!state.contact) return;
+
+          Object.assign(state.contact, updatedContact);
+        })
+      ),
   }));
 };
