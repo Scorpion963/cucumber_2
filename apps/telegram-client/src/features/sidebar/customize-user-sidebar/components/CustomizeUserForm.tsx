@@ -5,11 +5,11 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Edit } from "lucide-react";
 import { useForm } from "react-hook-form";
 import z from "zod";
-import { customizeUserFormSchema } from "../../schemas/customizeUserSchema";
+import { customizeUserFormSchema } from "../schemas/customizeUserSchema";
 import { authClient } from "@/lib/auth-client";
-import FloatingInput from "./FloatingInput";
-import FormSection from "./FormSection";
-import DarkLineBreak from "./DarkLineBreak";
+import FloatingInput from "../../../../components/FloatingInput";
+import FormSection from "../../../../components/FormSection";
+import DarkLineBreak from "../../../../components/DarkLineBreak";
 import { handleFieldErrors } from "@/lib/errors/handleFieldErrors";
 
 // TODO: Display username taken error

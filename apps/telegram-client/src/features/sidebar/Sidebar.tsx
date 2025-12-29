@@ -1,9 +1,8 @@
 import { SidebarRouterProvider } from "@/components/SidebarRouter/providers/sidebar-routes-provider";
 import SidebarRouter from "@/components/SidebarRouter/SidebarRouter";
-import SearchSidebar from "./components/SearchSidebar/SearchSidebar";
+import SearchSidebar from "./search-sidebar/SearchSidebar";
 import UserProfileSidebar from "./components/UserProfileSidebar/UserProfileSidebar";
-import CustomizeUserSidebar from "./components/CustomizeUserSidebar/CustomizeUserSidebar";
-import SidebarAnimationWrapper from "./components/SidebarAnimationWrapper";
+import CustomizeUserSidebar from "./customize-user-sidebar/CustomizeUserSidebar";
 
 const routes = {
   "/main": <SearchSidebar />,

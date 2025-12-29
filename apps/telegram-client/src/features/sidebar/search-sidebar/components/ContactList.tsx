@@ -2,7 +2,7 @@
 
 import { ScrollArea } from "@/components/ui/scroll-area";
 import Contact from "./Contact";
-import { useSearchStore } from "../../providers/search-store-provider";
+import { useSearchStore } from "../providers/search-store-provider";
 
 export default function ContactList() {
   const { usersFound, searchValue } = useSearchStore((state) => state);

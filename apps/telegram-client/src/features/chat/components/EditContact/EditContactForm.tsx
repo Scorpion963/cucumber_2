@@ -1,9 +1,9 @@
 "use client";
+import DarkLineBreak from "@/components/DarkLineBreak";
+import FloatingInput from "@/components/FloatingInput";
+import FormSection from "@/components/FormSection";
 import { Button } from "@/components/ui/button";
 import { Form, FormField } from "@/components/ui/form";
-import DarkLineBreak from "@/features/sidebar/components/CustomizeUserSidebar/DarkLineBreak";
-import FloatingInput from "@/features/sidebar/components/CustomizeUserSidebar/FloatingInput";
-import FormSection from "@/features/sidebar/components/CustomizeUserSidebar/FormSection";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Delete, ImagePlus } from "lucide-react";
 import { useForm } from "react-hook-form";
@@ -79,12 +79,10 @@ export default function EditContactForm() {
         <FormSection>
           <Button
             variant={"ghost"}
-            className="w-full items-center justify-start hover:text-destructive text-destructive cursor-pointer p-6 text-md gap-4"
+            className="w-full items-center justify-start hover:text-destructive text-destructive cursor-pointer p-5  text-md gap-4"
           >
-            <div className="flex gap-4  items-center">
               <Delete />
               <div>Delete Contact</div>
-            </div>
           </Button>
         </FormSection>
       </form>
@@ -94,9 +92,13 @@ export default function EditContactForm() {
 
 function PhotoManager({ text }: { text: string }) {
   return (
-    <div className="flex gap-4 items-center">
+    <Button variant={'ghost'} className="flex gap-4 p-5 items-center w-full justify-start cursor-pointer">
       <ImagePlus />
       <div>{text}</div>
-    </div>
+    </Button>
   );
 }
+
+
+// TODO: Create small wrappers like the FormSection one but for other things, idk I need to find them
+// TODO: Restructure the Sidebar folder, move all sidebars inside their own subfeature folders

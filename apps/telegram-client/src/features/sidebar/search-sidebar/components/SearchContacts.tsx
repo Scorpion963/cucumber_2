@@ -3,7 +3,7 @@
 import Search from "@/components/Search";
 import useDebouncedValue from "@/hooks/useDebouncedValue";
 import { useEffect } from "react";
-import { useSearchStore } from "../../providers/search-store-provider";
+import { useSearchStore } from "../providers/search-store-provider";
 
 // TODO: handle errors
 

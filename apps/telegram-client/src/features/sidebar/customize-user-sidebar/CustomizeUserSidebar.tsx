@@ -1,7 +1,7 @@
-import CustomizeUserForm from "./CustomizeUserForm";
-import SidebarHeader from "../SidebarHeader";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
+import SidebarHeader from "../components/SidebarHeader";
+import CustomizeUserForm from "./components/CustomizeUserForm";
 
 export default async function CustomizeUserSidebar() {
   const currentUser = await auth.api.getSession({ headers: await headers() });

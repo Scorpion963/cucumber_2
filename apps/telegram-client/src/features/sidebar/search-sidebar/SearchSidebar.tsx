@@ -1,11 +1,11 @@
 import { auth } from "@/lib/auth";
-import ContactList from "./ContactList";
-import SearchContacts from "./SearchContacts";
-import UserMenu from "./UserMenu";
-import { SearchStoreProvider } from "../../providers/search-store-provider";
+import ContactList from "./components/ContactList";
+import SearchContacts from "./components/SearchContacts";
+import UserMenu from "./components/UserMenu";
 import { headers } from "next/headers";
 import { chatMember, db } from "db";
 import { eq } from "drizzle-orm";
+import { SearchStoreProvider } from "./providers/search-store-provider";
 
 export default async function SearchSidebar() {
   const data = await auth.api.getSession({ headers: await headers() });
