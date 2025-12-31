@@ -28,6 +28,7 @@ export var messageRelations = relations(message, function (_a) {
         chat: one(chats, {
             fields: [message.chatId],
             references: [chats.id],
+            relationName: "messages"
         }),
         sender: one(user, {
             fields: [message.senderId],

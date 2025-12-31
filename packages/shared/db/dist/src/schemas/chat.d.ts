@@ -75,6 +75,23 @@ export declare const chats: import("drizzle-orm/pg-core").PgTableWithColumns<{
             identity: undefined;
             generated: undefined;
         }, {}, {}>;
+        lastMessageId: import("drizzle-orm/pg-core").PgColumn<{
+            name: "message_id";
+            tableName: "chats";
+            dataType: "string";
+            columnType: "PgUUID";
+            data: string;
+            driverParam: string;
+            notNull: false;
+            hasDefault: false;
+            isPrimaryKey: false;
+            isAutoincrement: false;
+            hasRuntimeDefault: false;
+            enumValues: undefined;
+            baseColumn: never;
+            identity: undefined;
+            generated: undefined;
+        }, {}, {}>;
         createdAt: import("drizzle-orm/pg-core").PgColumn<{
             name: "createdAt";
             tableName: "chats";
@@ -115,4 +132,5 @@ export declare const chats: import("drizzle-orm/pg-core").PgTableWithColumns<{
 export declare const chatRelations: import("drizzle-orm").Relations<"chats", {
     chatMember: import("drizzle-orm").Many<"chat_member">;
     messages: import("drizzle-orm").Many<"messages">;
+    lastMessage: import("drizzle-orm").One<"messages", false>;
 }>;

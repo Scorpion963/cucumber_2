@@ -24,6 +24,7 @@ export const message = pgTable("messages", {
     (): AnyPgColumn => message.id,
     { onDelete: "set null" }
   ),
+
   text: text(),
 
   createdAt,
@@ -35,6 +36,7 @@ export const messageRelations = relations(message, ({ one, many }) => ({
   chat: one(chats, {
     fields: [message.chatId],
     references: [chats.id],
+    relationName: "messages"
   }),
   sender: one(user, {
     fields: [message.senderId],

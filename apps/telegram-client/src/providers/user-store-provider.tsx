@@ -1,31 +1,33 @@
 "use client";
 
-import { createUserStore, UserStore } from "@/stores/userStore";
+import { createHomeChatsStore, HomeChatsStore } from "@/stores/userStore";
+import { user } from "db";
 import { createContext, ReactNode, useContext, useState } from "react";
 import { useStore } from "zustand";
 
-export type UserStoreApi = ReturnType<typeof createUserStore>;
+export type HomeChatsApi = ReturnType<typeof createHomeChatsStore>;
 
-export const UserStoreContext = createContext<null | UserStoreApi>(null);
+export const HomeChatsStoreContext = createContext<null | HomeChatsApi>(null);
 
-export type UserStoreProviderProps = {
+export type HomeChatsProviderProps = {
   children: ReactNode;
+  users: (typeof user.$inferSelect)
 };
 
-export function UserStoreProvider({ children }: UserStoreProviderProps) {
-  const [store] = useState(() => createUserStore());
+export function HomeChatsProvider({ children,users }: HomeChatsProviderProps) {
+  const [store] = useState(() => createHomeChatsStore());
 
   return (
-    <UserStoreContext.Provider value={store}>
+    <HomeChatsStoreContext.Provider value={store}>
       {children}
-    </UserStoreContext.Provider>
+    </HomeChatsStoreContext.Provider>
   );
 }
 
-export function useUserStore<T>(selector: (store: UserStore) => T): T {
-  const userStoreContext = useContext(UserStoreContext);
-  if (!userStoreContext)
+export function useHomeChatsStore<T>(selector: (store: HomeChatsStore) => T): T {
+  const homeChatsStoreContext = useContext(HomeChatsStoreContext);
+  if (!homeChatsStoreContext)
     throw new Error("useUserStore must be used within UserStoreProvider");
 
-  return useStore(userStoreContext, selector);
+  return useStore(homeChatsStoreContext, selector);
 }

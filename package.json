@@ -8,8 +8,8 @@
   "scripts": {
     "count": "cloc . --exclude-dir=node_modules,ui,dist,.next"
   },
-  "devDependencies": {
-    "nx": "^22.1.3",
-    "typescript": "^5"
+   "dependencies": {
+    "drizzle-orm": "^0.44.7",      
+    "zod": "^3.x"                   
   }
 }

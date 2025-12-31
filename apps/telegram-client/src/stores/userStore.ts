@@ -1,21 +1,26 @@
-import { user } from "db";
+import { chats, contact, message, user } from "db";
 import { createStore } from "zustand/vanilla";
 
-export type UserState = {
-  users: (typeof user.$inferSelect)[];
+type HomeChatsType = {
+  
+}
+
+export type HomeChatsState = {
+  chats: Map<string, HomeChatsType>
 };
 
-export type UserActions = {
-  setUsers: (usersToBeAdded: (typeof user.$inferSelect)[]) => void;
+export type HomeChatsActions = {
+
 };
 
-export type UserStore = UserState & UserActions;
+export type HomeChatsStore = HomeChatsState & HomeChatsActions;
 
-export const defaultInitState: UserState = { users: [] };
+export const defaultInitState: HomeChatsState = { };
 
-export const createUserStore = (initState: UserState = defaultInitState) => {
-  return createStore<UserStore>()((set) => ({
+export const createHomeChatsStore = (
+  initState: HomeChatsState = defaultInitState
+) => {
+  return createStore<HomeChatsStore>()((set) => ({
     ...initState,
-    setUsers: (usersToBeAdded) => set(() => ({ users: usersToBeAdded })),
   }));
 };

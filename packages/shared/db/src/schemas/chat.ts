@@ -1,5 +1,6 @@
 import { relations } from "drizzle-orm";
 import {
+  AnyPgColumn,
   pgEnum,
   pgTable,
   text,
@@ -20,11 +21,19 @@ export const chats = pgTable("chats", {
   type: ChatTypeEnum().notNull(),
   name: varchar("name", { length: 100 }),
   imageUrl: text("image_url"),
+  lastMessageId: uuid("message_id").references((): AnyPgColumn => message.id, {
+    onDelete: "set null",
+  }),
   createdAt,
   updatedAt,
 });
 
-export const chatRelations = relations(chats, ({ many }) => ({
+export const chatRelations = relations(chats, ({ many, one }) => ({
   chatMember: many(chatMember),
-  messages: many(message),
+  messages: many(message, { relationName: "messages" }),
+  lastMessage: one(message, {
+    fields: [chats.lastMessageId],
+    references: [message.id],
+    relationName: "last_message",
+  }),
 }));
