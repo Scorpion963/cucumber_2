@@ -22,9 +22,9 @@ import {
   reaction,
   user,
 } from "db";
-import { UserStoreProvider } from "@/providers/user-store-provider";
 import mapChatsToStore from "@/server/mappers/mapChatsToStore";
 import findHomeChatsForStore from "@/server/db/findHomeChatsForStore";
+import { HomeChatsProvider } from "@/providers/user-store-provider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -54,14 +54,14 @@ export default async function RootLayout({
 
   const {mappedChatInfo, mappedContacts} = mapChatsToStore(homeChats);
 
-  console.log(mappedChatInfo, mappedContacts)
+  console.log("mapped: ", mappedChatInfo, mappedContacts)
 
   return (
     <html lang="en">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased dark`}
       >
-        {/* <UserStoreProvider> */}
+        <HomeChatsProvider chats={mappedChatInfo} contacts={mappedContacts}>
           <div className="w-full h-screen">
             <div className=" w-full h-full">
               <ResizablePanelGroup
@@ -79,7 +79,7 @@ export default async function RootLayout({
             </div>
           </div>
           <Toaster position="top-center" />
-        {/* </UserStoreProvider> */}
+        </HomeChatsProvider>
       </body>
     </html>
   );

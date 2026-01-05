@@ -47,7 +47,7 @@ export default function findHomeChatsForStore(currentUserId: string) {
       contact,
       and(
         eq(contact.ownerId, currentUserId),
-        eq(contact.contactId, chatMemberAlias.id)
+        eq(contact.contactId, chatMemberAlias.userId)
       )
     )
     .where(eq(chatMember.userId, currentUserId))

@@ -52,6 +52,7 @@ export default async function handleChatFetch(
 
       return {
         canAccess: true,
+        
         chat: chat?.chat ?? null,
         contact: {
           id: chatter.id,

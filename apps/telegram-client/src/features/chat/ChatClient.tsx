@@ -9,7 +9,7 @@ import EditContact from "./components/EditContact/EditContact";
 export default function ChatClient() {
   const { chat } = useChatStore((state) => state);
   const { messages } = useMessageStore((state) => state);
-
+  if(chat == null)
   console.log("storeChat, ", chat);
   console.log("messages: ", messages);
 

@@ -1,5 +1,6 @@
 "use client";
 
+import { ContactType, HomeChatsType } from "@/server/mappers/mapChatsToStore";
 import { createHomeChatsStore, HomeChatsStore } from "@/stores/userStore";
 import { user } from "db";
 import { createContext, ReactNode, useContext, useState } from "react";
@@ -11,11 +12,16 @@ export const HomeChatsStoreContext = createContext<null | HomeChatsApi>(null);
 
 export type HomeChatsProviderProps = {
   children: ReactNode;
-  users: (typeof user.$inferSelect)
+  chats: Map<string, HomeChatsType>;
+  contacts: Map<string, ContactType>;
 };
 
-export function HomeChatsProvider({ children,users }: HomeChatsProviderProps) {
-  const [store] = useState(() => createHomeChatsStore());
+export function HomeChatsProvider({
+  children,
+  chats,
+  contacts,
+}: HomeChatsProviderProps) {
+  const [store] = useState(() => createHomeChatsStore({ chats, contacts }));
 
   return (
     <HomeChatsStoreContext.Provider value={store}>
@@ -24,7 +30,9 @@ export function HomeChatsProvider({ children,users }: HomeChatsProviderProps) {
   );
 }
 
-export function useHomeChatsStore<T>(selector: (store: HomeChatsStore) => T): T {
+export function useHomeChatsStore<T>(
+  selector: (store: HomeChatsStore) => T
+): T {
   const homeChatsStoreContext = useContext(HomeChatsStoreContext);
   if (!homeChatsStoreContext)
     throw new Error("useUserStore must be used within UserStoreProvider");

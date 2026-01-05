@@ -1,3 +1,5 @@
+import { contact } from "db";
+
 type HomeChatsPrivateType = {
   id: string;
   type: "private";
@@ -15,7 +17,7 @@ type HomeChatsGroupType = {
   lastMessage: HomeChatsLastMessageType | null;
 };
 
-type HomeChatsType = HomeChatsPrivateType | HomeChatsGroupType;
+export type HomeChatsType = HomeChatsPrivateType | HomeChatsGroupType;
 
 type HomeChatsLastMessageType = {
   text: string;
@@ -27,7 +29,7 @@ type BaseContactType = Pick<
   "imageUrl" | "lastName" | "notes" | "name"
 >;
 
-type ContactType = BaseContactType & {
+export type ContactType = BaseContactType & {
   userId: string;
   isContact: boolean;
   bio: string | null;
@@ -108,7 +110,7 @@ export default function mapChatsToStore(chatInfo: transformObjectType[]) {
 
       const refinedPrivateChat: HomeChatsPrivateType = {
         id: row.id,
-        imageUrl: row.imageUrl,
+        imageUrl: contact?.imageUrl ? contact.imageUrl : baseUser?.imageUrl ? baseUser.imageUrl : row.imageUrl,
         lastMessage:
           typeof row.lastMessage?.text === "undefined"
             ? null
