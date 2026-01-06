@@ -4,6 +4,7 @@ import { UserImage } from "@/components/UserImage";
 import EditContactForm from "./EditContactForm";
 import useChatInfo from "../../hooks/useChatInfo";
 
+
 export default function EditContact() {
   const { chatter } = useChatInfo();
 

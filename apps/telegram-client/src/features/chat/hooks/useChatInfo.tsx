@@ -11,33 +11,33 @@ type useChatInfoReturnType = {
   chatName: string | null;
 };
 
-// TODO: the image and text is not updating because i'm using the chatImage and chatName from the chat object
-// and whenever a user is updated, the chat fields are not updated, that's why i need to retrieve values from the
-// chatter object
-
 export default function useChatInfo(): useChatInfoReturnType {
   const { currentChatId, chatter } = useChatStore((state) => state);
   const { chats, contacts } = useHomeChatsStore((state) => state);
-  let chatImageUrl = null;
-  let chatName = null;
 
-  if (
-    currentChatId &&
-    chats.get(currentChatId)?.type === "private" &&
-    chatter &&
-    contacts.get(chatter.username)
-  ) {
-    chatImageUrl = contacts.get(chatter.username)?.imageUrl ?? null;
-    chatName = contacts.get(chatter.username)?.name ?? null;
-  } else if (currentChatId && chats.get(currentChatId)?.type === "private") {
-    chatImageUrl = chats.get(currentChatId)?.imageUrl ?? null;
-    chatName = chats.get(currentChatId)?.name ?? null;
+  const resolvedChatter = chatter
+    ? contacts.get(chatter.username) ?? null
+    : null;
+
+  const chat = currentChatId
+    ? chats.get(currentChatId) ?? null
+    : null;
+
+  if (!currentChatId) {
+    return {
+      chat: null,
+      chatter,
+      chatImageUrl: resolvedChatter?.imageUrl ?? null,
+      chatName: resolvedChatter?.name ?? null,
+    };
   }
 
   return {
-    chat: currentChatId ? chats.get(currentChatId) ?? null : null,
-    chatter: chatter ? contacts.get(chatter.username) ?? null : null,
-    chatImageUrl,
-    chatName,
+    chat,
+    chatter: resolvedChatter,
+    chatImageUrl:
+      resolvedChatter?.imageUrl ?? chat?.imageUrl ?? null,
+    chatName:
+      resolvedChatter?.name ?? chat?.name ?? null,
   };
 }
