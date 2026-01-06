@@ -1,45 +1,46 @@
-import { chats, contact } from "db";
-import { produce } from "immer";
+import { ContactType } from "@/server/mappers/mapChatsToStore";
 import { createStore } from "zustand/vanilla";
 
-export type chatterType = Pick<
-  typeof contact.$inferSelect,
-  "id" | "imageUrl" | "lastName" | "name" | "notes"
->;
+// TODO: add the type of the contact if the user finds a contact outside of their contacts
+
+export type chatterType = {
+  chatId: string | null;
+  chatter: ContactType | null;
+};
 
 export type ChatState = {
-  chat: typeof chats.$inferSelect | null;
-  contact: null | chatterType;
+  currentChatId: string | null;
+  chatter: ContactType | null;
 };
 
 export type ChatActions = {
-  setChat: (chatToBeAdded: typeof chats.$inferSelect | null) => void;
-  updateContactFields: (updatedContact: Omit<chatterType, "id">) => void;
+  // setChat: (chatToBeAdded: typeof chats.$inferSelect | null) => void;
+  // updateContactFields: (updatedContact: Omit<chatterType, "id">) => void;
+  setCurrentChatId: (chatId: string) => void;
+  setCurrentUsername: (username: string) => void;
 };
 
 export type ChatStore = ChatState & ChatActions;
 
 export const defaultInitState = {
-  chat: null,
-  chatInfo: {
-    imageUrl: null,
-    name: null,
-  },
-  contact: null,
+  currentChatId: null,
+  chatter: null
 };
 
 export const createChatStore = (initState: ChatState = defaultInitState) => {
   return createStore<ChatStore>()((set) => ({
     ...initState,
-    setChat: (chatToBeAdded) =>
-      set((state) => ({ ...state, chat: chatToBeAdded })),
-    updateContactFields: (updatedContact) =>
-      set(
-        produce((state: ChatState) => {
-          if (!state.contact) return;
+    setCurrentChatId: (chatId) => set((state) => ({...state, currentChatId: chatId})),
+    setCurrentUsername: (username) => set(state => ({...state, currentUsername: username})),
+    // setChat: (chatToBeAdded) =>
+    //   set((state) => ({ ...state, chat: chatToBeAdded })),
+    // updateContactFields: (updatedContact) =>
+    //   set(
+    //     produce((state: ChatState) => {
+    //       if (!state.contact) return;
 
-          Object.assign(state.contact, updatedContact);
-        })
-      ),
+    //       Object.assign(state.contact, updatedContact);
+    //     })
+    //   ),
   }));
 };

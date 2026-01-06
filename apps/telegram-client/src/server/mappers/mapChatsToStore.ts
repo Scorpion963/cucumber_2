@@ -33,6 +33,7 @@ export type ContactType = BaseContactType & {
   userId: string;
   isContact: boolean;
   bio: string | null;
+  username: string
 };
 
 type transformObjectType = {
@@ -95,6 +96,7 @@ export default function mapChatsToStore(chatInfo: transformObjectType[]) {
           name: contact.name,
           notes: contact.notes,
           userId: contact.contactId,
+          username: baseUser!.username
         });
       } else if (!contact && baseUser) {
         mappedContacts.set(baseUser.username, {
@@ -105,6 +107,7 @@ export default function mapChatsToStore(chatInfo: transformObjectType[]) {
           name: baseUser.name,
           notes: null,
           userId: baseUser.id,
+          username: baseUser.username
         });
       }
 
@@ -131,3 +134,4 @@ export default function mapChatsToStore(chatInfo: transformObjectType[]) {
 
   return { mappedChatInfo, mappedContacts };
 }
+

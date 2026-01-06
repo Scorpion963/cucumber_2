@@ -10,6 +10,8 @@ import { useForm } from "react-hook-form";
 import z from "zod";
 import { useChatStore } from "../../providers/chatStoreProvider";
 import { upsertContact } from "../../actions/editContact";
+import { useHomeChatsStore } from "@/providers/user-store-provider";
+import { ContactType } from "@/server/mappers/mapChatsToStore";
 
 const editFormSchema = z.object({
   firstName: z.string().trim().min(1),
@@ -19,20 +21,20 @@ const editFormSchema = z.object({
 
 //TODO: handle errors
 
-export default function EditContactForm() {
-  const { contact, updateContactFields } = useChatStore((state) => state);
+export default function EditContactForm({chatter}: {chatter: ContactType}) {
+  const { updateContactByUsername } = useHomeChatsStore((state) => state);
   const form = useForm<z.infer<typeof editFormSchema>>({
     resolver: zodResolver(editFormSchema),
     defaultValues: {
-      firstName: contact?.name ?? "",
-      lastName: contact?.lastName ?? "",
-      notes: contact?.notes ?? "",
+      firstName: chatter.name ?? "",
+      lastName: chatter.lastName ?? "",
+      notes: chatter.notes ?? "",
     },
   });
 
   async function handleSubmit(data: z.infer<typeof editFormSchema>) {
     const response = await upsertContact({
-      contactId: contact?.id ?? "",
+      contactId: chatter?.userId ?? "",
       firstName: data.firstName,
       lastName: data.lastName,
       notes: data.notes,
@@ -44,9 +46,9 @@ export default function EditContactForm() {
       return;
     }
 
-    updateContactFields({
+    updateContactByUsername(chatter.username ,{
       name: response.data.name,
-      imageUrl: response.data.imageUrl,
+      imageUrl: response.data.imageUrl ?? chatter.imageUrl,
       lastName: response.data.lastName,
       notes: response.data.notes,
     });

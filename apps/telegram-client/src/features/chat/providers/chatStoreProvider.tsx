@@ -3,6 +3,7 @@ import { createContext, ReactNode, useContext, useState } from "react";
 import { ChatStore, chatterType, createChatStore } from "../stores/chatStore";
 import { useStore } from "zustand";
 import { chats } from "db";
+import { ChatState } from "../stores/chatStore";
 
 // TODO: Create a global chattype to use in case i need to change something
 
@@ -10,18 +11,16 @@ export type ChatStoreApi = ReturnType<typeof createChatStore>;
 
 export const ChatStoreContext = createContext<null | ChatStoreApi>(null);
 
-export type ChatStoreProviderProps = {
+export type ChatStoreProviderProps = ChatState & {
   children: ReactNode;
-  chat: typeof chats.$inferSelect | null;
-  contact: chatterType | null
 };
 
 export function ChatStoreProvider({
   children,
-  chat,
-  contact
+  currentChatId,
+  chatter,
 }: ChatStoreProviderProps) {
-  const [store] = useState(() => createChatStore({ chat, contact }));
+  const [store] = useState(() => createChatStore({ currentChatId, chatter }));
 
   return (
     <ChatStoreContext.Provider value={store}>

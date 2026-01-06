@@ -15,13 +15,13 @@ export async function ChatServer({ paramsId }: { paramsId: string }) {
 
   if (!chat.canAccess) redirect("/");
 
-  const messages: (typeof message.$inferSelect)[] = chat.chat
-    ? await getMessagesDB(chat.chat.id)
+  const messages: (typeof message.$inferSelect)[] = chat.currentChatId
+    ? await getMessagesDB(chat.currentChatId)
     : [];
 
 
   return (
-    <ChatStoreProvider contact={chat.contact} chat={chat.chat}>
+    <ChatStoreProvider currentChatId={chat.currentChatId} chatter={chat.chatter}>
       <MessageStoreProvider value={messages}>
         <ChatClient />
       </MessageStoreProvider>

@@ -5,7 +5,7 @@ import { FaUserAlt } from "react-icons/fa";
 import useChatInfo from "../hooks/useChatInfo";
 
 export default function ChatHeader() {
-  const {chatImageUrl, chatName} = useChatInfo()
+  const { chatImageUrl, chatName } = useChatInfo();
   return (
     <div className="w-full flex gap-2 px-4  items-center py-1 border-b">
       <div className="size-9 rounded-full bg-card flex items-center justify-center relative overflow-hidden">

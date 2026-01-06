@@ -5,12 +5,20 @@ import ChatInput from "./components/ChatInput";
 import { useChatStore } from "./providers/chatStoreProvider";
 import { useMessageStore } from "./providers/messageStoreProvider";
 import EditContact from "./components/EditContact/EditContact";
+import { useHomeChatsStore } from "@/providers/user-store-provider";
+import { useEffect } from "react";
 
 export default function ChatClient() {
-  const { chat } = useChatStore((state) => state);
+  const { chatter } = useChatStore((state) => state);
   const { messages } = useMessageStore((state) => state);
-  if(chat == null)
-  console.log("storeChat, ", chat);
+  const { addContact } = useHomeChatsStore((state) => state);
+
+  useEffect(() => {
+    if (chatter?.userId) {
+      addContact(chatter);
+    }
+  }, [addContact, chatter]);
+
   console.log("messages: ", messages);
 
   return (
