@@ -11,7 +11,7 @@ export default function Page() {
         <ModalContent>
           <div className="flex flex-col bg-background p-6 gap-4 rounded-lg">
             <h1 className="font-bold text-2xl">Drag to reposition</h1>
-            <div className="max-w-120 w-full h-full overflow-hidden">
+            <div className="max-w-120 w-full h-full overflow-hidden ">
               <FixedCircularCropper />
             </div>
 
