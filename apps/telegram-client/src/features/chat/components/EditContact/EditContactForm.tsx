@@ -8,7 +8,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Delete, ImagePlus } from "lucide-react";
 import { useForm } from "react-hook-form";
 import z from "zod";
-import { useChatStore } from "../../providers/chatStoreProvider";
 import { upsertContact } from "../../actions/editContact";
 import { useHomeChatsStore } from "@/providers/user-store-provider";
 import { ContactType } from "@/server/mappers/mapChatsToStore";
@@ -21,7 +20,7 @@ const editFormSchema = z.object({
 
 //TODO: handle errors
 
-export default function EditContactForm({chatter}: {chatter: ContactType}) {
+export default function EditContactForm({ chatter }: { chatter: ContactType }) {
   const { updateContactByUsername } = useHomeChatsStore((state) => state);
   const form = useForm<z.infer<typeof editFormSchema>>({
     resolver: zodResolver(editFormSchema),
@@ -43,10 +42,11 @@ export default function EditContactForm({chatter}: {chatter: ContactType}) {
     if (response.error || !response.data) {
       console.log("Error inside EditContactForm happened");
       console.log(response.error);
+      form.setError("root", { message: response.error });
       return;
     }
 
-    updateContactByUsername(chatter.username ,{
+    updateContactByUsername(chatter.username, {
       name: response.data.name,
       imageUrl: response.data.imageUrl ?? chatter.imageUrl,
       lastName: response.data.lastName,
@@ -64,6 +64,9 @@ export default function EditContactForm({chatter}: {chatter: ContactType}) {
     <Form {...form}>
       <form onSubmit={form.handleSubmit((data) => handleSubmit(data))}>
         <FormSection>
+          <p className="text-destructive">
+            {form.formState.errors.root && form.formState.errors.root.message}
+          </p>
           <FormField
             name="firstName"
             control={form.control}
