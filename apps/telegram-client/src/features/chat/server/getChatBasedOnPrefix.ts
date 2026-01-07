@@ -55,11 +55,11 @@ export default async function handleChatFetch(
         currentChatId: chat?.chat.id ?? null,
         chatter: {
           bio: chatter.bio,
-          imageUrl: chatter.contactsOf[0].imageUrl ?? chatter.image,
-          isContact: chatter.contactsOf[0].contactId != null,
-          lastName: chatter.contactsOf[0].lastName ?? chatter.lastName,
-          name: chatter.contactsOf[0].name ?? chatter.name,
-          notes: chatter.contactsOf[0].notes ?? null,
+          imageUrl: chatter.contactsOf[0]?.imageUrl ?? chatter.image,
+          isContact: chatter.contactsOf[0]?.contactId != null,
+          lastName: chatter.contactsOf[0]?.lastName ?? chatter.lastName,
+          name: chatter.contactsOf[0]?.name ?? chatter.name,
+          notes: chatter.contactsOf[0]?.notes ?? null,
           userId: chatter.id,
           username: chatter.username
         },

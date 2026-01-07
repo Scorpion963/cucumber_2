@@ -25,9 +25,9 @@ export default function EditContactForm({ chatter }: { chatter: ContactType }) {
   const form = useForm<z.infer<typeof editFormSchema>>({
     resolver: zodResolver(editFormSchema),
     defaultValues: {
-      firstName: chatter.name ?? "",
-      lastName: chatter.lastName ?? "",
-      notes: chatter.notes ?? "",
+      firstName: chatter?.name ?? "",
+      lastName: chatter?.lastName ?? "",
+      notes: chatter?.notes ?? "",
     },
   });
 

@@ -23,10 +23,12 @@ export default function useChatInfo(): useChatInfoReturnType {
     ? chats.get(currentChatId) ?? null
     : null;
 
+    console.log("resolvedChatter: ", resolvedChatter)
+
   if (!currentChatId) {
     return {
       chat: null,
-      chatter,
+      chatter: resolvedChatter ? resolvedChatter : chatter,
       chatImageUrl: resolvedChatter?.imageUrl ?? null,
       chatName: resolvedChatter?.name ?? null,
     };
