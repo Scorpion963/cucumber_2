@@ -1,9 +1,7 @@
 "use client";
 
-import FixedCircularCropper from "@/components/FixedCropper";
 import { FixedCropperWithSlider } from "@/components/FixedCropperWithSlider";
 import { Modal, ModalContent } from "@/components/Modal";
-import { Button } from "@/components/ui/button";
 import { CircleStencil, ImageRestriction } from "react-advanced-cropper";
 
 export default function Page() {

@@ -9,6 +9,7 @@ import {
 
 import { createPortal } from "react-dom";
 import { Button } from "./ui/button";
+import useMounted from "@/hooks/useMounted";
 
 type ModalProps = {
   defaultOpen?: boolean;
@@ -47,6 +48,7 @@ export function Overlay() {
 
 export function ModalContent({ children }: { children: React.ReactNode }) {
   const { isOpen, setIsOpen } = useModal();
+  const [mounted, setMounted] = useMounted();
 
   useEffect(() => {
     function handleKey(e: KeyboardEvent) {
@@ -54,11 +56,10 @@ export function ModalContent({ children }: { children: React.ReactNode }) {
     }
 
     if (isOpen) window.addEventListener("keydown", handleKey);
-
     return () => window.removeEventListener("keydown", handleKey);
-  }, [isOpen]);
+  }, [isOpen, setIsOpen]);
 
-  if (typeof document === "undefined") return null;
+  if (!mounted) return null;
 
   return createPortal(
     isOpen && (

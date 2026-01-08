@@ -9,7 +9,6 @@ import {
 import { Menu, UserIcon } from "lucide-react";
 import { useState } from "react";
 
-
 export default function UserMenu() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { push } = useSidebarRouterStore((state) => state);
@@ -24,7 +23,10 @@ export default function UserMenu() {
         className="w-56 flex flex-col p-0"
       >
         <Button
-          onClick={() => {setIsModalOpen(false);push("/user-profile")}}
+          onClick={() => {
+            setIsModalOpen(false);
+            push("/user-profile");
+          }}
           variant={"ghost"}
           className="rounded-t-lg rounded-lg cursor-pointer justify-start"
         >

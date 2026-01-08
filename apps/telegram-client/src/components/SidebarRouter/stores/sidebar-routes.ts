@@ -9,6 +9,7 @@ export type SidebarRouterState = {
 export type SidebarRouterActions = {
   push: (route: string) => void;
   pop: () => string | null;
+  replace: (route: string) => void;
 };
 
 export type SidebarRouterStore = SidebarRouterState & SidebarRouterActions;
@@ -42,6 +43,19 @@ export function createSidebarRouterStore(
         produce((state: SidebarRouterState) => {
           state.previousRoutes = [...state.routes];
           state.routes.push(route);
+        })
+      );
+    },
+
+    replace: (route) => {
+      set(
+        produce((state: SidebarRouterState) => {
+          state.previousRoutes = [...state.routes];
+          if (state.routes.length === 0) {
+            state.routes.push(route);
+          } else {
+            state.routes[state.routes.length - 1] = route;
+          }
         })
       );
     },
