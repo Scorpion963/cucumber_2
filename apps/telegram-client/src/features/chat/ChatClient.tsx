@@ -5,10 +5,8 @@ import ChatInput from "./components/ChatInput";
 import { useChatStore } from "./providers/chatStoreProvider";
 import { useMessageStore } from "./providers/messageStoreProvider";
 import { useHomeChatsStore } from "@/providers/user-store-provider";
-import { JSX, ReactNode, useEffect } from "react";
+import { useEffect } from "react";
 import SidebarRouter from "@/components/SidebarRouter/SidebarRouter";
-import EditContact from "./components/EditContact/EditContact";
-import { useSidebarRouterStore } from "@/components/SidebarRouter/providers/sidebar-routes-provider";
 import { privateSidebarRoutesMap } from "./components/EllipsisMenuManager";
 
 export default function ChatClient() {
@@ -16,13 +14,10 @@ export default function ChatClient() {
   const { messages } = useMessageStore((state) => state);
   const { addContact } = useHomeChatsStore((state) => state);
 
-  const {push} = useSidebarRouterStore(state => state)
-
   useEffect(() => {
     if (chatter?.userId) {
       addContact(chatter);
     }
-
   }, [addContact, chatter]);
 
   console.log("messages: ", messages);

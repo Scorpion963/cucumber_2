@@ -1,7 +1,9 @@
 import React, {
   CSSProperties,
   forwardRef,
+  SetStateAction,
   useEffect,
+  useImperativeHandle,
   useRef,
   useState,
 } from "react";
@@ -14,6 +16,7 @@ import {
   CropperState,
   ExtendedSettings,
   CropperRef,
+  Coordinates,
 } from "react-advanced-cropper";
 import "react-advanced-cropper/dist/style.css";
 import {
@@ -24,7 +27,11 @@ import { Slider } from "@/components/ui/slider";
 import { Check, X } from "lucide-react";
 import { Button } from "./ui/button";
 
-export type CustomCropperProps = FixedCropperProps;
+export type CustomCropperProps = FixedCropperProps &
+  CropperFadeTypes & {
+    setCroppedImage: React.Dispatch<SetStateAction<string | undefined>>;
+    onCropSuccess: () => void;
+  };
 
 export type CustomCropperRef = FixedCropperRef;
 
@@ -42,13 +49,18 @@ export const FixedCropperWithSlider = forwardRef<
       stencilProps,
       fadeStyle,
       fadeClassName,
+      setCroppedImage,
+      onCropSuccess,
       ...props
-    }: CustomCropperProps & CropperFadeTypes,
+    },
     ref
   ) => {
     const [state, setState] = useState<CropperState | null>(null);
     const [settings, setSettings] = useState<ExtendedSettings | null>(null);
     const experimentRef = useRef<FixedCropperRef | null>(null);
+    const [coordinates, setCoordinates] = useState<Coordinates | null>(null);
+    const [image, setImage] = useState<string>();
+    useImperativeHandle(ref, () => experimentRef.current!, []);
 
     const onZoom = (value: number, transitions?: boolean) => {
       if (!experimentRef.current || !settings) return;
@@ -56,6 +68,20 @@ export const FixedCropperWithSlider = forwardRef<
       experimentRef.current.zoomImage(getZoomFactor(state, settings, value), {
         transitions: !!transitions,
       });
+    };
+
+    const onCrop = () => {
+      if (experimentRef.current) {
+        setCoordinates(experimentRef.current.getCoordinates());
+        const cropped = experimentRef.current.getCanvas()?.toDataURL();
+        if (cropped) {
+          setImage(cropped);
+          setCroppedImage(cropped);
+          onCropSuccess();
+        } else {
+          console.log("the crop was unsuccessfull");
+        }
+      }
     };
 
     return (
@@ -95,7 +121,10 @@ export const FixedCropperWithSlider = forwardRef<
               onZoom(Math.min(1, Math.max(0, e[0] / 100)));
             }}
           />
-          <Button className="rounded-full px-3 py-5 cursor-pointer dark:px-3 dark:py-5">
+          <Button
+            onClick={() => onCrop()}
+            className="rounded-full px-3 py-5 cursor-pointer dark:px-3 dark:py-5"
+          >
             <Check />
           </Button>
         </div>

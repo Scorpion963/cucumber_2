@@ -1,9 +1,15 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import { Form, FormField } from "@/components/ui/form";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormMessage,
+} from "@/components/ui/form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Edit } from "lucide-react";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import z from "zod";
 import { customizeUserFormSchema } from "../schemas/customizeUserSchema";
 import { authClient } from "@/lib/auth-client";
@@ -11,6 +17,9 @@ import FloatingInput from "../../../../components/FloatingInput";
 import FormSection from "../../../../components/FormSection";
 import DarkLineBreak from "../../../../components/DarkLineBreak";
 import { handleFieldErrors } from "@/lib/errors/handleFieldErrors";
+import ChangeAvatar from "@/components/ChangeAvatar";
+import { useEffect } from "react";
+import { FixedSliderCropperModal, ModalWithCropper } from "@/app/test/page";
 
 // TODO: Display username taken error
 
@@ -26,8 +35,17 @@ export default function CustomizeUserForm({
       firstName: defaultFields.firstName,
       lastName: defaultFields.lastName,
       username: defaultFields.username,
+      image: null,
     },
   });
+
+  const image = useWatch({ control: form.control, name: "image" });
+
+  useEffect(() => {
+    if (!image) return;
+
+    console.log("image: ", image);
+  }, [image]);
 
   async function onSubmit(data: z.infer<typeof customizeUserFormSchema>) {
     const result = await authClient.updateUser({
@@ -66,9 +84,20 @@ export default function CustomizeUserForm({
       >
         <div>
           <div className="w-full flex items-center justify-center">
-            <div className="size-32 rounded-full bg-gray-500 flex items-center justify-center">
-              <Edit className="size-16" />
-            </div>
+            <FormField
+              name="image"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <>
+                  <FormItem>
+                    <FormControl>
+                      <FixedSliderCropperModal />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                </>
+              )}
+            />
           </div>
           <FormSection>
             {" "}
@@ -155,24 +184,3 @@ export default function CustomizeUserForm({
     </Form>
   );
 }
-
-// <FormItem className="relative">
-//                   <FormControl>
-//                     <Input placeholder="hello" className="peer placeholder:text-transparent dark:bg-background focus:bg-background" {...field} />
-//                   </FormControl>
-//                   <FormLabel className="peer-focus:bottom-8 bottom-3 transition-all bg-background px-1 peer-focus:text-xs absolute left-3 peer-not-placeholder-shown:bottom-8 peer-not-placeholder-shown:text-xs">
-//                     Username
-//                   </FormLabel>
-//                 </FormItem>
-
-// one of the versions:
-
-//  <FormField
-//             name="lastName"
-//             control={form.control}
-//             render={({ field }) => (
-//               <>
-
-//               </>
-//             )}
-//           />

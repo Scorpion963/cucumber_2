@@ -5,6 +5,7 @@ export const customizeUserFormSchema = z.object({
   lastName: z.string().trim(),
   bio: z.string().trim(),
   username: z.string().trim().min(5),
+  image: z.file().mime(["image/png", "image/jpeg"]).nullable(),
 });
 
 export const customizeUserSchemaServer = z.object({
