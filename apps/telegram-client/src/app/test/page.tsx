@@ -8,28 +8,39 @@ import { ChangeEvent, ReactNode, useEffect, useRef, useState } from "react";
 import { CircleStencil, ImageRestriction } from "react-advanced-cropper";
 
 export default function Page() {
-  return (
-    <div>
-      <ModalWithCropper />
-    </div>
-  );
+  return <div>{/* <ModalWithCropper /> */}</div>;
 }
 
-function ModalWithCropper() {
+export function ModalWithCropper({
+  setImageInForm,
+}: {
+  setImageInForm: (croppedImage: File) => void;
+}) {
   const [image, setImage] = useState<null | string>(null);
-  const [croppedImage, setCroppedImage] = useState<string>();
+  const [croppedImage, setCroppedImage] = useState<Blob>();
   const { setIsOpen } = useModal();
+
+  // TODO: Safely handle fetch
+  async function onCropSuccess(cropped: string) {
+    setIsOpen(false);
+    setImage(cropped);
+    const res = await fetch(cropped);
+    const b = await res.blob();
+    setCroppedImage(b);
+    const file = new File([b], "avatar.png", { type: b.type });
+    setImageInForm(file)
+  }
+
+  useEffect(() => {
+    console.log("blob: ", croppedImage);
+  }, [croppedImage]);
 
   return (
     <>
-      <AvatarChange
-        image={croppedImage ? croppedImage : image}
-        setImage={setImage}
-      />
+      <AvatarChange image={image} setImage={setImage} />
       <ModalContent>
         <FixedCropperWithSlider
-          onCropSuccess={() => setIsOpen(false)}
-          setCroppedImage={setCroppedImage}
+          onCropSuccess={(cropped) => onCropSuccess(cropped)}
           stencilSize={{ width: 400, height: 400 }}
           src={
             image
@@ -51,7 +62,7 @@ function ModalWithCropper() {
   );
 }
 
-export function FixedSliderCropperModal() {
+function FixedSliderCropperModal() {
   return (
     <Modal defaultOpen={false}>
       <ModalWithCropper />

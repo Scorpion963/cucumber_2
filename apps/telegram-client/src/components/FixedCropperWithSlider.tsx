@@ -29,8 +29,7 @@ import { Button } from "./ui/button";
 
 export type CustomCropperProps = FixedCropperProps &
   CropperFadeTypes & {
-    setCroppedImage: React.Dispatch<SetStateAction<string | undefined>>;
-    onCropSuccess: () => void;
+    onCropSuccess: (e: string) => void;
   };
 
 export type CustomCropperRef = FixedCropperRef;
@@ -49,7 +48,6 @@ export const FixedCropperWithSlider = forwardRef<
       stencilProps,
       fadeStyle,
       fadeClassName,
-      setCroppedImage,
       onCropSuccess,
       ...props
     },
@@ -70,14 +68,13 @@ export const FixedCropperWithSlider = forwardRef<
       });
     };
 
-    const onCrop = () => {
+    const onCrop = async () => {
       if (experimentRef.current) {
         setCoordinates(experimentRef.current.getCoordinates());
         const cropped = experimentRef.current.getCanvas()?.toDataURL();
         if (cropped) {
           setImage(cropped);
-          setCroppedImage(cropped);
-          onCropSuccess();
+          onCropSuccess(cropped);
         } else {
           console.log("the crop was unsuccessfull");
         }

@@ -20,6 +20,7 @@ import { handleFieldErrors } from "@/lib/errors/handleFieldErrors";
 import ChangeAvatar from "@/components/ChangeAvatar";
 import { useEffect } from "react";
 import { FixedSliderCropperModal, ModalWithCropper } from "@/app/test/page";
+import { Modal } from "@/components/Modal";
 
 // TODO: Display username taken error
 
@@ -91,7 +92,9 @@ export default function CustomizeUserForm({
                 <>
                   <FormItem>
                     <FormControl>
-                      <FixedSliderCropperModal />
+                      <Modal defaultOpen={false}>
+                        <ModalWithCropper setImageInForm={field.onChange} />
+                      </Modal>
                     </FormControl>
                     <FormMessage />
                   </FormItem>
