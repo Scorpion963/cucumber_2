@@ -1,3 +1,6 @@
+export declare const IMAGE_PROVIDERS: readonly ["google", "github", "aws"];
+export type ImageProviderTypes = (typeof IMAGE_PROVIDERS)[number];
+export declare const ImageProviderTypesEnum: import("drizzle-orm/pg-core").PgEnum<["google", "github", "aws"]>;
 export declare const user: import("drizzle-orm/pg-core").PgTableWithColumns<{
     name: "user";
     schema: undefined;
@@ -176,6 +179,23 @@ export declare const user: import("drizzle-orm/pg-core").PgTableWithColumns<{
         }, {}, {
             length: 100;
         }>;
+        imageProvider: import("drizzle-orm/pg-core").PgColumn<{
+            name: "imageProvider";
+            tableName: "user";
+            dataType: "string";
+            columnType: "PgEnumColumn";
+            data: "google" | "github" | "aws";
+            driverParam: string;
+            notNull: false;
+            hasDefault: false;
+            isPrimaryKey: false;
+            isAutoincrement: false;
+            hasRuntimeDefault: false;
+            enumValues: ["google", "github", "aws"];
+            baseColumn: never;
+            identity: undefined;
+            generated: undefined;
+        }, {}, {}>;
     };
     dialect: "pg";
 }>;

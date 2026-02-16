@@ -3,11 +3,13 @@ var __makeTemplateObject = (this && this.__makeTemplateObject) || function (cook
     return cooked;
 };
 import { relations, sql } from "drizzle-orm";
-import { pgTable, text, timestamp, boolean, uuid, index, varchar, } from "drizzle-orm/pg-core";
+import { pgTable, text, timestamp, boolean, uuid, index, varchar, pgEnum, } from "drizzle-orm/pg-core";
 import { chatMember } from "./chatMember";
 import { contact } from "./contact";
 import { message } from "./message/message";
 import { reaction } from "./message/reaction";
+export var IMAGE_PROVIDERS = ["google", "github", "aws"];
+export var ImageProviderTypesEnum = pgEnum("image_provider", IMAGE_PROVIDERS);
 export var user = pgTable("user", {
     id: uuid("id")
         .default(sql(templateObject_1 || (templateObject_1 = __makeTemplateObject(["pg_catalog.gen_random_uuid()"], ["pg_catalog.gen_random_uuid()"]))))
@@ -23,7 +25,8 @@ export var user = pgTable("user", {
         .notNull(),
     username: text("username").notNull().unique(),
     bio: varchar({ length: 100 }),
-    lastName: varchar({ length: 100 })
+    lastName: varchar({ length: 100 }),
+    imageProvider: ImageProviderTypesEnum()
 });
 export var account = pgTable("account", {
     id: uuid("id")

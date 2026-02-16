@@ -1,7 +1,7 @@
 import z from "zod";
 
 export const customizeUserFormSchema = z.object({
-  firstName: z.string().trim().min(1),
+  firstName: z.string().trim().min(1, {message: "Please provide your first name"}),
   lastName: z.string().trim(),
   bio: z.string().trim(),
   username: z.string().trim().min(5),

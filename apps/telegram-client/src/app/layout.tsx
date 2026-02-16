@@ -10,18 +10,6 @@ import Sidebar from "@/features/sidebar/Sidebar";
 import { Toaster } from "@/components/ui/sonner";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
-import { and, eq, ne } from "drizzle-orm";
-import { alias } from "drizzle-orm/pg-core";
-import {
-  chatMember,
-  chats,
-  contact,
-  db,
-  message,
-  messageMedia,
-  reaction,
-  user,
-} from "db";
 import mapChatsToStore from "@/server/mappers/mapChatsToStore";
 import findHomeChatsForStore from "@/server/db/findHomeChatsForStore";
 import { HomeChatsProvider } from "@/providers/user-store-provider";
@@ -50,11 +38,11 @@ export default async function RootLayout({
   if (!session?.user) return;
   console.log(session.user.email);
 
-  const homeChats = await findHomeChatsForStore(session.user.id)
+  const homeChats = await findHomeChatsForStore(session.user.id);
 
-  const {mappedChatInfo, mappedContacts} = mapChatsToStore(homeChats);
+  const { mappedChatInfo, mappedContacts } = mapChatsToStore(homeChats);
 
-  console.log("mapped: ", mappedChatInfo, mappedContacts)
+  console.log("mapped: ", mappedChatInfo, mappedContacts);
 
   return (
     <html lang="en">
@@ -84,5 +72,3 @@ export default async function RootLayout({
     </html>
   );
 }
-
-

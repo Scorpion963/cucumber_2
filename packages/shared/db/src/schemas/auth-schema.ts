@@ -7,11 +7,16 @@ import {
   uuid,
   index,
   varchar,
+  pgEnum,
 } from "drizzle-orm/pg-core";
 import { chatMember } from "./chatMember";
 import { contact } from "./contact";
 import { message } from "./message/message";
 import { reaction } from "./message/reaction";
+
+export const IMAGE_PROVIDERS = ["google", "github", "aws"] as const;
+export type ImageProviderTypes = (typeof IMAGE_PROVIDERS)[number];
+export const ImageProviderTypesEnum = pgEnum("image_provider", IMAGE_PROVIDERS);
 
 export const user = pgTable("user", {
   id: uuid("id")
@@ -28,7 +33,8 @@ export const user = pgTable("user", {
     .notNull(),
   username: text("username").notNull().unique(),
   bio: varchar({length: 100}),
-  lastName: varchar({length: 100})
+  lastName: varchar({length: 100}),
+  imageProvider: ImageProviderTypesEnum() 
 });
 
 export const account = pgTable(

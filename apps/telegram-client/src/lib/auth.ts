@@ -3,9 +3,11 @@ import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { db, user } from "db";
 import { createAuthMiddleware } from "better-auth/api";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { throwAPIError } from "./APIErrorFactory";
 import { headers } from "next/headers";
+import { DeleteObjectCommand } from "@aws-sdk/client-s3";
+import { BUCKET_NAME, s3 } from "@/services/s3/s3";
 
 // TODO: add middleware auth check
 
@@ -65,6 +67,12 @@ export const auth = betterAuth({
         input: true,
         unique: false,
       },
+      imageProvider: {
+        type: "string",
+        required: false,
+        input: true,
+        unique: false,
+      },
     },
   },
   hooks: {
@@ -74,7 +82,7 @@ export const auth = betterAuth({
 
       if (!(ctx.path === "/sign-up/email" || ctx.path === "/update-user"))
         return;
-      
+
       switch (ctx.path) {
         case "/sign-up/email":
           if (ctx.body?.username.trim().length === 0) {
@@ -97,16 +105,42 @@ export const auth = betterAuth({
           const sessionUsername = await auth.api.getSession({
             headers: await headers(),
           });
+          if (!sessionUsername?.user.username) {
+            throw throwAPIError("UNAUTHORIZED");
+          }
           const bodyUsername = ctx.body?.username?.trim();
 
-          if (sessionUsername?.user.username === bodyUsername) return;
+          if (sessionUsername?.user.username !== bodyUsername) {
+            await handleUsernameExistsError(bodyUsername);
+          }
 
-          await handleUsernameExistsError(bodyUsername);
+          const bodyImage = ctx.body?.image;
+          if (bodyImage) {
+            console.log("body image", bodyImage)
+            console.log("running before handle s3imageupdate")
+            await handleS3ImageUpdate(sessionUsername.user.username);
+          }
+
           break;
       }
     }),
   },
 });
+
+async function handleS3ImageUpdate(username: string) {
+  const currentImage = await db.query.user.findFirst({
+    where: and(eq(user.username, username)),
+    columns: { image: true, imageProvider: true },
+  });
+  console.log("current image: ", currentImage)
+  if (!currentImage?.image) return;
+
+  console.log("running before deletion command")
+  const command = new DeleteObjectCommand({ Bucket: BUCKET_NAME, Key: currentImage.image });
+  const response = await s3.send(command);
+  console.log("Deleted object response: ", response);
+  return;
+}
 
 async function handleUsernameExistsError(username: string) {
   const usernameExists = await db.query.user.findFirst({

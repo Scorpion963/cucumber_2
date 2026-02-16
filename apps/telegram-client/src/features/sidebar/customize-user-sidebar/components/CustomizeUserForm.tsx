@@ -1,4 +1,6 @@
 "use client";
+import {motion} from 'framer-motion'
+import { ImSpinner8 } from "react-icons/im";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -8,7 +10,6 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Edit } from "lucide-react";
 import { useForm, useWatch } from "react-hook-form";
 import z from "zod";
 import { customizeUserFormSchema } from "../schemas/customizeUserSchema";
@@ -17,17 +18,27 @@ import FloatingInput from "../../../../components/FloatingInput";
 import FormSection from "../../../../components/FormSection";
 import DarkLineBreak from "../../../../components/DarkLineBreak";
 import { handleFieldErrors } from "@/lib/errors/handleFieldErrors";
-import ChangeAvatar from "@/components/ChangeAvatar";
-import { useEffect } from "react";
-import { FixedSliderCropperModal, ModalWithCropper } from "@/app/test/page";
 import { Modal } from "@/components/Modal";
-
+import { ModalWithCropper } from "@/components/ModalWithCropper/ModalWithCropper";
+import { getSignedPutUrl } from "@/actions/getSignedUrl";
+import { IMAGE_PROVIDERS, ImageProviderTypes, user } from "db";
+import { ReasonPhrases } from "http-status-codes";
+import { Check } from "lucide-react";
+import { AnimatePresence } from "framer-motion";
 // TODO: Display username taken error
 
+// TODO: instead of manually passing down the image and the image provider, create a resolver that's going to return a signedUrl in case an image is from aws
+// or return the image
+
 export default function CustomizeUserForm({
+  defaultUserImage,
   defaultFields,
 }: {
   defaultFields: z.infer<typeof customizeUserFormSchema>;
+  defaultUserImage: {
+    imageProvider: ImageProviderTypes | null;
+    image: string | null;
+  };
 }) {
   const form = useForm<z.infer<typeof customizeUserFormSchema>>({
     resolver: zodResolver(customizeUserFormSchema),
@@ -40,40 +51,85 @@ export default function CustomizeUserForm({
     },
   });
 
-  const image = useWatch({ control: form.control, name: "image" });
+  async function handleImageUpload(imageToUpload: File) {
+    const url = await getSignedPutUrl(imageToUpload.type);
 
-  useEffect(() => {
-    if (!image) return;
+    if (url.error) {
+      handleResponseErrors(url.error.code);
+    }
 
-    console.log("image: ", image);
-  }, [image]);
+    const response = await fetch(url.data!.url, {
+      method: "PUT",
+      body: imageToUpload,
+      headers: { "Content-Type": imageToUpload.type },
+    });
+
+    if (!response.ok) {
+      form.setError("root", {
+        message:
+          "An error happened on our end during the image uploading, please try again later",
+      });
+      return;
+    }
+
+    return url.data!.key;
+  }
+
+  function handleResponseErrors(errorCode: string) {
+    switch (errorCode) {
+      case ReasonPhrases.UNAUTHORIZED:
+        form.setError("root", {
+          message: "You must be logged in to change your information",
+        });
+        return;
+      case ReasonPhrases.UNPROCESSABLE_ENTITY:
+        form.setError("root", { message: "Invalid content type" });
+        return;
+      default:
+        form.setError("root", {
+          message: "Unexpected error happened, please try again later",
+        });
+    }
+  }
 
   async function onSubmit(data: z.infer<typeof customizeUserFormSchema>) {
-    const result = await authClient.updateUser({
+    let uploadedImageKey;
+    const baseUpdateUser = {
       bio: data.bio.trim().length === 0 ? null : data.bio,
       lastName: data.lastName.trim().length === 0 ? null : data.lastName,
       name: data.firstName,
       username: data.username,
-    });
+    };
 
-    console.log("result: ", result);
+    if (data.image) {
+      uploadedImageKey = await handleImageUpload(data.image);
+    }
+
+    const result = await authClient.updateUser({
+      ...baseUpdateUser,
+      ...(uploadedImageKey && {
+        image: uploadedImageKey,
+        imageProvider: "aws",
+      }),
+    });
 
     if (result.error?.message && result.error.code) {
       handleFieldErrors(
         { code: result.error.code, message: result.error.message },
-        form
+        form,
       );
     }
 
-    console.log(form.getFieldState("username"));
-
     if (result.data) {
-      form.reset({
-        bio: data.bio,
-        firstName: data.firstName,
-        lastName: data.lastName,
-        username: data.username,
-      });
+      form.reset(
+        {
+          bio: data.bio,
+          firstName: data.firstName,
+          lastName: data.lastName,
+          username: data.username,
+        },
+        { keepErrors: true },
+      );
     }
   }
 
@@ -93,9 +149,13 @@ export default function CustomizeUserForm({
                   <FormItem>
                     <FormControl>
                       <Modal defaultOpen={false}>
-                        <ModalWithCropper setImageInForm={field.onChange} />
+                        <ModalWithCropper
+                          defaultImage={defaultUserImage.image}
+                          setImageInForm={field.onChange}
+                        />
                       </Modal>
                     </FormControl>
+                    <p></p>
                     <FormMessage />
                   </FormItem>
                 </>
@@ -179,8 +239,33 @@ export default function CustomizeUserForm({
         </div>
 
         <FormSection>
-          <Button disabled={!form.formState.isDirty} className="w-full">
-            Save
+          <div className='h-6'>
+            <AnimatePresence>
+              {form.formState.isSubmitSuccessful &&
+                !form.formState.isSubmitting && (
+                  <motion.div initial={{opacity: 0}} animate={{opacity: 1}} exit={{opacity: 0}} className="flex gap-2 text-green-400">
+                    <Check />
+                    <span>Success</span>
+                  </motion.div>
+                )}
+            </AnimatePresence>
+          </div>
+
+          {form.formState.errors.root && (
+            <p className="text-destructive">
+              {form.formState.errors.root.message}
+            </p>
+          )}
+
+          <Button
+            disabled={!form.formState.isDirty}
+            className="w-full cursor-pointer"
+          >
+            {form.formState.isSubmitting ? (
+              <ImSpinner8 className="animate-spin" />
+            ) : (
+              <>Save</>
+            )}
           </Button>
         </FormSection>
       </form>

@@ -11,8 +11,6 @@ import ChatClient from "./ChatClient";
 import { SidebarRouterProvider } from "@/components/SidebarRouter/providers/sidebar-routes-provider";
 
 
-
-
 export async function ChatServer({ paramsId }: { paramsId: string }) {
   const user = await auth.api.getSession({ headers: await headers() });
   const chat = await handleChatFetch(paramsId, user!.user.id);

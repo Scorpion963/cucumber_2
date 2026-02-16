@@ -40,7 +40,9 @@ export default async function handleChatFetch(
       };
     }
     case "@": {
+      console.log("BEFORE FETCHING CHATTER: ")
       const chatter = await getUserWithContactSingle(slicedId, currentUserId);
+      console.log("CHATTER:", chatter)
       if (!chatter)
         return {
           canAccess: false,

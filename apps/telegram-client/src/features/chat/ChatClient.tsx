@@ -9,6 +9,13 @@ import { useEffect } from "react";
 import SidebarRouter from "@/components/SidebarRouter/SidebarRouter";
 import { privateSidebarRoutesMap } from "./components/EllipsisMenuManager";
 
+//  the use of useChatStore and useHomeChatsStore feels a little weird
+// because the useChatStore almost plays almost the same role as the useHomechatsStore but for single user
+// that has been found, i feel like since the state is local
+// there is not need in creating a new store just for a single user
+// i could just just pass this user down the props and add it the homeChatsStore
+// and in case i need to display info i could creete hooks that would return just the data
+
 export default function ChatClient() {
   const { chatter } = useChatStore((state) => state);
   const { messages } = useMessageStore((state) => state);
