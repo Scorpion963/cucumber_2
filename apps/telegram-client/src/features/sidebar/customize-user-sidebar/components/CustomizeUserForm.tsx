@@ -258,7 +258,7 @@ export default function CustomizeUserForm({
           )}
 
           <Button
-            disabled={!form.formState.isDirty}
+            disabled={!form.formState.isDirty || form.formState.isSubmitting}
             className="w-full cursor-pointer"
           >
             {form.formState.isSubmitting ? (

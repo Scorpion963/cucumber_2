@@ -71,6 +71,7 @@ export const FixedCropperWithSlider = forwardRef<
     const onCrop = async () => {
       if (experimentRef.current) {
         setCoordinates(experimentRef.current.getCoordinates());
+        console.log("Image inside of oncrop: ", experimentRef.current.getCanvas())
         const cropped = experimentRef.current.getCanvas()?.toDataURL();
         if (cropped) {
           setImage(cropped);

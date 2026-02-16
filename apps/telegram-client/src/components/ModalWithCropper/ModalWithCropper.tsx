@@ -3,32 +3,78 @@ import { ModalContent, useModal } from "../Modal";
 import AvatarChange from "./AvatarChange";
 import { FixedCropperWithSlider } from "../FixedCropperWithSlider";
 import { CircleStencil, ImageRestriction } from "react-advanced-cropper";
+import { toast } from "sonner";
 
 export function ModalWithCropper({
   setImageInForm,
-  defaultImage
+  defaultImage,
 }: {
   setImageInForm: (croppedImage: File) => void;
-  defaultImage: string | null
+  defaultImage: string | null;
 }) {
   const [image, setImage] = useState<null | string>(null);
-  const [croppedImage, setCroppedImage] = useState<Blob>();
   const { setIsOpen } = useModal();
+
+  function compressImage(
+    image: string,
+    targetSize: number = 256,
+    quality: number = 0.8,
+  ): Promise<Blob> {
+    return new Promise((resolve, reject) => {
+      const canvas = document.createElement("canvas");
+      const context = canvas.getContext("2d");
+      const imgElement = new Image();
+      imgElement.src = image;
+
+      if (!context) {
+        reject(new Error("Context can't be loaded, canvas not supported"));
+        return;
+      }
+
+      imgElement.onload = async () => {
+        if(imgElement.height <= targetSize || imgElement.width <= targetSize) {
+          const response = await fetch(image)
+          const blob = await response.blob()
+          return blob
+        }
+
+        canvas.width = targetSize;
+        canvas.height = targetSize;
+
+        context.imageSmoothingEnabled = true;
+        context.imageSmoothingQuality = "high";
+
+        context.drawImage(imgElement, 0, 0, targetSize, targetSize);
+        canvas.toBlob(
+          (blob) => {
+            if (!blob) {
+              reject(new Error("Compression failed"));
+              return;
+            }
+            resolve(blob);
+          },
+          "image/jpeg",
+          quality,
+        );
+      };
+    });
+  }
 
   // TODO: Safely handle fetch
   async function onCropSuccess(cropped: string) {
     setIsOpen(false);
     setImage(cropped);
-    const res = await fetch(cropped);
-    const b = await res.blob();
-    setCroppedImage(b);
-    const file = new File([b], "avatar.png", { type: b.type });
-    setImageInForm(file);
-  }
 
-  useEffect(() => {
-    console.log("blob: ", croppedImage);
-  }, [croppedImage]);
+    try {
+      const compressedImage = await compressImage(cropped);
+      console.log("compressedImage: ", compressedImage);
+      const file = new File([compressedImage], "avatar.png", { type: "image/jpeg" });
+      setImageInForm(file);
+    } catch (err) {
+      console.log(err)
+      toast.error("Image prcessing failed");
+    }
+  }
 
   return (
     <>
