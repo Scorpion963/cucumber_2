@@ -18,6 +18,8 @@ export default async function CustomizeUserSidebar() {
       ? await getImageUrlS3(currentUser.user.image)
       : (currentUser.user.image ?? null);
 
+      console.log(imageUrl)
+
   return (
     <div className="pr-2">
     

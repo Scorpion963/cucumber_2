@@ -64,7 +64,7 @@ export function ModalWithCropper({
   async function onCropSuccess(cropped: string) {
     setIsOpen(false);
     setImage(cropped);
-
+    URL.revokeObjectURL(cropped)
     try {
       const compressedImage = await compressImage(cropped);
       console.log("compressedImage: ", compressedImage);

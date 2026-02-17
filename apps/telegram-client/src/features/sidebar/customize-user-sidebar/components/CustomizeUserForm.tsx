@@ -1,5 +1,5 @@
 "use client";
-import {motion} from 'framer-motion'
+import { motion } from "framer-motion";
 import { ImSpinner8 } from "react-icons/im";
 import { Button } from "@/components/ui/button";
 import {
@@ -20,7 +20,7 @@ import DarkLineBreak from "../../../../components/DarkLineBreak";
 import { handleFieldErrors } from "@/lib/errors/handleFieldErrors";
 import { Modal } from "@/components/Modal";
 import { ModalWithCropper } from "@/components/ModalWithCropper/ModalWithCropper";
-import { getSignedPutUrl } from "@/actions/getSignedUrl";
+import { getPresignedPostUrl, getSignedPutUrl } from "@/actions/getSignedUrl";
 import { IMAGE_PROVIDERS, ImageProviderTypes, user } from "db";
 import { ReasonPhrases } from "http-status-codes";
 import { Check } from "lucide-react";
@@ -29,6 +29,10 @@ import { AnimatePresence } from "framer-motion";
 
 // TODO: instead of manually passing down the image and the image provider, create a resolver that's going to return a signedUrl in case an image is from aws
 // or return the image
+
+// TODO IMPORTANT: add a zustand store and provider to update the user's state when it's changed, because now even if i change the state
+// in the edit form, it doesn't actually update it clientside, as soon as i switch sidebars it goes back to the old data because the url
+// doesn't change and therefore no data fetching
 
 export default function CustomizeUserForm({
   defaultUserImage,
@@ -51,28 +55,39 @@ export default function CustomizeUserForm({
     },
   });
 
-  async function handleImageUpload(imageToUpload: File) {
-    const url = await getSignedPutUrl(imageToUpload.type);
-
+  async function handleImageUploadPost(imageToUpload: File) {
+    const url = await getPresignedPostUrl(imageToUpload.type);
     if (url.error) {
       handleResponseErrors(url.error.code);
     }
 
-    const response = await fetch(url.data!.url, {
-      method: "PUT",
-      body: imageToUpload,
-      headers: { "Content-Type": imageToUpload.type },
+    const formData = new FormData();
+    Object.entries(url.data!.url.fields).forEach(([f, v]) => {
+      formData.append(f, v);
     });
+    formData.append("file", imageToUpload);
 
-    if (!response.ok) {
+    console.log("URL: ", url);
+
+    let response;
+    try {
+       response = await fetch(url.data!.url.url, {
+        method: "POST",
+        body: formData,
+      });
+    } catch (err) {
+     console.log("ERROR: ", err)
+    }
+
+    if (!response?.ok) {
+      console.log("an error inside handleIMageUploadPost response: ", response);
       form.setError("root", {
         message:
           "An error happened on our end during the image uploading, please try again later",
       });
-      return;
     }
 
-    return url.data!.key;
+    return url.data?.key;
   }
 
   function handleResponseErrors(errorCode: string) {
@@ -93,6 +108,7 @@ export default function CustomizeUserForm({
   }
 
   async function onSubmit(data: z.infer<typeof customizeUserFormSchema>) {
+    console.log("ONSUBMIT");
     let uploadedImageKey;
     const baseUpdateUser = {
       bio: data.bio.trim().length === 0 ? null : data.bio,
@@ -102,7 +118,8 @@ export default function CustomizeUserForm({
     };
 
     if (data.image) {
-      uploadedImageKey = await handleImageUpload(data.image);
+      console.log("UPLOADING THE IMAGE :", uploadedImageKey);
+      uploadedImageKey = await handleImageUploadPost(data.image);
     }
 
     const result = await authClient.updateUser({
@@ -239,11 +256,16 @@ export default function CustomizeUserForm({
         </div>
 
         <FormSection>
-          <div className='h-6'>
+          <div className="h-6">
             <AnimatePresence>
               {form.formState.isSubmitSuccessful &&
                 !form.formState.isSubmitting && (
-                  <motion.div initial={{opacity: 0}} animate={{opacity: 1}} exit={{opacity: 0}} className="flex gap-2 text-green-400">
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    className="flex gap-2 text-green-400"
+                  >
                     <Check />
                     <span>Success</span>
                   </motion.div>
