@@ -57,8 +57,8 @@ export const auth = betterAuth({
       },
       bio: {
         type: "string",
-        required: false,
         input: true,
+        required: false,
         unique: false,
       },
       lastName: {

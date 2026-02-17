@@ -25,6 +25,7 @@ import { IMAGE_PROVIDERS, ImageProviderTypes, user } from "db";
 import { ReasonPhrases } from "http-status-codes";
 import { Check } from "lucide-react";
 import { AnimatePresence } from "framer-motion";
+import { useRouter } from "next/navigation";
 // TODO: Display username taken error
 
 // TODO: instead of manually passing down the image and the image provider, create a resolver that's going to return a signedUrl in case an image is from aws

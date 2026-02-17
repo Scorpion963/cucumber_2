@@ -34,7 +34,7 @@ export const user = pgTable("user", {
   username: text("username").notNull().unique(),
   bio: varchar({length: 100}),
   lastName: varchar({length: 100}),
-  imageProvider: ImageProviderTypesEnum() 
+  imageProvider: ImageProviderTypesEnum()
 });
 
 export const account = pgTable(

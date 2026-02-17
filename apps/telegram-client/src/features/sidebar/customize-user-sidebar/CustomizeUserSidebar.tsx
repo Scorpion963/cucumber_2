@@ -18,7 +18,7 @@ export default async function CustomizeUserSidebar() {
       ? await getImageUrlS3(currentUser.user.image)
       : (currentUser.user.image ?? null);
 
-      console.log(imageUrl)
+      console.log("Image url", imageUrl)
 
   return (
     <div className="pr-2">
@@ -40,6 +40,7 @@ export default async function CustomizeUserSidebar() {
   );
 }
 
+// TODO: the presigned links should also be generated on the client in case the person hasn't reloaded the page
 async function getImageUrlS3(key: string) {
   const command = new GetObjectCommand({ Bucket: BUCKET_NAME, Key: key });
   const url = await getSignedUrl(s3, command, { expiresIn: 120 });
