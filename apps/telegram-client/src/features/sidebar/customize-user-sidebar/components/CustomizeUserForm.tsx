@@ -10,7 +10,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm, useWatch } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import z from "zod";
 import { customizeUserFormSchema } from "../schemas/customizeUserSchema";
 import { authClient } from "@/lib/auth-client";
@@ -20,12 +20,13 @@ import DarkLineBreak from "../../../../components/DarkLineBreak";
 import { handleFieldErrors } from "@/lib/errors/handleFieldErrors";
 import { Modal } from "@/components/Modal";
 import { ModalWithCropper } from "@/components/ModalWithCropper/ModalWithCropper";
-import { getPresignedPostUrl, getSignedPutUrl } from "@/actions/getSignedUrl";
-import { IMAGE_PROVIDERS, ImageProviderTypes, user } from "db";
+import { getPresignedPostUrl } from "@/actions/getSignedUrl";
+import { ImageProviderTypes } from "db";
 import { ReasonPhrases } from "http-status-codes";
 import { Check } from "lucide-react";
 import { AnimatePresence } from "framer-motion";
-import { useRouter } from "next/navigation";
+import { useCurrentUserStore } from "@/providers/current-user-store-provider";
+import { useEffect } from "react";
 // TODO: Display username taken error
 
 // TODO: instead of manually passing down the image and the image provider, create a resolver that's going to return a signedUrl in case an image is from aws
@@ -45,16 +46,21 @@ export default function CustomizeUserForm({
     image: string | null;
   };
 }) {
+  const { updateUser, currentUser } = useCurrentUserStore((state) => state);
   const form = useForm<z.infer<typeof customizeUserFormSchema>>({
     resolver: zodResolver(customizeUserFormSchema),
     defaultValues: {
       bio: defaultFields.bio,
-      firstName: defaultFields.firstName,
+      name: defaultFields.name,
       lastName: defaultFields.lastName,
       username: defaultFields.username,
       image: null,
     },
   });
+  
+  useEffect(() => {
+    console.log("current user in customize form: ", currentUser)
+  }, [currentUser])
 
   async function handleImageUploadPost(imageToUpload: File) {
     const url = await getPresignedPostUrl(imageToUpload.type);
@@ -72,12 +78,12 @@ export default function CustomizeUserForm({
 
     let response;
     try {
-       response = await fetch(url.data!.url.url, {
+      response = await fetch(url.data!.url.url, {
         method: "POST",
         body: formData,
       });
     } catch (err) {
-     console.log("ERROR: ", err)
+      console.log("ERROR: ", err);
     }
 
     if (!response?.ok) {
@@ -114,7 +120,7 @@ export default function CustomizeUserForm({
     const baseUpdateUser = {
       bio: data.bio.trim().length === 0 ? null : data.bio,
       lastName: data.lastName.trim().length === 0 ? null : data.lastName,
-      name: data.firstName,
+      name: data.name,
       username: data.username,
     };
 
@@ -138,11 +144,21 @@ export default function CustomizeUserForm({
       );
     }
 
+    updateUser({
+      ...data,
+      ...(uploadedImageKey
+        ? {
+            image: uploadedImageKey,
+            imageProvider: "aws",
+          }
+        : { imageProvider: undefined, image: undefined }),
+    });
+
     if (result.data) {
       form.reset(
         {
           bio: data.bio,
-          firstName: data.firstName,
+          name: data.name,
           lastName: data.lastName,
           username: data.username,
         },
@@ -183,7 +199,7 @@ export default function CustomizeUserForm({
           <FormSection>
             {" "}
             <FormField
-              name="firstName"
+              name="name"
               control={form.control}
               render={({ field, fieldState }) => (
                 <>

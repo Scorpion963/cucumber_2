@@ -3,7 +3,7 @@
 import { ReasonPhrases } from "http-status-codes";
 import { auth } from "@/lib/auth";
 import { BUCKET_NAME, s3 } from "@/services/s3/s3";
-import { PutObjectCommand } from "@aws-sdk/client-s3";
+import { GetObjectCommand, PutObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { headers } from "next/headers";
 import { v4 } from "uuid";
@@ -68,7 +68,7 @@ export async function getPresignedPostUrl(contentType: string) {
     ],
     Fields: { key, "Content-Type": contentType },
   });
-  console.log("Presigned Post Url: ", url)
+  console.log("Presigned Post Url: ", url);
 
   return { error: null, data: { key, url: url } };
 }
@@ -108,4 +108,12 @@ export async function getSignedPutUrl(
   const url = await getSignedUrl(s3, command, { expiresIn: 120 });
 
   return { error: null, data: { key, url } };
+}
+
+// TODO: the presigned links should also be generated on the client in case the person hasn't reloaded the page
+export async function getImageUrlS3(key: string) {
+  "use server";
+  const command = new GetObjectCommand({ Bucket: BUCKET_NAME, Key: key });
+  const url = await getSignedUrl(s3, command, { expiresIn: 120 });
+  return url;
 }

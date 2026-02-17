@@ -1,4 +1,5 @@
 import { user } from "db"
+import { produce } from "immer"
 import { createStore } from "zustand/vanilla"
 
 export type CurrentUserState = {
@@ -6,7 +7,7 @@ export type CurrentUserState = {
 }
 
 export type CurrentUserActions = {
-    udpateUser: (userToUpdate: Partial<typeof user.$inferSelect>) => void
+    updateUser: (userToUpdate: Partial<typeof user.$inferSelect>) => void
 }
 
 export type CurrentUserStore = CurrentUserState & CurrentUserActions
@@ -14,9 +15,10 @@ export type CurrentUserStore = CurrentUserState & CurrentUserActions
 export const createCurrentUserStore = (initState: CurrentUserState) => {
     return createStore<CurrentUserStore>()(set => ({
         ...initState,
-        udpateUser: (userToUpdate) => {
+        updateUser: (userToUpdate) => {
             const cleanObject: Partial<typeof user.$inferSelect> = removeUndefined(userToUpdate) 
-            set((prev) => ({...prev, ...cleanObject}))
+            console.log("Clean object: ", cleanObject)
+            set(prev => ({...prev, currentUser: {...prev.currentUser, ...cleanObject}}))      
         }
     }))
 }
