@@ -9,3 +9,4 @@ export const s3 = new S3Client({
 });
 
 export const BUCKET_NAME = "chatting-app-test-bucket";
+export const PUBLIC_BUCKET_NAME = "cucumber-app-public"

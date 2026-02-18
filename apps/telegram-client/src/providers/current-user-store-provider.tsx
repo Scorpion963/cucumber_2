@@ -17,7 +17,7 @@ export type CurrentUserStoreProviderProps = {
 
 export function CurrentUserStoreProvider({children, currentUser} : CurrentUserStoreProviderProps) {
     const [store] = useState(() => createCurrentUserStore({currentUser}))
-
+    
     return <CurrentUserStoreContext value={store}>
         {children}
     </CurrentUserStoreContext>

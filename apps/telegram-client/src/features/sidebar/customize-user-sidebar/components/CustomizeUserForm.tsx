@@ -26,21 +26,15 @@ import { ReasonPhrases } from "http-status-codes";
 import { Check } from "lucide-react";
 import { AnimatePresence } from "framer-motion";
 import { useCurrentUserStore } from "@/providers/current-user-store-provider";
-import { useEffect } from "react";
+import { ReactNode, useEffect } from "react";
+
 // TODO: Display username taken error
-
-// TODO: instead of manually passing down the image and the image provider, create a resolver that's going to return a signedUrl in case an image is from aws
-// or return the image
-
-// TODO IMPORTANT: add a zustand store and provider to update the user's state when it's changed, because now even if i change the state
-// in the edit form, it doesn't actually update it clientside, as soon as i switch sidebars it goes back to the old data because the url
-// doesn't change and therefore no data fetching
 
 export default function CustomizeUserForm({
   defaultUserImage,
   defaultFields,
 }: {
-  defaultFields: z.infer<typeof customizeUserFormSchema>;
+  defaultFields: Omit<z.infer<typeof customizeUserFormSchema>, "image">;
   defaultUserImage: {
     imageProvider: ImageProviderTypes | null;
     image: string | null;
@@ -57,13 +51,9 @@ export default function CustomizeUserForm({
       image: null,
     },
   });
-  
-  useEffect(() => {
-    console.log("current user in customize form: ", currentUser)
-  }, [currentUser])
 
   async function handleImageUploadPost(imageToUpload: File) {
-    const url = await getPresignedPostUrl(imageToUpload.type);
+    const url = await getPresignedPostUrl(imageToUpload.type, "cucumber-app-public");
     if (url.error) {
       handleResponseErrors(url.error.code);
     }
@@ -115,7 +105,6 @@ export default function CustomizeUserForm({
   }
 
   async function onSubmit(data: z.infer<typeof customizeUserFormSchema>) {
-    console.log("ONSUBMIT");
     let uploadedImageKey;
     const baseUpdateUser = {
       bio: data.bio.trim().length === 0 ? null : data.bio,
@@ -125,7 +114,6 @@ export default function CustomizeUserForm({
     };
 
     if (data.image) {
-      console.log("UPLOADING THE IMAGE :", uploadedImageKey);
       uploadedImageKey = await handleImageUploadPost(data.image);
     }
 
@@ -189,7 +177,6 @@ export default function CustomizeUserForm({
                         />
                       </Modal>
                     </FormControl>
-                    <p></p>
                     <FormMessage />
                   </FormItem>
                 </>
@@ -197,7 +184,6 @@ export default function CustomizeUserForm({
             />
           </div>
           <FormSection>
-            {" "}
             <FormField
               name="name"
               control={form.control}
@@ -300,14 +286,22 @@ export default function CustomizeUserForm({
             disabled={!form.formState.isDirty || form.formState.isSubmitting}
             className="w-full cursor-pointer"
           >
-            {form.formState.isSubmitting ? (
-              <ImSpinner8 className="animate-spin" />
-            ) : (
+            <ConditionalLoading isLoading={form.formState.isSubmitting}>
               <>Save</>
-            )}
+            </ConditionalLoading>
           </Button>
         </FormSection>
       </form>
     </Form>
   );
+}
+
+function ConditionalLoading({
+  isLoading,
+  children,
+}: {
+  isLoading: boolean;
+  children: ReactNode;
+}) {
+  return isLoading ? <ImSpinner8 className="animate-spin" /> : children;
 }

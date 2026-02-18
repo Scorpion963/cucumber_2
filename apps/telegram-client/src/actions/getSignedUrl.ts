@@ -2,12 +2,13 @@
 
 import { ReasonPhrases } from "http-status-codes";
 import { auth } from "@/lib/auth";
-import { BUCKET_NAME, s3 } from "@/services/s3/s3";
+import { BUCKET_NAME, PUBLIC_BUCKET_NAME, s3 } from "@/services/s3/s3";
 import { GetObjectCommand, PutObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { headers } from "next/headers";
 import { v4 } from "uuid";
 import { createPresignedPost } from "@aws-sdk/s3-presigned-post";
+import { BUCKET_TYPE } from "@/services/s3/lib/helpers";
 
 type ErrorType = {
   code: string;
@@ -33,7 +34,7 @@ type SignedUrlResponseType = SignedUrlSuccessType | SignedUrlFailType;
 
 const ALLOWED_CONTENT_TYPES = ["image/png", "image/jpeg"];
 
-export async function getPresignedPostUrl(contentType: string) {
+export async function getPresignedPostUrl(contentType: string, bucketName: BUCKET_TYPE) {
   const user = await auth.api.getSession({ headers: await headers() });
   if (!user) {
     return {
@@ -58,7 +59,7 @@ export async function getPresignedPostUrl(contentType: string) {
   const key = `${v4()}.${extension}`;
 
   const url = await createPresignedPost(s3, {
-    Bucket: BUCKET_NAME,
+    Bucket: bucketName,
     Key: key,
     Expires: 120,
     Conditions: [
@@ -112,7 +113,6 @@ export async function getSignedPutUrl(
 
 // TODO: the presigned links should also be generated on the client in case the person hasn't reloaded the page
 export async function getImageUrlS3(key: string) {
-  "use server";
   const command = new GetObjectCommand({ Bucket: BUCKET_NAME, Key: key });
   const url = await getSignedUrl(s3, command, { expiresIn: 120 });
   return url;

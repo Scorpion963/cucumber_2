@@ -8,6 +8,7 @@ import { throwAPIError } from "./APIErrorFactory";
 import { headers } from "next/headers";
 import { DeleteObjectCommand } from "@aws-sdk/client-s3";
 import { BUCKET_NAME, s3 } from "@/services/s3/s3";
+import { BUCKET_TYPE } from "@/services/s3/lib/helpers";
 
 // TODO: add middleware auth check
 
@@ -118,7 +119,7 @@ export const auth = betterAuth({
           if (bodyImage) {
             console.log("body image", bodyImage)
             console.log("running before handle s3imageupdate")
-            await handleS3ImageUpdate(sessionUsername.user.username);
+            await handleS3ImageUpdate(sessionUsername.user.username, "cucumber-app-public");
           }
 
           break;
@@ -127,7 +128,7 @@ export const auth = betterAuth({
   },
 });
 
-async function handleS3ImageUpdate(username: string) {
+async function handleS3ImageUpdate(username: string, bucketName: BUCKET_TYPE) {
   const currentImage = await db.query.user.findFirst({
     where: and(eq(user.username, username)),
     columns: { image: true, imageProvider: true },
@@ -136,7 +137,7 @@ async function handleS3ImageUpdate(username: string) {
   if (!currentImage?.image) return;
 
   console.log("running before deletion command")
-  const command = new DeleteObjectCommand({ Bucket: BUCKET_NAME, Key: currentImage.image });
+  const command = new DeleteObjectCommand({ Bucket: bucketName, Key: currentImage.image });
   const response = await s3.send(command);
   console.log("Deleted object response: ", response);
   return;

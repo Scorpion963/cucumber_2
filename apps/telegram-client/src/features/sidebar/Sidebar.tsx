@@ -21,7 +21,7 @@ export default async function Sidebar() {
   if (!currentUser?.user) return;
 
   // I can't match the types that are in drizzle and better auth, they are slightly out of sync, because unprovided types 
-  // in drizzle are null by default, but better auth doesn't know that, so it assins them possible undefined which breaks the ts
+  // in drizzle are null by default, but better auth doesn't know that, so it assigns them possible undefined which breaks the ts
   
   const typedU = currentUser.user as typeof user.$inferSelect
 
