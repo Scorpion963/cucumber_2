@@ -15,6 +15,7 @@ export function UserImage({
         {imageUrl && (
           <Image
             fill
+            draggable="false"
             src={imageUrl}
             style={{ objectFit: "cover" }}
             alt={`{name}'s profile image`}

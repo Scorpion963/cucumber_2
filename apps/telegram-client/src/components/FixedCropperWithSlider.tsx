@@ -26,10 +26,12 @@ import {
 import { Slider } from "@/components/ui/slider";
 import { Check, X } from "lucide-react";
 import { Button } from "./ui/button";
+import { useModal } from "./Modal";
 
 export type CustomCropperProps = FixedCropperProps &
   CropperFadeTypes & {
     onCropSuccess: (e: string) => void;
+    onCropCancel: () => void
   };
 
 export type CustomCropperRef = FixedCropperRef;
@@ -44,20 +46,14 @@ export const FixedCropperWithSlider = forwardRef<
   CustomCropperProps
 >(
   (
-    {
-      stencilProps,
-      fadeStyle,
-      fadeClassName,
-      onCropSuccess,
-      ...props
-    },
-    ref
+    { stencilProps, fadeStyle, fadeClassName, onCropSuccess, onCropCancel, ...props },
+    ref,
   ) => {
     const [state, setState] = useState<CropperState | null>(null);
     const [settings, setSettings] = useState<ExtendedSettings | null>(null);
     const experimentRef = useRef<FixedCropperRef | null>(null);
     const [coordinates, setCoordinates] = useState<Coordinates | null>(null);
-    const [image, setImage] = useState<string>();
+    const { setIsOpen } = useModal();
     useImperativeHandle(ref, () => experimentRef.current!, []);
 
     const onZoom = (value: number, transitions?: boolean) => {
@@ -71,10 +67,12 @@ export const FixedCropperWithSlider = forwardRef<
     const onCrop = async () => {
       if (experimentRef.current) {
         setCoordinates(experimentRef.current.getCoordinates());
-        console.log("Image inside of oncrop: ", experimentRef.current.getCanvas())
+        console.log(
+          "Image inside of oncrop: ",
+          experimentRef.current.getCanvas(),
+        );
         const cropped = experimentRef.current.getCanvas()?.toDataURL();
         if (cropped) {
-          setImage(cropped);
           onCropSuccess(cropped);
         } else {
           console.log("the crop was unsuccessfull");
@@ -85,7 +83,9 @@ export const FixedCropperWithSlider = forwardRef<
     return (
       <div className="flex flex-col gap-4 p-4 rounded-lg bg-card">
         <div className="flex gap-2 items-center font-bold text-lg">
-          <X />
+          <Button variant={'ghost'} className="rounded-full cursor-pointer" onClick={() => {setIsOpen(false); onCropCancel()}}>
+            <X />
+          </Button>
           <div>Drag to resize</div>
         </div>
         <CropperFade
@@ -128,7 +128,7 @@ export const FixedCropperWithSlider = forwardRef<
         </div>
       </div>
     );
-  }
+  },
 );
 
 FixedCropperWithSlider.displayName = "CustomCropper";

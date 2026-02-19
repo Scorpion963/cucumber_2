@@ -53,7 +53,10 @@ export default function CustomizeUserForm({
   });
 
   async function handleImageUploadPost(imageToUpload: File) {
-    const url = await getPresignedPostUrl(imageToUpload.type, "cucumber-app-public");
+    const url = await getPresignedPostUrl(
+      imageToUpload.type,
+      "cucumber-app-public",
+    );
     if (url.error) {
       handleResponseErrors(url.error.code);
     }
@@ -115,6 +118,8 @@ export default function CustomizeUserForm({
 
     if (data.image) {
       uploadedImageKey = await handleImageUploadPost(data.image);
+      if (uploadedImageKey)
+        updateUser({ imageProvider: "aws", image: uploadedImageKey });
     }
 
     const result = await authClient.updateUser({
@@ -130,16 +135,13 @@ export default function CustomizeUserForm({
         { code: result.error.code, message: result.error.message },
         form,
       );
+      return;
     }
 
     updateUser({
       ...data,
-      ...(uploadedImageKey
-        ? {
-            image: uploadedImageKey,
-            imageProvider: "aws",
-          }
-        : { imageProvider: undefined, image: undefined }),
+      imageProvider: undefined,
+      image: undefined,
     });
 
     if (result.data) {
@@ -170,7 +172,7 @@ export default function CustomizeUserForm({
                 <>
                   <FormItem>
                     <FormControl>
-                      <Modal defaultOpen={false}>
+                      <Modal onAbort={() => form.setValue("image", null)} defaultOpen={false}>
                         <ModalWithCropper
                           defaultImage={defaultUserImage.image}
                           setImageInForm={field.onChange}

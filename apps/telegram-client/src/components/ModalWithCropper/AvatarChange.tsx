@@ -43,6 +43,7 @@ export default function AvatarChange({
         <div className="size-32 rounded-full overflow-hidden relative cursor-pointer bg-gray-500 flex items-center justify-center">
           {image ? (
             <Image
+            draggable="false"
               src={image}
               alt="Profile photo"
               fill

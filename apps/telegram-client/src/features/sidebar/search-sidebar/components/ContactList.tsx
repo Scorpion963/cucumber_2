@@ -4,6 +4,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import Contact from "./Contact";
 import { useSearchStore } from "../providers/search-store-provider";
 import useHomeChatsArray from "@/hooks/useHomeChatsArray";
+import { getPublicAssetUrl } from "@/services/s3/lib/helpers";
 
 // TODO: memoize chats and contacts
 
@@ -34,7 +35,7 @@ export default function ContactList() {
       ) : (
         usersFound.map((user) => (
           <Contact
-            imageUrl={user.image}
+            imageUrl={getPublicAssetUrl(user.image, user.imageProvider)}
             id={user.username}
             key={user.id}
             name={user.name}

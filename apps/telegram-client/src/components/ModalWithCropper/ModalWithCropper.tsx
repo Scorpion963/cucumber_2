@@ -9,11 +9,11 @@ export function ModalWithCropper({
   setImageInForm,
   defaultImage,
 }: {
-  setImageInForm: (croppedImage: File) => void;
+  setImageInForm: (croppedImage: File | null) => void;
   defaultImage: string | null;
 }) {
   const [image, setImage] = useState<null | string>(null);
-  const { setIsOpen } = useModal();
+  const { setIsOpen, isOpen } = useModal();
 
   function compressImage(
     image: string,
@@ -35,7 +35,7 @@ export function ModalWithCropper({
         if(imgElement.height <= targetSize || imgElement.width <= targetSize) {
           const response = await fetch(image)
           const blob = await response.blob()
-          return blob
+          resolve(blob)
         }
 
         canvas.width = targetSize;
@@ -76,12 +76,19 @@ export function ModalWithCropper({
     }
   }
 
+  async function onCropCancel(){
+    setIsOpen(false)
+    setImage(defaultImage)
+    setImageInForm(null)
+  }  
+
   return (
     <>
       <AvatarChange image={image ? image : defaultImage} setImage={setImage} />
-      <ModalContent>
+      <ModalContent onAbort={onCropCancel}>
         <FixedCropperWithSlider
           onCropSuccess={(cropped) => onCropSuccess(cropped)}
+          onCropCancel={onCropCancel}
           stencilSize={{ width: 400, height: 400 }}
           src={
             image

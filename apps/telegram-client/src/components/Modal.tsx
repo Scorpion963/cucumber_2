@@ -13,12 +13,14 @@ import useMounted from "@/hooks/useMounted";
 
 type ModalProps = {
   defaultOpen?: boolean;
+  onAbort?: () => void;
   children: React.ReactNode;
 };
 
 type ModalContextProps = {
   isOpen: boolean;
   setIsOpen: React.Dispatch<SetStateAction<boolean>>;
+  abort: () => void;
 };
 
 const ModalContext = createContext<ModalContextProps | null>(null);
@@ -32,11 +34,20 @@ export function useModal() {
   return values;
 }
 
-export function Modal({ defaultOpen = false, children }: ModalProps) {
+export function Modal({
+  defaultOpen = false,
+  onAbort = () => {},
+  children,
+}: ModalProps) {
   const [isOpen, setIsOpen] = useState(defaultOpen);
 
+  function abort(){
+    setIsOpen(false)
+    onAbort()
+  }
+
   return (
-    <ModalContext.Provider value={{ isOpen, setIsOpen }}>
+    <ModalContext.Provider value={{ isOpen, setIsOpen, abort }}>
       {children}
     </ModalContext.Provider>
   );
@@ -46,7 +57,7 @@ export function Overlay() {
   return <div className="bg-black/50 fixed inset-0" />;
 }
 
-export function ModalContent({ children }: { children: React.ReactNode }) {
+export function ModalContent({ children, onAbort = () => {} }: { children: React.ReactNode; onAbort?: () => void }) {
   const { isOpen, setIsOpen } = useModal();
   const [mounted, setMounted] = useMounted();
 
@@ -66,7 +77,10 @@ export function ModalContent({ children }: { children: React.ReactNode }) {
       <>
         <Overlay />
         <div
-          onClick={() => setIsOpen(false)}
+          onClick={() => {
+            setIsOpen(false)
+            onAbort()
+          }}
           className="fixed inset-0 flex items-center justify-center"
         >
           <div
@@ -79,7 +93,7 @@ export function ModalContent({ children }: { children: React.ReactNode }) {
         </div>
       </>
     ),
-    document.body
+    document.body,
   );
 }
 
