@@ -3,6 +3,7 @@
 import { useHomeChatsStore } from "@/providers/user-store-provider";
 import { useChatStore } from "../providers/chatStoreProvider";
 import { ContactType, HomeChatsType } from "@/server/mappers/mapChatsToStore";
+import {getPublicAssetUrl} from '../../../services/s3/lib/helpers'
 
 type useChatInfoReturnType = {
   chat: null | HomeChatsType;
