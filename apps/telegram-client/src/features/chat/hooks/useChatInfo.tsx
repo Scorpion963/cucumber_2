@@ -2,22 +2,21 @@
 
 import { useHomeChatsStore } from "@/providers/user-store-provider";
 import { useChatStore } from "../providers/chatStoreProvider";
-import { ContactType, HomeChatsType } from "@/server/mappers/mapChatsToStore";
-import {getPublicAssetUrl} from '../../../services/s3/lib/helpers'
+import { HomeChatsType, UserWithContactType } from "@/providers/types/user-store-provider-types";
 
 type useChatInfoReturnType = {
   chat: null | HomeChatsType;
-  chatter: null | ContactType;
+  chatter: null | UserWithContactType;
   chatImageUrl: string | null;
   chatName: string | null;
 };
 
 export default function useChatInfo(): useChatInfoReturnType {
   const { currentChatId, chatter } = useChatStore((state) => state);
-  const { chats, contacts } = useHomeChatsStore((state) => state);
+  const { chats, users } = useHomeChatsStore((state) => state);
 
   const resolvedChatter = chatter
-    ? contacts.get(chatter.username) ?? null
+    ? users.get(chatter.username) ?? null
     : null;
 
   const chat = currentChatId
@@ -25,6 +24,7 @@ export default function useChatInfo(): useChatInfoReturnType {
     : null;
 
     console.log("resolvedChatter: ", resolvedChatter)
+
 
   if (!currentChatId) {
     return {

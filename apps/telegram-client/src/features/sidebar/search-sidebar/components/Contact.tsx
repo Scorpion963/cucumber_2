@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { FaUserAlt } from "react-icons/fa";
 
-export default function Contact({ imageUrl, name, id }: { imageUrl: string | null, name: string; id: string }) {
+export default function Contact({ imageUrl, name, id }: { imageUrl: string | null, name: string | null; id: string }) {
   return (
     <Link
       href={`/@${id}`}
@@ -13,7 +13,7 @@ export default function Contact({ imageUrl, name, id }: { imageUrl: string | nul
           {imageUrl ? <Image src={`${imageUrl}`} fill style={{objectFit: 'cover'}} alt={`${name}\'s photo`} /> : <FaUserAlt size={24} />}
         </div>
         <div className="min-w-0">
-          <div className="font-semibold text-sm">{name}</div>
+          <div className="font-semibold text-sm">{name ? name : "User deleted"}</div>
           <div className="text-sm text-muted-foreground truncate w-full max-w-[500px] inline-block whitespace-nowrap overflow-hidden">
             This is my last message This is my last message This is my last
             message This is my last message

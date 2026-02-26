@@ -17,7 +17,7 @@ export default function SidebarRouter({
   console.log("previousRoutes: ", previousRoutes);
   console.log("Current: ", routes);
 
-  console.log("Route: ", routesMap[activeRoute]);
+  // console.log("Route: ", routesMap[activeRoute]);
 
   if (!animate) {
     return routesMap[activeRoute] ?? <></>;

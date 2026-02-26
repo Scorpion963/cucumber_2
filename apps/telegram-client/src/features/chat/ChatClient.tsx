@@ -19,13 +19,13 @@ import { privateSidebarRoutesMap } from "./components/EllipsisMenuManager";
 export default function ChatClient() {
   const { chatter } = useChatStore((state) => state);
   const { messages } = useMessageStore((state) => state);
-  const { addContact } = useHomeChatsStore((state) => state);
+  const { addUser } = useHomeChatsStore((state) => state);
 
   useEffect(() => {
     if (chatter?.userId) {
-      addContact(chatter);
+      addUser(chatter);
     }
-  }, [addContact, chatter]);
+  }, [addUser, chatter]);
 
   console.log("messages: ", messages);
 

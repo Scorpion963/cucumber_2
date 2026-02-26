@@ -2,7 +2,26 @@ import { chatMember, chats, contact, db, message, user } from "db";
 import { and, eq, ne } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 
-export default function findHomeChatsForStore(currentUserId: string) {
+export type FindHomeChatsReturnType = {
+  id: string;
+  type: "private" | "group";
+  name: string | null;
+  imageUrl: string | null;
+  baseChatter: typeof user.$inferSelect | null;
+  contactInfo: {
+    id: string;
+    imageUrl: string | null;
+    name: string | null;
+    lastName: string | null;
+    notes: string | null;
+  } | null;
+  lastMessage: {
+    text: string | null;
+    updatedAt: Date;
+  } | null;
+};
+
+export default function findHomeChatsForStore(currentUserId: string): Promise<FindHomeChatsReturnType[]> {
   const chatMemberAlias = alias(chatMember, "other_members");
 
   return db
@@ -11,16 +30,9 @@ export default function findHomeChatsForStore(currentUserId: string) {
       type: chats.type,
       name: chats.name,
       imageUrl: chats.imageUrl,
-      baseChatter: {
-        id: user.id,
-        name: user.name,
-        username: user.username,
-        imageUrl: user.image,
-        bio: user.bio,
-        lastNmae: user.lastName,
-      },
+      baseChatter: user,
       contactInfo: {
-        contactId: contact.id,
+        id: contact.id,
         imageUrl: contact.imageUrl,
         name: contact.name,
         lastName: contact.lastName,
@@ -39,16 +51,16 @@ export default function findHomeChatsForStore(currentUserId: string) {
       and(
         eq(chatMemberAlias.chatId, chats.id),
         ne(chatMemberAlias.userId, currentUserId),
-        eq(chats.type, "private")
-      )
+        eq(chats.type, "private"),
+      ),
     )
     .leftJoin(user, eq(user.id, chatMemberAlias.userId))
     .leftJoin(
       contact,
       and(
         eq(contact.ownerId, currentUserId),
-        eq(contact.contactId, chatMemberAlias.userId)
-      )
+        eq(contact.contactId, chatMemberAlias.userId),
+      ),
     )
     .where(eq(chatMember.userId, currentUserId))
     .orderBy(chats.updatedAt);

@@ -1,24 +1,24 @@
-import { ContactType, HomeChatsType } from "@/server/mappers/mapChatsToStore";
+import { HomeChatsType, UserWithContactType } from "@/providers/types/user-store-provider-types";
 import { createStore } from "zustand/vanilla";
 
 export type HomeChatsState = {
   chats: Map<string, HomeChatsType>;
-  contacts: Map<string, ContactType>;
+  users: Map<string, UserWithContactType>;
 };
 
 export type HomeChatsActions = {
   updateContactByUsername: (
     username: string,
-    contact: Pick<ContactType, "notes" | "imageUrl" | "name" | "lastName">
+    users: Pick<UserWithContactType, "contactInfo" | "name" | "lastName">
   ) => void;
-  addContact: (contact: ContactType) => void;
+  addUser: (contact: UserWithContactType) => void;
 };
 
 export type HomeChatsStore = HomeChatsState & HomeChatsActions;
 
 export const defaultInitState: HomeChatsState = {
   chats: new Map<string, HomeChatsType>(),
-  contacts: new Map<string, ContactType>(),
+  users: new Map<string, UserWithContactType>(),
 };
 
 export const createHomeChatsStore = (
@@ -26,26 +26,27 @@ export const createHomeChatsStore = (
 ) => {
   return createStore<HomeChatsStore>()((set) => ({
     ...initState,
-    updateContactByUsername: (username, contact) => {
+    updateContactByUsername: (username, user) => {
       set((state) => {
-        const contactExists = state.contacts.get(username);
+        const contactExists = state.users.get(username);
         if (!contactExists) return { ...state };
 
-        const newContact: ContactType = {
+        const newContact: UserWithContactType = {
           ...contactExists,
-          ...contact,
+          ...user,
         };
-        const newMap = new Map(state.contacts);
+        const newMap = new Map(state.users);
         newMap.set(username, newContact);
         return { ...state, contacts: newMap };
       });
     },
-    addContact: (contact) =>
-      set((state) => {
-        const contacts = new Map(state.contacts);
-        contacts.set(contact.username, contact);
 
-        return { ...state, contacts };
+    addUser: (contact) =>
+      set((state) => {
+        const users = new Map(state.users);
+        users.set(contact.username, contact);
+
+        return { ...state, users };
       }),
   }));
 };

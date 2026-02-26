@@ -26,8 +26,8 @@ export default function ContactList() {
           {chats.map((v) => (
             <Contact
               imageUrl={v.imageUrl}
-              id={v.type === "private" ? v.username : v.id}
-              name={v.name}
+              id={v.id}
+              name={v.chatName}
               key={v.id}
             />
           ))}
@@ -45,3 +45,4 @@ export default function ContactList() {
     </ScrollArea>
   );
 }
+
