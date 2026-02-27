@@ -2,10 +2,7 @@
 import ChatHeader from "./components/ChatHeader";
 import ChatContent from "./components/ChatContent";
 import ChatInput from "./components/ChatInput";
-import { useChatStore } from "./providers/chatStoreProvider";
 import { useMessageStore } from "./providers/messageStoreProvider";
-import { useHomeChatsStore } from "@/providers/user-store-provider";
-import { useEffect } from "react";
 import SidebarRouter from "@/components/SidebarRouter/SidebarRouter";
 import { privateSidebarRoutesMap } from "./components/EllipsisMenuManager";
 
@@ -17,16 +14,7 @@ import { privateSidebarRoutesMap } from "./components/EllipsisMenuManager";
 // and in case i need to display info i could creete hooks that would return just the data
 
 export default function ChatClient() {
-  const { chatter } = useChatStore((state) => state);
   const { messages } = useMessageStore((state) => state);
-  const { addUser } = useHomeChatsStore((state) => state);
-
-  useEffect(() => {
-    if (chatter?.userId) {
-      addUser(chatter);
-    }
-  }, [addUser, chatter]);
-
   console.log("messages: ", messages);
 
   return (

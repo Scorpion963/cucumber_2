@@ -1,11 +1,12 @@
-import { chatMember, chats, db } from "db";
+import { chatMember, chats, db, message } from "db";
 import { and, eq } from "drizzle-orm";
 
 export default async function getGroupChat(chatId: string, userId: string) {
   const [chat] = await db
-    .select({ chats })
+    .select({ chats, message })
     .from(chatMember)
     .innerJoin(chats, eq(chats.id, chatMember.chatId))
+    .leftJoin(message, eq(chats.lastMessageId, message.id))
     .where(
       and(
         eq(chatMember.userId, userId),
@@ -14,5 +15,5 @@ export default async function getGroupChat(chatId: string, userId: string) {
       )
     );
 
-  return chat.chats;
+  return chat;
 }

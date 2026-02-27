@@ -1,9 +1,6 @@
-import { contact, user } from "db";
+import { contact, message, user } from "db";
 
-export type HomeChatsLastMessageType = {
-  text: string;
-  updatedAt: Date;
-};
+export type HomeChatsLastMessageType = Pick<typeof message.$inferSelect, "id" | "text" | "updatedAt">
 
 export type HomeChatsPrivateType = {
   id: string;

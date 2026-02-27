@@ -19,6 +19,9 @@ export default function ContactList() {
       </div>
     );
 
+    console.log("Users Found: ", usersFound)
+    console.log("Chats: ", chats)
+
   return (
     <ScrollArea className="h-full w-full">
       {usersFound.length === 0 ? (
@@ -36,7 +39,7 @@ export default function ContactList() {
         usersFound.map((user) => (
           <Contact
             imageUrl={getPublicAssetUrl(user.image, user.imageProvider)}
-            id={user.username}
+            id={user.id}
             key={user.id}
             name={user.name}
           />

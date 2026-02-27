@@ -2,45 +2,85 @@
 
 import { useHomeChatsStore } from "@/providers/user-store-provider";
 import { useChatStore } from "../providers/chatStoreProvider";
-import { HomeChatsType, UserWithContactType } from "@/providers/types/user-store-provider-types";
+import {
+  HomeChatsType,
+  UserWithContactType,
+} from "@/providers/types/user-store-provider-types";
+import { useEffect, useState } from "react";
+import { ImageProviderTypes } from "db";
+import useS3Image from "./useS3Image";
 
 type useChatInfoReturnType = {
   chat: null | HomeChatsType;
   chatter: null | UserWithContactType;
   chatImageUrl: string | null;
-  chatName: string | null;
+  chatName: string;
+};
+
+type ImageProps = {
+  image: string | null;
+  imageProvider: ImageProviderTypes;
+  isPublic: boolean;
 };
 
 export default function useChatInfo(): useChatInfoReturnType {
-  const { currentChatId, chatter } = useChatStore((state) => state);
-  const { chats, users } = useHomeChatsStore((state) => state);
+  const { currentChatId, currentChatterId } = useChatStore((state) => state);
+  const currentChat = useHomeChatsStore(state => currentChatId ? state.chats.get(currentChatId) : null)
+  const currentChatter = useHomeChatsStore(state => currentChatterId ? state.users.get(currentChatterId) : null)
 
-  const resolvedChatter = chatter
-    ? users.get(chatter.username) ?? null
-    : null;
+  console.log("CurrentChatId: ", currentChatterId)
+  console.log("Current Chatter: ", currentChatter)
 
-  const chat = currentChatId
-    ? chats.get(currentChatId) ?? null
-    : null;
+  const {chatName, image, imageProvider, isPublic} = handleChatNameAndImage(currentChat, currentChatter)
 
-    console.log("resolvedChatter: ", resolvedChatter)
-
-
-  if (!currentChatId) {
-    return {
-      chat: null,
-      chatter: resolvedChatter ? resolvedChatter : chatter,
-      chatImageUrl: resolvedChatter?.imageUrl ?? null,
-      chatName: resolvedChatter?.name ?? null,
-    };
-  }
+  const url = useS3Image({
+    imageProvider: imageProvider,
+    isPublic: isPublic,
+    url: image,
+  });
 
   return {
-    chat,
-    chatter: resolvedChatter,
-    chatImageUrl:
-      resolvedChatter?.imageUrl ?? chat?.imageUrl ?? null,
-    chatName:
-      resolvedChatter?.name ?? chat?.name ?? null,
+    chat: currentChat ?? null,
+    chatter: currentChatter ?? null,
+    chatImageUrl: url,
+    chatName: chatName,
+  };
+}
+
+type HandlChatNameAndImageProps = ImageProps & { chatName: string };
+
+function handleChatNameAndImage(
+  currentChat: HomeChatsType | null | undefined,
+  currentChatter: UserWithContactType | null | undefined,
+): ImageProps & { chatName: string } {
+  if (currentChat && currentChat.type === "group") {
+    return {
+      image: currentChat.imageUrl,
+      imageProvider: "aws",
+      isPublic: false,
+      chatName: currentChat.name,
+    };
+  } else if (currentChatter) {
+    const image: ImageProps = currentChatter.contactInfo?.imageUrl
+      ? {
+          image: currentChatter.contactInfo.imageUrl,
+          isPublic: false,
+          imageProvider: "aws",
+        }
+      : {
+          image: currentChatter.image,
+          isPublic: true,
+          imageProvider: currentChatter.imageProvider as ImageProviderTypes,
+        };
+
+    return { ...image, chatName: currentChatter.name };
+  }
+
+  //TODO: figure out how to do it if there currentChatter and currentChat is null
+  return {
+    image: null,
+    imageProvider: "aws",
+    isPublic: true,
+    chatName: "Default chat name (Error happened)",
   };
 }

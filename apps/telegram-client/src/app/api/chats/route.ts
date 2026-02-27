@@ -29,7 +29,7 @@ export async function GET(request: NextRequest) {
 
   const refinedUsers = users.map(mergeContactInfoWithUser);
 
-  console.log("refinedUsers: ", refinedUsers);
+  // console.log("refinedUsers: ", refinedUsers);
 
   return NextResponse.json({ data: refinedUsers }, { status: 200 });
 }

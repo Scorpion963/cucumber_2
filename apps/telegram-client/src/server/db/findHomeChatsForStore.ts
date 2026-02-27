@@ -8,18 +8,21 @@ export type FindHomeChatsReturnType = {
   name: string | null;
   imageUrl: string | null;
   baseChatter: typeof user.$inferSelect | null;
-  contactInfo: {
+  contactInfo: BasicContact | null;
+  lastMessage: {
+    id: string,
+    text: string | null;
+    updatedAt: Date;
+  } | null;
+};
+
+export type BasicContact = {
     id: string;
     imageUrl: string | null;
     name: string | null;
     lastName: string | null;
     notes: string | null;
-  } | null;
-  lastMessage: {
-    text: string | null;
-    updatedAt: Date;
-  } | null;
-};
+}
 
 export default function findHomeChatsForStore(currentUserId: string): Promise<FindHomeChatsReturnType[]> {
   const chatMemberAlias = alias(chatMember, "other_members");
@@ -39,6 +42,7 @@ export default function findHomeChatsForStore(currentUserId: string): Promise<Fi
         notes: contact.notes,
       },
       lastMessage: {
+        id: message.id,
         text: message.text,
         updatedAt: message.updatedAt,
       },

@@ -11,9 +11,6 @@ import { Toaster } from "@/components/ui/sonner";
 import findHomeChatsForStore from "@/server/db/findHomeChatsForStore";
 import { HomeChatsProvider } from "@/providers/user-store-provider";
 import { mapChatsToStore } from "@/server/mappers/mapChatsToStore";
-import { chatMember, chats, contact, db, message, user } from "db";
-import { and, eq, ne } from "drizzle-orm";
-import { alias } from "drizzle-orm/pg-core";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 

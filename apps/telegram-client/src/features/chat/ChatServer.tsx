@@ -10,21 +10,27 @@ import { headers } from "next/headers";
 import ChatClient from "./ChatClient";
 import { SidebarRouterProvider } from "@/components/SidebarRouter/providers/sidebar-routes-provider";
 
-
 export async function ChatServer({ paramsId }: { paramsId: string }) {
   const user = await auth.api.getSession({ headers: await headers() });
   const chat = await handleChatFetch(paramsId, user!.user.id);
 
-  if (!chat.canAccess) redirect("/");
+  console.log(chat)
 
-  const messages: (typeof message.$inferSelect)[] = chat.currentChatId
-    ? await getMessagesDB(chat.currentChatId)
+  if (!chat.canAccess) redirect("/");
+  if(!chat.chat && !chat.chatter) redirect("/")
+  
+  const messages: (typeof message.$inferSelect)[] = chat.chat?.id
+    ? await getMessagesDB(chat.chat.id)
     : [];
+
+    console.log("Fetched current chat: ", chat)
 
   return (
     <SidebarRouterProvider>
       <ChatStoreProvider
-        currentChatId={chat.currentChatId}
+        currentChatterId={chat.chatter?.id ?? null}
+        currentChatId={chat.chat?.id ?? null}
+        chat={chat.chat}
         chatter={chat.chatter}
       >
         <MessageStoreProvider value={messages}>

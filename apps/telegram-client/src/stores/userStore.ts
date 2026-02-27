@@ -12,6 +12,7 @@ export type HomeChatsActions = {
     users: Pick<UserWithContactType, "contactInfo" | "name" | "lastName">
   ) => void;
   addUser: (contact: UserWithContactType) => void;
+  addChat: (chat: HomeChatsType) => void
 };
 
 export type HomeChatsStore = HomeChatsState & HomeChatsActions;
@@ -24,6 +25,7 @@ export const defaultInitState: HomeChatsState = {
 export const createHomeChatsStore = (
   initState: HomeChatsState = defaultInitState
 ) => {
+  console.log("RECREATED")
   return createStore<HomeChatsStore>()((set) => ({
     ...initState,
     updateContactByUsername: (username, user) => {
@@ -37,14 +39,22 @@ export const createHomeChatsStore = (
         };
         const newMap = new Map(state.users);
         newMap.set(username, newContact);
-        return { ...state, contacts: newMap };
+        return { ...state, users: newMap };
       });
     },
+
+    addChat: (chat) => set(state => {
+      const chats = new Map(state.chats)
+      chats.set(chat.id, chat)
+
+      return {...state, chats}
+    })
+    ,
 
     addUser: (contact) =>
       set((state) => {
         const users = new Map(state.users);
-        users.set(contact.username, contact);
+        users.set(contact.id, contact);
 
         return { ...state, users };
       }),

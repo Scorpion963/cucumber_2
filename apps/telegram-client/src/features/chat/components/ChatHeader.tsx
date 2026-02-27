@@ -7,8 +7,10 @@ import { PopoverWrapper } from "./EllipsisMenuManager";
 import { EllipsisVertical } from "lucide-react";
 
 export default function ChatHeader() {
-  const { chatImageUrl, chatName, chat, chatter } = useChatInfo();
+  const { chat, chatter, chatImageUrl, chatName } = useChatInfo();
   if (!chatter && !chat) return null;
+
+
   return (
     <div className="w-full flex  py-1 border-b items-center px-4">
       <div className="w-full flex gap-2   items-center">

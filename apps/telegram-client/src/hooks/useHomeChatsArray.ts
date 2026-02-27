@@ -41,7 +41,7 @@ export default function useHomeChatsArray() {
       setSidebarChats(fetchedImages);
     }
 
-    handleImageUrls()
+    handleImageUrls();
   }, [arrayChats]);
 
   return sidebarChats;
@@ -52,7 +52,7 @@ type DisplayChats = {
   imageUrl: string | null;
   chatName: string | null;
   isImagePublic: boolean;
-  imageProvider: ImageProviderTypes
+  imageProvider: ImageProviderTypes;
 };
 
 export function getRelevantChat(
@@ -71,14 +71,25 @@ export function getRelevantChat(
         id: chat.id,
         imageUrl: null,
         isImagePublic: false,
-        imageProvider: "aws"
+        imageProvider: "aws",
       };
-    const image: Pick<DisplayChats, "imageUrl" | "imageProvider" | "isImagePublic"> = user.contactInfo?.imageUrl
-      ? { imageUrl: user.contactInfo.imageUrl, isImagePublic: false, imageProvider: "aws" }
-      : { imageUrl: user.image, isImagePublic: true,  imageProvider: user.imageProvider as ImageProviderTypes};
+    const image: Pick<
+      DisplayChats,
+      "imageUrl" | "imageProvider" | "isImagePublic"
+    > = user.contactInfo?.imageUrl
+      ? {
+          imageUrl: user.contactInfo.imageUrl,
+          isImagePublic: false,
+          imageProvider: "aws",
+        }
+      : {
+          imageUrl: user.image,
+          isImagePublic: true,
+          imageProvider: user.imageProvider as ImageProviderTypes,
+        };
     return {
       chatName: user.name,
-      id: user.username,
+      id: user.id,
       ...image,
     };
   }
@@ -88,6 +99,6 @@ export function getRelevantChat(
     id: chat.id,
     imageUrl: chat.imageUrl,
     isImagePublic: false,
-    imageProvider: "aws"
+    imageProvider: "aws",
   };
 }
