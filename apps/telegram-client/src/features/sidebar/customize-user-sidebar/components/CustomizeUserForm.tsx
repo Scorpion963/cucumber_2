@@ -10,8 +10,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import z from "zod";
+import { FieldValues, useForm, UseFormReturn } from "react-hook-form";
 import { customizeUserFormSchema } from "../schemas/customizeUserSchema";
 import { authClient } from "@/lib/auth-client";
 import FloatingInput from "../../../../components/FloatingInput";
@@ -20,15 +19,36 @@ import DarkLineBreak from "../../../../components/DarkLineBreak";
 import { handleFieldErrors } from "@/lib/errors/handleFieldErrors";
 import { Modal } from "@/components/Modal";
 import { ModalWithCropper } from "@/components/ModalWithCropper/ModalWithCropper";
-import { getPresignedPostUrl } from "@/actions/getSignedUrl";
 import { ImageProviderTypes } from "db";
 import { ReasonPhrases } from "http-status-codes";
 import { Check } from "lucide-react";
 import { AnimatePresence } from "framer-motion";
 import { useCurrentUserStore } from "@/providers/current-user-store-provider";
-import { ReactNode, useEffect } from "react";
+import { ReactNode } from "react";
+import z from "zod";
+import { uploadImageToS3 } from "@/actions/consumers/uploadToS3";
 
 // TODO: Display username taken error
+
+function handleResponseErrors<T extends FieldValues>(
+  errorCode: string,
+  form: UseFormReturn<T>,
+) {
+  switch (errorCode) {
+    case ReasonPhrases.UNAUTHORIZED:
+      form.setError("root", {
+        message: "You must be logged in to this information",
+      });
+      return;
+    case ReasonPhrases.UNPROCESSABLE_ENTITY:
+      form.setError("root", { message: "Invalid content type" });
+      return;
+    default:
+      form.setError("root", {
+        message: "Unexpected error happened, please try again later",
+      });
+  }
+}
 
 export default function CustomizeUserForm({
   defaultUserImage,
@@ -40,7 +60,7 @@ export default function CustomizeUserForm({
     image: string | null;
   };
 }) {
-  const { updateUser, currentUser } = useCurrentUserStore((state) => state);
+  const { updateUser } = useCurrentUserStore((state) => state);
   const form = useForm<z.infer<typeof customizeUserFormSchema>>({
     resolver: zodResolver(customizeUserFormSchema),
     defaultValues: {
@@ -52,61 +72,6 @@ export default function CustomizeUserForm({
     },
   });
 
-  async function handleImageUploadPost(imageToUpload: File) {
-    const url = await getPresignedPostUrl(
-      imageToUpload.type,
-      "cucumber-app-public",
-    );
-    if (url.error) {
-      handleResponseErrors(url.error.code);
-    }
-
-    const formData = new FormData();
-    Object.entries(url.data!.url.fields).forEach(([f, v]) => {
-      formData.append(f, v);
-    });
-    formData.append("file", imageToUpload);
-
-    console.log("URL: ", url);
-
-    let response;
-    try {
-      response = await fetch(url.data!.url.url, {
-        method: "POST",
-        body: formData,
-      });
-    } catch (err) {
-      console.log("ERROR: ", err);
-    }
-
-    if (!response?.ok) {
-      console.log("an error inside handleIMageUploadPost response: ", response);
-      form.setError("root", {
-        message:
-          "An error happened on our end during the image uploading, please try again later",
-      });
-    }
-
-    return url.data?.key;
-  }
-
-  function handleResponseErrors(errorCode: string) {
-    switch (errorCode) {
-      case ReasonPhrases.UNAUTHORIZED:
-        form.setError("root", {
-          message: "You must be logged in to change your information",
-        });
-        return;
-      case ReasonPhrases.UNPROCESSABLE_ENTITY:
-        form.setError("root", { message: "Invalid content type" });
-        return;
-      default:
-        form.setError("root", {
-          message: "Unexpected error happened, please try again later",
-        });
-    }
-  }
-
   async function onSubmit(data: z.infer<typeof customizeUserFormSchema>) {
     let uploadedImageKey;
     const baseUpdateUser = {
@@ -117,15 +82,25 @@ export default function CustomizeUserForm({
     };
 
     if (data.image) {
-      uploadedImageKey = await handleImageUploadPost(data.image);
-      if (uploadedImageKey)
-        updateUser({ imageProvider: "aws", image: uploadedImageKey });
+      uploadedImageKey = await uploadImageToS3(
+        data.image,
+        "cucumber-app-public",
+      );
+      if (!uploadedImageKey.success) {
+        handleResponseErrors(uploadedImageKey.error.code, form);
+      } else {
+        if (uploadedImageKey)
+          updateUser({
+            imageProvider: "aws",
+            image: uploadedImageKey.data.imageKey,
+          });
+      }
     }
 
     const result = await authClient.updateUser({
       ...baseUpdateUser,
-      ...(uploadedImageKey && {
-        image: uploadedImageKey,
+      ...(uploadedImageKey?.success && {
+        image: uploadedImageKey.data.imageKey,
         imageProvider: "aws",
       }),
     });
@@ -172,7 +147,10 @@ export default function CustomizeUserForm({
                 <>
                   <FormItem>
                     <FormControl>
-                      <Modal onAbort={() => form.setValue("image", null)} defaultOpen={false}>
+                      <Modal
+                        onAbort={() => form.setValue("image", null)}
+                        defaultOpen={false}
+                      >
                         <ModalWithCropper
                           defaultImage={defaultUserImage.image}
                           setImageInForm={field.onChange}

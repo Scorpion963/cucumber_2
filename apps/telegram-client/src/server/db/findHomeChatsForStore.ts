@@ -1,3 +1,4 @@
+import { ConctactInfo } from "@/providers/types/user-store-provider-types";
 import { chatMember, chats, contact, db, message, user } from "db";
 import { and, eq, ne } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
@@ -8,7 +9,7 @@ export type FindHomeChatsReturnType = {
   name: string | null;
   imageUrl: string | null;
   baseChatter: typeof user.$inferSelect | null;
-  contactInfo: BasicContact | null;
+  contactInfo: typeof contact.$inferSelect | null
   lastMessage: {
     id: string,
     text: string | null;
@@ -34,13 +35,7 @@ export default function findHomeChatsForStore(currentUserId: string): Promise<Fi
       name: chats.name,
       imageUrl: chats.imageUrl,
       baseChatter: user,
-      contactInfo: {
-        id: contact.id,
-        imageUrl: contact.imageUrl,
-        name: contact.name,
-        lastName: contact.lastName,
-        notes: contact.notes,
-      },
+      contactInfo: contact,
       lastMessage: {
         id: message.id,
         text: message.text,

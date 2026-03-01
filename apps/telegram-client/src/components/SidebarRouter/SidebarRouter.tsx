@@ -14,11 +14,6 @@ export default function SidebarRouter({
   const { routes, previousRoutes } = useSidebarRouterStore((state) => state);
   const activeRoute = routes[routes.length - 1];
 
-  console.log("previousRoutes: ", previousRoutes);
-  console.log("Current: ", routes);
-
-  // console.log("Route: ", routesMap[activeRoute]);
-
   if (!animate) {
     return routesMap[activeRoute] ?? <></>;
   }

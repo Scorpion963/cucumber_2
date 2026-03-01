@@ -14,7 +14,7 @@ function Popover({
 function PopoverTrigger({
   ...props
 }: React.ComponentProps<typeof PopoverPrimitive.Trigger>) {
-  return <PopoverPrimitive.Trigger data-slot="popover-trigger" {...props} />
+  return <PopoverPrimitive.Trigger className={cn("cursor-pointer rounded-full hover:bg-slate-500/30 p-2 transition-all", props.className)} data-slot="popover-trigger" {...props} />
 }
 
 function PopoverContent({

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import { ModalContent, useModal } from "../Modal";
 import AvatarChange from "./AvatarChange";
 import { FixedCropperWithSlider } from "../FixedCropperWithSlider";
@@ -8,9 +8,11 @@ import { toast } from "sonner";
 export function ModalWithCropper({
   setImageInForm,
   defaultImage,
+  children
 }: {
   setImageInForm: (croppedImage: File | null) => void;
   defaultImage: string | null;
+  children?: ReactNode
 }) {
   const [image, setImage] = useState<null | string>(null);
   const { setIsOpen, isOpen } = useModal();
@@ -84,7 +86,7 @@ export function ModalWithCropper({
 
   return (
     <>
-      <AvatarChange image={image ? image : defaultImage} setImage={setImage} />
+      <AvatarChange image={image ? image : defaultImage} setImage={setImage}>{children}</AvatarChange>
       <ModalContent onAbort={onCropCancel}>
         <FixedCropperWithSlider
           onCropSuccess={(cropped) => onCropSuccess(cropped)}

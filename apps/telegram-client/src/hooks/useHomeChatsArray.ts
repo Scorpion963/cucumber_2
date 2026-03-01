@@ -73,6 +73,7 @@ export function getRelevantChat(
         isImagePublic: false,
         imageProvider: "aws",
       };
+
     const image: Pick<
       DisplayChats,
       "imageUrl" | "imageProvider" | "isImagePublic"
@@ -87,8 +88,9 @@ export function getRelevantChat(
           isImagePublic: true,
           imageProvider: user.imageProvider as ImageProviderTypes,
         };
+
     return {
-      chatName: user.name,
+      chatName: getChatName(user),
       id: user.id,
       ...image,
     };
@@ -101,4 +103,11 @@ export function getRelevantChat(
     isImagePublic: false,
     imageProvider: "aws",
   };
+}
+
+export function getChatName(user: UserWithContactType) {
+  const chatName = user.contactInfo?.name
+    ? user.contactInfo.name + " " + user.contactInfo.lastName
+    : user.name + " " + user.lastName;
+  return chatName;
 }

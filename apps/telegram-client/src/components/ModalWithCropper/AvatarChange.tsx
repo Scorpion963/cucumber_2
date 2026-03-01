@@ -1,6 +1,6 @@
-"use client"
+"use client";
 
-import { ChangeEvent, useEffect } from "react";
+import { ChangeEvent, ReactNode, useEffect } from "react";
 import { useModal } from "../Modal";
 import Image from "next/image";
 import { Edit } from "lucide-react";
@@ -8,9 +8,11 @@ import { Edit } from "lucide-react";
 export default function AvatarChange({
   setImage,
   image,
+  children
 }: {
   setImage: React.Dispatch<React.SetStateAction<string | null>>;
   image: string | null;
+  children?: ReactNode
 }) {
   const { setIsOpen, isOpen } = useModal();
 
@@ -40,20 +42,23 @@ export default function AvatarChange({
         onChange={onChange}
       />
       <label htmlFor="avatarChange">
-        <div className="size-32 rounded-full overflow-hidden relative cursor-pointer bg-gray-500 flex items-center justify-center">
-          {image ? (
-            <Image
-            draggable="false"
-              src={image}
-              alt="Profile photo"
-              fill
-              style={{ objectFit: "cover" }}
-            />
-          ) : (
-            <Edit />
-          )}
-          <p className="sr-only">{"Change your avatar"}</p>
-        </div>
+        {children}
+        {!children && (
+          <div className="size-32 rounded-full overflow-hidden relative cursor-pointer bg-gray-500 flex items-center justify-center">
+            {image ? (
+              <Image
+                draggable="false"
+                src={image}
+                alt="Profile photo"
+                fill
+                style={{ objectFit: "cover" }}
+              />
+            ) : (
+              <Edit />
+            )}
+            <p className="sr-only">{"Change your avatar"}</p>
+          </div>
+        )}
       </label>
     </div>
   );

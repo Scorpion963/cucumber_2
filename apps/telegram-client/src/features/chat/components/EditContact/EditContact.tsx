@@ -6,18 +6,18 @@ import useChatInfo from "../../hooks/useChatInfo";
 import { useSidebarRouterStore } from "@/components/SidebarRouter/providers/sidebar-routes-provider";
 
 export default function EditContact() {
-  const { chatter } = useChatInfo();
   const { pop } = useSidebarRouterStore((state) => state);
+  const {chatImageUrl, chatName, chatter} = useChatInfo()
 
   return (
     <div className="h-full border-l w-106">
       <SidebarHeader className="" title="Edit" onClick={() => pop()} />
       <div>
         <UserImage
-          name={chatter?.name ?? "User"}
-          imageUrl={chatter?.imageUrl}
+          name={chatName}
+          imageUrl={chatImageUrl}
         />
-        <EditContactForm chatter={chatter!} />
+        {chatter && <EditContactForm chatter={chatter} />}
       </div>
     </div>
   );

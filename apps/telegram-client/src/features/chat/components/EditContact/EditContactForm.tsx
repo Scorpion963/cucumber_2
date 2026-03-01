@@ -3,37 +3,70 @@ import DarkLineBreak from "@/components/DarkLineBreak";
 import FloatingInput from "@/components/FloatingInput";
 import FormSection from "@/components/FormSection";
 import { Button } from "@/components/ui/button";
-import { Form, FormField } from "@/components/ui/form";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormMessage,
+} from "@/components/ui/form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Delete, ImagePlus } from "lucide-react";
 import { useForm } from "react-hook-form";
-import z from "zod";
 import { upsertContact } from "../../actions/editContact";
 import { useHomeChatsStore } from "@/providers/user-store-provider";
-import { ContactType } from "@/server/mappers/mapChatsToStore";
+import { UserWithContactType } from "@/providers/types/user-store-provider-types";
+import { Modal } from "@/components/Modal";
+import { ModalWithCropper } from "@/components/ModalWithCropper/ModalWithCropper";
+import z from "zod";
+import useChatInfo from "../../hooks/useChatInfo";
+import { getPresignedPostUrl, getSignedPutUrl } from "@/actions/getSignedUrl";
 
 const editFormSchema = z.object({
   firstName: z.string().trim().min(1),
   lastName: z.string(),
   notes: z.string(),
+  image: z.file().mime(["image/jpeg", "image/png"]).nullable(),
 });
+
+type EditFormSchemaType = z.infer<typeof editFormSchema>;
 
 //TODO: handle errors
 
-export default function EditContactForm({ chatter }: { chatter: ContactType }) {
+export default function EditContactForm({
+  chatter,
+}: {
+  chatter: UserWithContactType;
+}) {
   const { updateContactByUsername } = useHomeChatsStore((state) => state);
-  const form = useForm<z.infer<typeof editFormSchema>>({
+  const { chatImageUrl } = useChatInfo();
+  const defaultObject: EditFormSchemaType = chatter.contactInfo?.name
+    ? {
+        firstName: chatter.contactInfo.name,
+        lastName: chatter.contactInfo.lastName ?? "",
+        notes: chatter.contactInfo.notes ?? "",
+        image: null,
+      }
+    : {
+        firstName: chatter.name,
+        lastName: chatter.lastName ?? "",
+        notes: "",
+        image: null,
+      };
+
+  const form = useForm<EditFormSchemaType>({
     resolver: zodResolver(editFormSchema),
-    defaultValues: {
-      firstName: chatter?.name ?? "",
-      lastName: chatter?.lastName ?? "",
-      notes: chatter?.notes ?? "",
-    },
+    defaultValues: defaultObject,
   });
 
   async function handleSubmit(data: z.infer<typeof editFormSchema>) {
+    if(data.image){
+      const url = await getPresignedPostUrl(data.image.type , "chatting-app-test-bucket")
+      
+    }
+
     const response = await upsertContact({
-      contactId: chatter?.userId ?? "",
+      contactId: chatter.id,
       firstName: data.firstName,
       lastName: data.lastName,
       notes: data.notes,
@@ -103,7 +136,28 @@ export default function EditContactForm({ chatter }: { chatter: ContactType }) {
         </FormSection>
         <DarkLineBreak />
         <FormSection>
-          <PhotoManager text="Suggest Photo for Egor" />
+          <FormField
+            control={form.control}
+            name="image"
+            render={({ field, fieldState }) => (
+              <FormItem>
+                <FormControl>
+                  <Modal
+                    onAbort={() => form.setValue("image", null)}
+                    defaultOpen={false}
+                  >
+                    <ModalWithCropper
+                      defaultImage={null}
+                      setImageInForm={field.onChange}
+                    >
+                      <PhotoManager text="Suggest Photo for Egor" />
+                    </ModalWithCropper>
+                  </Modal>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
           <PhotoManager text="Set Photo for Egor" />
           <p className="text-muted-foreground">
             You can replace Egor\`s photo with another photo that only you will
@@ -135,11 +189,15 @@ export default function EditContactForm({ chatter }: { chatter: ContactType }) {
 function PhotoManager({ text }: { text: string }) {
   return (
     <Button
+      asChild
+      type="button"
       variant={"ghost"}
       className="flex gap-4 p-5 items-center w-full justify-start cursor-pointer"
     >
-      <ImagePlus />
-      <div>{text}</div>
+      <div>
+        <ImagePlus />
+        <div>{text}</div>
+      </div>
     </Button>
   );
 }

@@ -1,22 +1,18 @@
 import { ConctactInfo, UserWithContactType } from "@/providers/types/user-store-provider-types";
-import { user } from "db";
-import { BasicContact } from "../db/findHomeChatsForStore";
+import { contact, user } from "db";
 
-export default function createUserWithContact(baseUser: typeof user.$inferSelect, contact: BasicContact | null): UserWithContactType {
-  const info: Pick<UserWithContactType, "name" | "lastName"> = contact?.name
-    ? { name: contact.name, lastName: contact.lastName }
-    : { name: baseUser.name, lastName: baseUser.lastName };
-
+export default function createUserWithContact(baseUser: typeof user.$inferSelect, contactData: typeof contact.$inferSelect | null): UserWithContactType {
   const images: Pick<UserWithContactType, "imageProvider" | "image"> =
-    contact?.imageUrl
-      ? { image: contact.imageUrl, imageProvider: "aws" }
+    contactData?.imageUrl
+      ? { image: contactData.imageUrl, imageProvider: "aws" }
       : { image: baseUser.image, imageProvider: baseUser.imageProvider };
 
   const contactInfo: ConctactInfo = {
-    contactInfo: contact?.id
-      ? { id: contact.id, imageUrl: contact.imageUrl, notes: contact.notes }
+    contactInfo: contactData?.id
+      ? { id: contactData.id, imageUrl: contactData.imageUrl, notes: contactData.notes, contactId: contactData.contactId, createdAt: contactData.createdAt, lastName: contactData.lastName, name: contactData.name}
       : null,
   };
+
   return {
     createdAt: baseUser.createdAt,
     email: baseUser.email,
@@ -25,8 +21,9 @@ export default function createUserWithContact(baseUser: typeof user.$inferSelect
     username: baseUser.username,
     updatedAt: baseUser.updatedAt,
     bio: baseUser.bio,
+    lastName: baseUser.lastName,
+    name: baseUser.name,
     ...contactInfo,
-    ...info,
     ...images,
   };
 }

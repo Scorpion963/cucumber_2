@@ -19,6 +19,6 @@ export type HomeChatsGroupType = {
 
 export type HomeChatsType = HomeChatsGroupType | HomeChatsPrivateType;
 export type ConctactInfo = {
-    contactInfo: Pick<typeof contact.$inferSelect, "notes" | "id" | "imageUrl"> | null
+    contactInfo: Pick<typeof contact.$inferSelect, "notes" | "id" | "imageUrl" | "lastName" | "name" | "contactId" | "createdAt"> | null
 }
 export type UserWithContactType = typeof user.$inferSelect & ConctactInfo; 

@@ -6,9 +6,9 @@ import {
   HomeChatsType,
   UserWithContactType,
 } from "@/providers/types/user-store-provider-types";
-import { useEffect, useState } from "react";
 import { ImageProviderTypes } from "db";
 import useS3Image from "./useS3Image";
+import { getChatName } from "@/hooks/useHomeChatsArray";
 
 type useChatInfoReturnType = {
   chat: null | HomeChatsType;
@@ -43,11 +43,9 @@ export default function useChatInfo(): useChatInfoReturnType {
     chat: currentChat ?? null,
     chatter: currentChatter ?? null,
     chatImageUrl: url,
-    chatName: chatName,
+    chatName: chatName
   };
 }
-
-type HandlChatNameAndImageProps = ImageProps & { chatName: string };
 
 function handleChatNameAndImage(
   currentChat: HomeChatsType | null | undefined,
@@ -73,7 +71,7 @@ function handleChatNameAndImage(
           imageProvider: currentChatter.imageProvider as ImageProviderTypes,
         };
 
-    return { ...image, chatName: currentChatter.name };
+    return { ...image, chatName: getChatName(currentChatter) };
   }
 
   //TODO: figure out how to do it if there currentChatter and currentChat is null
