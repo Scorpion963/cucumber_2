@@ -27,6 +27,7 @@ import { useCurrentUserStore } from "@/providers/current-user-store-provider";
 import { ReactNode } from "react";
 import z from "zod";
 import { uploadImageToS3 } from "@/actions/consumers/uploadToS3";
+import ConditionalLoading from "@/components/ConditionalLoading";
 
 // TODO: Display username taken error
 
@@ -275,12 +276,3 @@ export default function CustomizeUserForm({
   );
 }
 
-function ConditionalLoading({
-  isLoading,
-  children,
-}: {
-  isLoading: boolean;
-  children: ReactNode;
-}) {
-  return isLoading ? <ImSpinner8 className="animate-spin" /> : children;
-}

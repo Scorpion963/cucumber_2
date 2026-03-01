@@ -22,6 +22,7 @@ import z from "zod";
 import useChatInfo from "../../hooks/useChatInfo";
 import { getPresignedPostUrl, getSignedPutUrl } from "@/actions/getSignedUrl";
 import { uploadImageToS3 } from "@/actions/consumers/uploadToS3";
+import ConditionalLoading from "@/components/ConditionalLoading";
 
 const editFormSchema = z.object({
   firstName: z.string().trim().min(1),
@@ -160,7 +161,7 @@ export default function EditContactForm({
                 <FormControl>
                   <Modal
                     onSuccess={() => {
-                      form.handleSubmit(handleSubmit)()
+                      form.handleSubmit(handleSubmit)();
                     }}
                     onAbort={() => form.setValue("image", null)}
                     defaultOpen={false}
@@ -199,7 +200,14 @@ export default function EditContactForm({
 
         <DarkLineBreak />
         <FormSection>
-          <Button className="w-full cursor-pointer">Save</Button>
+            <Button
+              disabled={!form.formState.isDirty || form.formState.isSubmitting}
+              className="w-full cursor-pointer"
+            >
+              <ConditionalLoading isLoading={form.formState.isSubmitting}>
+              Save
+              </ConditionalLoading>
+            </Button>
         </FormSection>
       </form>
     </Form>
