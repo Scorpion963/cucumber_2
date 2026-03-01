@@ -23,6 +23,7 @@ const editContactSchemaAction = z.object({
       typeof val === "string" && val.trim().length !== 0 ? val : null
     ),
   contactId: z.string().trim().min(1),
+  image: z.string().optional()
 });
 
 export async function upsertContact(
@@ -43,12 +44,14 @@ export async function upsertContact(
         name: data.firstName,
         lastName: data.lastName,
         notes: data.notes,
+        imageUrl: data.image
       })
       .onConflictDoUpdate({
         set: {
           name: data.firstName,
           lastName: data.lastName,
           notes: data.notes,
+          imageUrl: data.image
         },
         target: [contact.ownerId, contact.contactId],
         setWhere: eq(contact.ownerId, session.user.id),
@@ -58,7 +61,8 @@ export async function upsertContact(
       console.log("Updated: ", updatedContact)
 
     return { data: updatedContact, error: null };
-  } catch {
+  } catch (err) {
+    console.log(err)
     return { data: null, error: "Error during inserting happened" };
   }
 }

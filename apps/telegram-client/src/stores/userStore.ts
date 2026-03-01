@@ -1,4 +1,6 @@
+import removeUndefined from "@/lib/removeUndefined";
 import { HomeChatsType, UserWithContactType } from "@/providers/types/user-store-provider-types";
+import { contact } from "db";
 import { createStore } from "zustand/vanilla";
 
 export type HomeChatsState = {
@@ -7,9 +9,9 @@ export type HomeChatsState = {
 };
 
 export type HomeChatsActions = {
-  updateContactByUsername: (
-    username: string,
-    users: Pick<UserWithContactType, "contactInfo" | "name" | "lastName">
+  updateContactInfoById: (
+    id: string,
+    users: Partial<Pick<typeof contact.$inferSelect, | "id" | "imageUrl" | "lastName" | "notes" | "name">>
   ) => void;
   addUser: (contact: UserWithContactType) => void;
   addChat: (chat: HomeChatsType) => void
@@ -28,17 +30,15 @@ export const createHomeChatsStore = (
   console.log("RECREATED")
   return createStore<HomeChatsStore>()((set) => ({
     ...initState,
-    updateContactByUsername: (username, user) => {
+    updateContactInfoById: (id, user) => {
       set((state) => {
-        const contactExists = state.users.get(username);
-        if (!contactExists) return { ...state };
+        const contactExists = state.users.get(id);
+        if (!contactExists?.contactInfo) return { ...state };
 
-        const newContact: UserWithContactType = {
-          ...contactExists,
-          ...user,
-        };
+        const cleanUser = removeUndefined(user)
         const newMap = new Map(state.users);
-        newMap.set(username, newContact);
+
+        newMap.set(id, {...contactExists, contactInfo: {...contactExists.contactInfo, ...cleanUser}});
         return { ...state, users: newMap };
       });
     },

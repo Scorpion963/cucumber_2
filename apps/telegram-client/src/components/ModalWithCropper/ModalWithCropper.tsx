@@ -15,7 +15,7 @@ export function ModalWithCropper({
   children?: ReactNode
 }) {
   const [image, setImage] = useState<null | string>(null);
-  const { setIsOpen, isOpen } = useModal();
+  const { setIsOpen, isOpen, success } = useModal();
 
   function compressImage(
     image: string,
@@ -72,6 +72,7 @@ export function ModalWithCropper({
       console.log("compressedImage: ", compressedImage);
       const file = new File([compressedImage], "avatar.png", { type: "image/jpeg" });
       setImageInForm(file);
+      success()
     } catch (err) {
       console.log(err)
       toast.error("Image prcessing failed");

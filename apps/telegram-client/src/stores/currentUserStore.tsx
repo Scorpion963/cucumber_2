@@ -1,5 +1,5 @@
+import removeUndefined from "@/lib/removeUndefined"
 import { user } from "db"
-import { produce } from "immer"
 import { createStore } from "zustand/vanilla"
 
 export type CurrentUserState = {
@@ -21,18 +21,4 @@ export const createCurrentUserStore = (initState: CurrentUserState) => {
             set(prev => ({...prev, currentUser: {...prev.currentUser, ...cleanObject}}))      
         }
     }))
-}
-
-function removeUndefined<T extends object>(obj: Partial<T>) {
-    const result: Partial<T> = {}
-    
-    for(const key of Object.keys(obj) as (keyof T)[]){
-        const value = obj[key]
-
-        if(value !== undefined){
-            result[key] = value
-        }
-    }
-
-    return result
 }

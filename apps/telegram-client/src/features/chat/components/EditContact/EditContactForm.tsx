@@ -21,6 +21,7 @@ import { ModalWithCropper } from "@/components/ModalWithCropper/ModalWithCropper
 import z from "zod";
 import useChatInfo from "../../hooks/useChatInfo";
 import { getPresignedPostUrl, getSignedPutUrl } from "@/actions/getSignedUrl";
+import { uploadImageToS3 } from "@/actions/consumers/uploadToS3";
 
 const editFormSchema = z.object({
   firstName: z.string().trim().min(1),
@@ -38,7 +39,7 @@ export default function EditContactForm({
 }: {
   chatter: UserWithContactType;
 }) {
-  const { updateContactByUsername } = useHomeChatsStore((state) => state);
+  const { updateContactInfoById } = useHomeChatsStore((state) => state);
   const { chatImageUrl } = useChatInfo();
   const defaultObject: EditFormSchemaType = chatter.contactInfo?.name
     ? {
@@ -60,9 +61,17 @@ export default function EditContactForm({
   });
 
   async function handleSubmit(data: z.infer<typeof editFormSchema>) {
-    if(data.image){
-      const url = await getPresignedPostUrl(data.image.type , "chatting-app-test-bucket")
-      
+    let imageResponse;
+    if (data.image) {
+      imageResponse = await uploadImageToS3(
+        data.image,
+        "chatting-app-test-bucket",
+      );
+      // TODO: Handle errors
+      if (!imageResponse.success) {
+        console.log("Error inside of editContactForm happened");
+        return;
+      }
     }
 
     const response = await upsertContact({
@@ -70,6 +79,7 @@ export default function EditContactForm({
       firstName: data.firstName,
       lastName: data.lastName,
       notes: data.notes,
+      image: imageResponse?.success && imageResponse.data.imageKey,
     });
 
     if (response.error || !response.data) {
@@ -79,10 +89,12 @@ export default function EditContactForm({
       return;
     }
 
-    updateContactByUsername(chatter.username, {
-      name: response.data.name,
-      imageUrl: response.data.imageUrl ?? chatter.imageUrl,
+    console.log("I AM HERE");
+
+    updateContactInfoById(chatter.id, {
+      imageUrl: response.data.imageUrl,
       lastName: response.data.lastName,
+      name: response.data.name,
       notes: response.data.notes,
     });
 
@@ -135,7 +147,11 @@ export default function EditContactForm({
           />
         </FormSection>
         <DarkLineBreak />
+        {/* <button onClick={() => form.handleSubmit(handleSubmit)()}>test</button> */}
         <FormSection>
+          <PhotoManager
+            text={`Suggest photo for ${chatter.contactInfo?.name ?? chatter.name}`}
+          />
           <FormField
             control={form.control}
             name="image"
@@ -143,6 +159,9 @@ export default function EditContactForm({
               <FormItem>
                 <FormControl>
                   <Modal
+                    onSuccess={() => {
+                      form.handleSubmit(handleSubmit)()
+                    }}
                     onAbort={() => form.setValue("image", null)}
                     defaultOpen={false}
                   >
@@ -150,7 +169,9 @@ export default function EditContactForm({
                       defaultImage={null}
                       setImageInForm={field.onChange}
                     >
-                      <PhotoManager text="Suggest Photo for Egor" />
+                      <PhotoManager
+                        text={`Set Photo for ${chatter.contactInfo?.name ?? chatter.name}`}
+                      />
                     </ModalWithCropper>
                   </Modal>
                 </FormControl>
@@ -158,7 +179,6 @@ export default function EditContactForm({
               </FormItem>
             )}
           />
-          <PhotoManager text="Set Photo for Egor" />
           <p className="text-muted-foreground">
             You can replace Egor\`s photo with another photo that only you will
             see

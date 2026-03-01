@@ -120,7 +120,7 @@ export const FixedCropperWithSlider = forwardRef<
             }}
           />
           <Button
-            onClick={() => onCrop()}
+            onClick={() => {onCrop()}}
             className="rounded-full px-3 py-5 cursor-pointer dark:px-3 dark:py-5"
           >
             <Check />

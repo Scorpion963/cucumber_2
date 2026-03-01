@@ -37,7 +37,7 @@ function handleResponseErrors<T extends FieldValues>(
   switch (errorCode) {
     case ReasonPhrases.UNAUTHORIZED:
       form.setError("root", {
-        message: "You must be logged in to this information",
+        message: "You must be logged in to update this information",
       });
       return;
     case ReasonPhrases.UNPROCESSABLE_ENTITY:
@@ -89,11 +89,10 @@ export default function CustomizeUserForm({
       if (!uploadedImageKey.success) {
         handleResponseErrors(uploadedImageKey.error.code, form);
       } else {
-        if (uploadedImageKey)
-          updateUser({
-            imageProvider: "aws",
-            image: uploadedImageKey.data.imageKey,
-          });
+        updateUser({
+          imageProvider: "aws",
+          image: uploadedImageKey.data.imageKey,
+        });
       }
     }
 

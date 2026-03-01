@@ -13,6 +13,7 @@ import useMounted from "@/hooks/useMounted";
 
 type ModalProps = {
   defaultOpen?: boolean;
+  onSuccess?: () => void;
   onAbort?: () => void;
   children: React.ReactNode;
 };
@@ -21,6 +22,7 @@ type ModalContextProps = {
   isOpen: boolean;
   setIsOpen: React.Dispatch<SetStateAction<boolean>>;
   abort: () => void;
+  success: () => void
 };
 
 const ModalContext = createContext<ModalContextProps | null>(null);
@@ -37,6 +39,7 @@ export function useModal() {
 export function Modal({
   defaultOpen = false,
   onAbort = () => {},
+  onSuccess = () => {},
   children,
 }: ModalProps) {
   const [isOpen, setIsOpen] = useState(defaultOpen);
@@ -47,7 +50,7 @@ export function Modal({
   }
 
   return (
-    <ModalContext.Provider value={{ isOpen, setIsOpen, abort }}>
+    <ModalContext.Provider value={{ isOpen, setIsOpen, abort, success: onSuccess }}>
       {children}
     </ModalContext.Provider>
   );
