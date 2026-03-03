@@ -11,7 +11,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Delete, ImagePlus } from "lucide-react";
+import { Check, Delete, ImagePlus } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { upsertContact } from "../../actions/editContact";
 import { useHomeChatsStore } from "@/providers/user-store-provider";
@@ -21,7 +21,10 @@ import { ModalWithCropper } from "@/components/ModalWithCropper/ModalWithCropper
 import z from "zod";
 import useChatInfo from "../../hooks/useChatInfo";
 import { uploadImageToS3 } from "@/actions/consumers/uploadToS3";
-import ConditionalLoading from "@/components/ConditionalLoading";
+import handleUploadS3ResponseErrors from "@/lib/forms/handleUploadS3ResponseErrors";
+import SaveButton from "@/components/buttons/SaveButton";
+
+//TODO: User can't udpate the contact if the lastname or notes are empty
 
 const editFormSchema = z.object({
   firstName: z.string().trim().min(1),
@@ -70,6 +73,7 @@ export default function EditContactForm({
       // TODO: Handle errors
       if (!imageResponse.success) {
         console.log("Error inside of editContactForm happened");
+        handleUploadS3ResponseErrors(imageResponse.error.code, form);
         return;
       }
     }
@@ -102,6 +106,7 @@ export default function EditContactForm({
       firstName: response.data?.name ?? "",
       lastName: response.data?.lastName ?? "",
       notes: response.data?.notes ?? "",
+      image: null
     });
   }
 
@@ -109,9 +114,6 @@ export default function EditContactForm({
     <Form {...form}>
       <form onSubmit={form.handleSubmit((data) => handleSubmit(data))}>
         <FormSection>
-          <p className="text-destructive">
-            {form.formState.errors.root && form.formState.errors.root.message}
-          </p>
           <FormField
             name="firstName"
             control={form.control}
@@ -198,14 +200,15 @@ export default function EditContactForm({
 
         <DarkLineBreak />
         <FormSection>
-            <Button
-              disabled={!form.formState.isDirty || form.formState.isSubmitting}
-              className="w-full cursor-pointer"
-            >
-              <ConditionalLoading isLoading={form.formState.isSubmitting}>
-              Save
-              </ConditionalLoading>
-            </Button>
+          <p className="text-destructive">
+            {form.formState.errors.root && form.formState.errors.root.message}
+          </p>
+
+          <SaveButton
+            isSubmitting={form.formState.isSubmitting}
+            isSuccess={form.formState.isSubmitSuccessful}
+            disabed={!form.formState.isDirty || form.formState.isSubmitting}
+          />
         </FormSection>
       </form>
     </Form>

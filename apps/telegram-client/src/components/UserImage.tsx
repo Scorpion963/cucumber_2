@@ -22,8 +22,8 @@ export function UserImage({
           />
         )}
       </div>
-      <div className="flex flex-col items-center">
-        <div className="font-bold text-lg">{name}</div>
+      <div className="flex flex-col items-center w-full">
+        <div className="font-bold text-lg text-center w-full wrap-break-word">{name}</div>
         {isOnline && (
           <div className="text-sm text-muted-foreground">
             {isOnline ? "online" : "offline"}

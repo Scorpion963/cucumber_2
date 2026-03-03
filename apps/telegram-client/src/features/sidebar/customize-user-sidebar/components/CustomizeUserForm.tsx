@@ -1,7 +1,4 @@
 "use client";
-import { motion } from "framer-motion";
-import { ImSpinner8 } from "react-icons/im";
-import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
@@ -20,36 +17,13 @@ import { handleFieldErrors } from "@/lib/errors/handleFieldErrors";
 import { Modal } from "@/components/Modal";
 import { ModalWithCropper } from "@/components/ModalWithCropper/ModalWithCropper";
 import { ImageProviderTypes } from "db";
-import { ReasonPhrases } from "http-status-codes";
-import { Check } from "lucide-react";
-import { AnimatePresence } from "framer-motion";
 import { useCurrentUserStore } from "@/providers/current-user-store-provider";
-import { ReactNode } from "react";
 import z from "zod";
 import { uploadImageToS3 } from "@/actions/consumers/uploadToS3";
-import ConditionalLoading from "@/components/ConditionalLoading";
+import handleUploadS3ResponseErrors from "@/lib/forms/handleUploadS3ResponseErrors";
+import SaveButton from "@/components/buttons/SaveButton";
 
 // TODO: Display username taken error
-
-function handleResponseErrors<T extends FieldValues>(
-  errorCode: string,
-  form: UseFormReturn<T>,
-) {
-  switch (errorCode) {
-    case ReasonPhrases.UNAUTHORIZED:
-      form.setError("root", {
-        message: "You must be logged in to update this information",
-      });
-      return;
-    case ReasonPhrases.UNPROCESSABLE_ENTITY:
-      form.setError("root", { message: "Invalid content type" });
-      return;
-    default:
-      form.setError("root", {
-        message: "Unexpected error happened, please try again later",
-      });
-  }
-}
 
 export default function CustomizeUserForm({
   defaultUserImage,
@@ -88,7 +62,7 @@ export default function CustomizeUserForm({
         "cucumber-app-public",
       );
       if (!uploadedImageKey.success) {
-        handleResponseErrors(uploadedImageKey.error.code, form);
+        handleUploadS3ResponseErrors(uploadedImageKey.error.code, form);
       } else {
         updateUser({
           imageProvider: "aws",
@@ -126,6 +100,7 @@ export default function CustomizeUserForm({
           name: data.name,
           lastName: data.lastName,
           username: data.username,
+          image: null
         },
         { keepErrors: true },
       );
@@ -239,37 +214,13 @@ export default function CustomizeUserForm({
         </div>
 
         <FormSection>
-          <div className="h-6">
-            <AnimatePresence>
-              {form.formState.isSubmitSuccessful &&
-                !form.formState.isSubmitting && (
-                  <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    className="flex gap-2 text-green-400"
-                  >
-                    <Check />
-                    <span>Success</span>
-                  </motion.div>
-                )}
-            </AnimatePresence>
-          </div>
-
           {form.formState.errors.root && (
             <p className="text-destructive">
               {form.formState.errors.root.message}
             </p>
           )}
 
-          <Button
-            disabled={!form.formState.isDirty || form.formState.isSubmitting}
-            className="w-full cursor-pointer"
-          >
-            <ConditionalLoading isLoading={form.formState.isSubmitting}>
-              <>Save</>
-            </ConditionalLoading>
-          </Button>
+          <SaveButton disabed={!form.formState.isDirty || form.formState.isSubmitting} isSubmitting={form.formState.isSubmitting} isSuccess={form.formState.isSubmitSuccessful} />
         </FormSection>
       </form>
     </Form>
