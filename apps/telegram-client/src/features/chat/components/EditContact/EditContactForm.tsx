@@ -20,7 +20,6 @@ import { Modal } from "@/components/Modal";
 import { ModalWithCropper } from "@/components/ModalWithCropper/ModalWithCropper";
 import z from "zod";
 import useChatInfo from "../../hooks/useChatInfo";
-import { getPresignedPostUrl, getSignedPutUrl } from "@/actions/getSignedUrl";
 import { uploadImageToS3 } from "@/actions/consumers/uploadToS3";
 import ConditionalLoading from "@/components/ConditionalLoading";
 
@@ -148,7 +147,6 @@ export default function EditContactForm({
           />
         </FormSection>
         <DarkLineBreak />
-        {/* <button onClick={() => form.handleSubmit(handleSubmit)()}>test</button> */}
         <FormSection>
           <PhotoManager
             text={`Suggest photo for ${chatter.contactInfo?.name ?? chatter.name}`}
