@@ -107,7 +107,7 @@ export function getRelevantChat(
 
 export function getChatName(user: UserWithContactType) {
   const chatName = user.contactInfo?.name
-    ? user.contactInfo.name + " " + user.contactInfo.lastName
-    : user.name + " " + user.lastName;
+    ? user.contactInfo.name + " " + (user.contactInfo.lastName ?? "")
+    : user.name + " " + (user.lastName ?? "");
   return chatName;
 }

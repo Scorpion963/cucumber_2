@@ -106,7 +106,7 @@ export default function EditContactForm({
       firstName: response.data?.name ?? "",
       lastName: response.data?.lastName ?? "",
       notes: response.data?.notes ?? "",
-      image: null
+      image: null,
     });
   }
 

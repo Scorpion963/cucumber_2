@@ -1,6 +1,6 @@
 "use client";
 
-import { ChangeEvent, ReactNode, useEffect } from "react";
+import { ChangeEvent, ReactNode, useEffect, useId } from "react";
 import { useModal } from "../Modal";
 import Image from "next/image";
 import { Edit } from "lucide-react";
@@ -15,6 +15,7 @@ export default function AvatarChange({
   children?: ReactNode
 }) {
   const { setIsOpen, isOpen } = useModal();
+  const id = useId()
 
   function onChange(e: ChangeEvent<HTMLInputElement>) {
     e.preventDefault();
@@ -37,11 +38,11 @@ export default function AvatarChange({
       <input
         accept=".jpeg,.png"
         type="file"
-        id="avatarChange"
+        id={id}
         className="hidden"
         onChange={onChange}
       />
-      <label htmlFor="avatarChange">
+      <label htmlFor={id}>
         {children}
         {!children && (
           <div className="size-32 rounded-full overflow-hidden relative cursor-pointer bg-gray-500 flex items-center justify-center">
