@@ -8,7 +8,7 @@ import { headers } from "next/headers";
 import {
   CurrentUserStoreProvider,
 } from "@/providers/current-user-store-provider";
-import { db, ImageProviderTypes, user } from "db";
+import { user } from "db";
 
 const routes = {
   "/main": <SearchSidebar />,
@@ -20,7 +20,7 @@ export default async function Sidebar() {
   const currentUser = await auth.api.getSession({ headers: await headers() });
   if (!currentUser?.user) return;
 
-  // I can't match the types that are in drizzle and better auth, they are slightly out of sync, because unprovided types 
+  // I can't match the types that are in drizzle and better auth, they are slightly out of sync, because the unprovided types 
   // in drizzle are null by default, but better auth doesn't know that, so it assigns them possible undefined which breaks the ts
   
   const typedU = currentUser.user as typeof user.$inferSelect

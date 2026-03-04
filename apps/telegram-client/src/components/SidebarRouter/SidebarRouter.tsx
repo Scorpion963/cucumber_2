@@ -14,7 +14,7 @@ export default function SidebarRouter({
   const { routes, previousRoutes } = useSidebarRouterStore((state) => state);
   const activeRoute = routes[routes.length - 1];
 
-  if (!animate) {
+  if (!animate) { 
     return routesMap[activeRoute] ?? <></>;
   }
 

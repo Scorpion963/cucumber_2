@@ -1,18 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import {
-  ResizableHandle,
-  ResizablePanel,
-  ResizablePanelGroup,
-} from "@/components/ui/resizable";
-import Sidebar from "@/features/sidebar/Sidebar";
 import { Toaster } from "@/components/ui/sonner";
-import findHomeChatsForStore from "@/server/db/findHomeChatsForStore";
-import { HomeChatsProvider } from "@/providers/user-store-provider";
-import { mapChatsToStore } from "@/server/mappers/mapChatsToStore";
-import { auth } from "@/lib/auth";
-import { headers } from "next/headers";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",

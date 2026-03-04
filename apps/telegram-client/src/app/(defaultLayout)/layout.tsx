@@ -1,3 +1,4 @@
+import ResizablePanels from "@/components/ResizablePanels/ResizablePanels";
 import {
   ResizableHandle,
   ResizablePanel,
@@ -10,6 +11,8 @@ import findHomeChatsForStore from "@/server/db/findHomeChatsForStore";
 import { mapChatsToStore } from "@/server/mappers/mapChatsToStore";
 import { headers } from "next/headers";
 import { ReactNode } from "react";
+
+// TODO: Sidebar doesn't disappear when in mobile
 
 export default async function Layout({ children }: { children: ReactNode }) {
   const session = await auth.api.getSession({ headers: await headers() });
@@ -28,22 +31,12 @@ export default async function Layout({ children }: { children: ReactNode }) {
     <div>
       <HomeChatsProvider chats={mappedChatInfo} users={mappedUsers}>
         <div className="w-full h-screen">
-          <div className=" w-full h-full">
-            <ResizablePanelGroup
-              direction="horizontal"
-              className="rounded-lg border w-full "
-            >
-              <ResizablePanel minSize={15} maxSize={30} defaultSize={20}>
-                <Sidebar />
-              </ResizablePanel>
-              <ResizableHandle />
-              <ResizablePanel className="hidden lg:block" defaultSize={80}>
-                {children}
-              </ResizablePanel>
-            </ResizablePanelGroup>
-          </div>
+          <ResizablePanels sidebar={<Sidebar />}>
+            {children}
+          </ResizablePanels>
         </div>
       </HomeChatsProvider>
     </div>
   );
 }
+
