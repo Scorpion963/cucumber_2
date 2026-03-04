@@ -36,43 +36,13 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const session = await auth.api.getSession({ headers: await headers() });
-  if (!session?.user) return;
-  console.log(session.user.id);
-
-  console.log("LAYOUT_CHANGED");
-  const homeChats = await findHomeChatsForStore(session.user.id);
-
-  console.log("HOMECHATS: ", homeChats);
-
-  const { mappedUsers, mappedChatInfo } = mapChatsToStore(homeChats);
-
-  console.log("mapped: ", mappedChatInfo, mappedUsers);
-
   return (
     <html lang="en">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased dark`}
       >
-        <HomeChatsProvider chats={mappedChatInfo} users={mappedUsers}>
-          <div className="w-full h-screen">
-            <div className=" w-full h-full">
-              <ResizablePanelGroup
-                direction="horizontal"
-                className="rounded-lg border w-full "
-              >
-                <ResizablePanel minSize={15} maxSize={30} defaultSize={20}>
-                  <Sidebar />
-                </ResizablePanel>
-                <ResizableHandle />
-                <ResizablePanel className="hidden lg:block" defaultSize={80}>
-                  {children}
-                </ResizablePanel>
-              </ResizablePanelGroup>
-            </div>
-          </div>
-          <Toaster position="top-center" />
-        </HomeChatsProvider>
+        {children}
+        <Toaster position="top-center" />
       </body>
     </html>
   );
