@@ -1,9 +1,4 @@
 import ResizablePanels from "@/components/ResizablePanels/ResizablePanels";
-import {
-  ResizableHandle,
-  ResizablePanel,
-  ResizablePanelGroup,
-} from "@/components/ui/resizable";
 import Sidebar from "@/features/sidebar/Sidebar";
 import { auth } from "@/lib/auth";
 import { HomeChatsProvider } from "@/providers/user-store-provider";

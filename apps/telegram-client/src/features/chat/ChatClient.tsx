@@ -5,6 +5,9 @@ import ChatInput from "./components/ChatInput";
 import { useMessageStore } from "./providers/messageStoreProvider";
 import SidebarRouter from "@/components/SidebarRouter/SidebarRouter";
 import { privateSidebarRoutesMap } from "./components/EllipsisMenuManager";
+import useMediaQuery from "./hooks/useMediaQuery";
+import { useEffect } from "react";
+import { useSidebarRouterStore } from "@/components/SidebarRouter/providers/sidebar-routes-provider";
 
 //  the use of useChatStore and useHomeChatsStore feels a little weird
 // because the useChatStore almost plays almost the same role as the useHomechatsStore but for single user
@@ -15,7 +18,14 @@ import { privateSidebarRoutesMap } from "./components/EllipsisMenuManager";
 
 export default function ChatClient() {
   const { messages } = useMessageStore((state) => state);
+  const { clear } = useSidebarRouterStore((state) => state);
   console.log("messages: ", messages);
+
+  const { matches, prev } = useMediaQuery("(max-width: 1024px)");
+
+  useEffect(() => {
+    if (matches && matches !== prev) clear();
+  }, [matches, prev, clear]);
 
   return (
     <div className="w-full h-full flex">
