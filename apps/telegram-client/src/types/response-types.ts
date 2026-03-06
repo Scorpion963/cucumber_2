@@ -1,10 +1,11 @@
+import z from "zod";
 
 export type SuccessfulResponseType<T> = {
   success: true;
   data: T;
 };
 
-export type UnsuccessfulResponseType<E> = {
+export type UnsuccessfulResponseType<E = ErrorType> = {
   success: false;
   error: E;
 };
@@ -17,3 +18,6 @@ export type ErrorType = {
 export type ResponseType<T, E = ErrorType> =
   | SuccessfulResponseType<T>
   | UnsuccessfulResponseType<E>;
+  
+
+const responseTypeSchema = z.object({})

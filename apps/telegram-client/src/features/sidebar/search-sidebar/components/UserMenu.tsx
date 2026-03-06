@@ -12,6 +12,7 @@ import { useState } from "react";
 export default function UserMenu() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { push } = useSidebarRouterStore((state) => state);
+  
   return (
     <Popover onOpenChange={(e) => setIsModalOpen(e)} open={isModalOpen}>
       <PopoverTrigger>

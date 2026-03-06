@@ -4,11 +4,14 @@ import Search from "@/components/Search";
 import useDebouncedValue from "@/hooks/useDebouncedValue";
 import { useEffect } from "react";
 import { useSearchStore } from "../providers/search-store-provider";
+import { ResponseType } from "@/types/response-types";
+import { UserFoundType } from "../stores/search-store";
+import { ReasonPhrases } from "http-status-codes";
 
 // TODO: handle errors
 
 export default function SearchContacts() {
-  const { setUsers, setErrorMessage, searchValue, setSearchValue } =
+  const { setUsers, setErrorMessage, searchValue, setSearchValue, resetError } =
     useSearchStore((state) => state);
   const debouncedValue = useDebouncedValue(searchValue, 300);
 
@@ -16,7 +19,7 @@ export default function SearchContacts() {
     if (debouncedValue.trim().length === 0) return;
     const controller = new AbortController();
 
-    setErrorMessage(null);
+    resetError()
 
     async function fetchChats(controller: AbortController) {
       try {
@@ -24,26 +27,25 @@ export default function SearchContacts() {
           `/api/chats?query=${encodeURIComponent(debouncedValue)}`,
           { signal: controller.signal }
         );
+        const raw = await res.json()
 
-        if (!res.ok) {
-          const error = await res.json();
-          const message = error.message ?? `Error: ${res.status}`;
-          setErrorMessage(message);
-          throw new Error("Response status: " + res.status);
+        const json: ResponseType<UserFoundType[]> = raw
+        if(!json.success){
+          setErrorMessage(json.error.message, json.error.code)
+          return
         }
 
-        const data = await res.json();
-        console.log(data.data);
-        setUsers(data.data);
+        setUsers(json.data)
       } catch (error) {
         console.log("Error Happened: ", error);
+        setErrorMessage("An unexpected error happened, please try again later", ReasonPhrases.INTERNAL_SERVER_ERROR)
       }
     }
 
     fetchChats(controller);
 
     return () => controller.abort();
-  }, [debouncedValue, setUsers, setErrorMessage]);
+  }, [debouncedValue, setUsers, setErrorMessage, resetError]);
 
   return (
     <Search

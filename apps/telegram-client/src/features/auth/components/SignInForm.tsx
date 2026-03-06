@@ -65,7 +65,7 @@ export default function SignInForm() {
                 <div className="flex flex-col items-center gap-2 text-center">
                   <h1 className="text-2xl font-bold">Welcome Back</h1>
                   <p className="text-muted-foreground text-sm">
-                    Login to your Cucumber account
+                    Log into your Cucumber account
                   </p>
                 </div>
                 <div className="flex flex-col gap-4">

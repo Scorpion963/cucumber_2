@@ -9,8 +9,16 @@ import { getPublicAssetUrl } from "@/services/s3/lib/helpers";
 // TODO: memoize chats and contacts
 
 export default function ContactList() {
-  const { usersFound, searchValue } = useSearchStore((state) => state);
+  const { usersFound, searchValue, error } = useSearchStore((state) => state);
   const chats = useHomeChatsArray();
+
+  if (error) {
+    return (
+      <div className="flex items-center justify-center w-full h-full">
+        <p>{error.message}</p>
+      </div>
+    );
+  }
 
   if (usersFound.length === 0 && searchValue.trim().length !== 0)
     return (
@@ -19,12 +27,11 @@ export default function ContactList() {
       </div>
     );
 
-    console.log("Users Found: ", usersFound)
-    console.log("Chats: ", chats)
+
 
   return (
     <ScrollArea className="h-full w-full">
-      {usersFound.length === 0 ? (
+      {searchValue.trim().length === 0 ? (
         <>
           {chats.map((v) => (
             <Contact
@@ -48,4 +55,3 @@ export default function ContactList() {
     </ScrollArea>
   );
 }
-
