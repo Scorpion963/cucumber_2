@@ -8,6 +8,7 @@ import { privateSidebarRoutesMap } from "./components/EllipsisMenuManager";
 import useMediaQuery from "./hooks/useMediaQuery";
 import { useEffect } from "react";
 import { useSidebarRouterStore } from "@/components/SidebarRouter/providers/sidebar-routes-provider";
+import { useSocketStore } from "@/providers/socket-store-provider";
 
 //  the use of useChatStore and useHomeChatsStore feels a little weird
 // because the useChatStore almost plays almost the same role as the useHomechatsStore but for single user
@@ -26,6 +27,10 @@ export default function ChatClient() {
   useEffect(() => {
     if (matches && matches !== prev) clear();
   }, [matches, prev, clear]);
+
+  const socket = useSocketStore(state => state.socket)
+
+  console.log("socket in chat: ", socket)
 
   return (
     <div className="w-full h-full flex">

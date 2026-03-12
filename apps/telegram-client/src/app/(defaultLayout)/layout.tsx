@@ -1,6 +1,7 @@
 import ResizablePanels from "@/components/ResizablePanels/ResizablePanels";
 import Sidebar from "@/features/sidebar/Sidebar";
 import { auth } from "@/lib/auth";
+import { SocketStoreProvider } from "@/providers/socket-store-provider";
 import { HomeChatsProvider } from "@/providers/user-store-provider";
 import findHomeChatsForStore from "@/server/db/findHomeChatsForStore";
 import { mapChatsToStore } from "@/server/mappers/mapChatsToStore";
@@ -24,14 +25,11 @@ export default async function Layout({ children }: { children: ReactNode }) {
   console.log("mapped: ", mappedChatInfo, mappedUsers);
   return (
     <div>
-      <HomeChatsProvider chats={mappedChatInfo} users={mappedUsers}>
-        <div className="w-full h-screen">
-          <ResizablePanels sidebar={<Sidebar />}>
-            {children}
-          </ResizablePanels>
-        </div>
-      </HomeChatsProvider>
+        <HomeChatsProvider chats={mappedChatInfo} users={mappedUsers}>
+          <div className="w-full h-screen">
+            <ResizablePanels sidebar={<Sidebar />}>{children}</ResizablePanels>
+          </div>
+        </HomeChatsProvider>
     </div>
   );
 }
-

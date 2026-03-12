@@ -14,7 +14,9 @@ import EditContact from "./EditContact/EditContact";
 // TODO: organize everything into separate files
 
 const privateSidebarRoutes = ["/edit"] as const;
+
 type PrivateSidebarRoutesType = (typeof privateSidebarRoutes)[number];
+
 type S<T extends string> = {
   [K in T]: ReactNode;
 };
