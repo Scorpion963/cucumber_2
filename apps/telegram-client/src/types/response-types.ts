@@ -19,5 +19,3 @@ export type ResponseType<T, E = ErrorType> =
   | SuccessfulResponseType<T>
   | UnsuccessfulResponseType<E>;
   
-
-const responseTypeSchema = z.object({})

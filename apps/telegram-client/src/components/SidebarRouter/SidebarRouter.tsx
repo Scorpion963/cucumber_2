@@ -2,7 +2,7 @@
 import { ReactNode } from "react";
 import { useSidebarRouterStore } from "./providers/sidebar-routes-provider";
 import { AnimatePresence } from "framer-motion";
-import SidebarAnimationWrapper from "@/features/sidebar/components/SidebarAnimationWrapper";
+import SidebarAnimationWrapper from "./components/SidebarAnimationWrapper";
 
 export default function SidebarRouter({
   routesMap,

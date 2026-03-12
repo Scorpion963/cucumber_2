@@ -1,6 +1,5 @@
 import { ErrorType } from "@/types/response-types";
 import { user } from "db";
-import { ReasonPhrases } from "http-status-codes";
 import { createStore } from "zustand/vanilla";
 
 export type UserFoundType = typeof user.$inferSelect;
