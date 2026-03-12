@@ -1,36 +1,41 @@
 "use client";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useEffect, useRef, useState } from "react";
+import useIntersection from "../hooks/useIntersection";
 
 export default function ChatScrollArea({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const [isIntersecting, setIsIntersecting] = useState(false);
+  // const [isIntersecting, setIsIntersecting] = useState(false);
   const ref = useRef<null | HTMLDivElement>(null);
   const scrollAreaRef = useRef<null | HTMLDivElement>(null);
+  const isIntersecting = useIntersection({
+    observeRef: ref,
+    rootRef: scrollAreaRef,
+  });
 
-  useEffect(() => {
-    if (!scrollAreaRef.current || !ref.current) return;
-    const handleIntersection = (entries: IntersectionObserverEntry[]) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          setIsIntersecting(true);
-          console.log("intersecting");
-        } else {
-          setIsIntersecting(false);
-          console.log("not intersecting");
-        }
-      });
-    };
-    const observer = new IntersectionObserver(
-      (entries) => handleIntersection(entries),
-      { root: scrollAreaRef.current, threshold: 1 }
-    );
-    observer.observe(ref.current);
-    return () => observer.disconnect();
-  }, []);
+  // useEffect(() => {
+  //   if (!scrollAreaRef.current || !ref.current) return;
+  //   const handleIntersection = (entries: IntersectionObserverEntry[]) => {
+  //     entries.forEach((entry) => {
+  //       if (entry.isIntersecting) {
+  //         setIsIntersecting(true);
+  //         console.log("intersecting");
+  //       } else {
+  //         setIsIntersecting(false);
+  //         console.log("not intersecting");
+  //       }
+  //     });
+  //   };
+  //   const observer = new IntersectionObserver(
+  //     (entries) => handleIntersection(entries),
+  //     { root: scrollAreaRef.current, threshold: 1 }
+  //   );
+  //   observer.observe(ref.current);
+  //   return () => observer.disconnect();
+  // }, []);
 
   return (
     <ScrollArea

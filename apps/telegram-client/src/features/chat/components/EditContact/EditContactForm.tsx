@@ -23,6 +23,7 @@ import useChatInfo from "../../hooks/useChatInfo";
 import { uploadImageToS3 } from "@/actions/consumers/uploadToS3";
 import handleUploadS3ResponseErrors from "@/lib/forms/handleUploadS3ResponseErrors";
 import SaveButton from "@/components/buttons/SaveButton";
+import { getFirstNameFromUser } from "@/lib/userWithContact";
 
 //TODO: User can't udpate the contact if the lastname or notes are empty
 
@@ -181,7 +182,7 @@ export default function EditContactForm({
             )}
           />
           <p className="text-muted-foreground">
-            You can replace Egor\`s photo with another photo that only you will
+            You can replace {getFirstNameFromUser(chatter)}{`'`}s photo with another photo that only you will
             see
           </p>
         </FormSection>

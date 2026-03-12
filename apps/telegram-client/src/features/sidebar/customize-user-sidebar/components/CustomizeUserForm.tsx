@@ -63,12 +63,14 @@ export default function CustomizeUserForm({
       );
       if (!uploadedImageKey.success) {
         handleUploadS3ResponseErrors(uploadedImageKey.error.code, form);
-      } else {
-        updateUser({
-          imageProvider: "aws",
-          image: uploadedImageKey.data.imageKey,
-        });
+        return
       }
+      //  else {
+      //   updateUser({
+      //     imageProvider: "aws",
+      //     image: uploadedImageKey.data.imageKey,
+      //   });
+      // }
     }
 
     const result = await authClient.updateUser({
@@ -208,7 +210,7 @@ export default function CustomizeUserForm({
             <p className="text-muted-foreground">
               You can use a-z, 0-9 and underscores. Minimum length is 5
               characters. <br /> This link opens a chat with you: <br />
-              https://t.me/dimasik23123
+              https://t.me/{defaultFields.username}
             </p>
           </FormSection>
         </div>
