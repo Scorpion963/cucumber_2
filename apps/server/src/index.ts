@@ -14,20 +14,23 @@ const io = new Server(server, {
   },
 });
 
-// io.use(async (socket, next) => {
-//   const token = socket.handshake.auth.token;
-//   const exists = await redis.get(token);
-//   if (exists === 0) {
-//     next(new Error("Invalid session"));
-//   } else {
-//     next();
-//   }
-// });
+io.use(async (socket, next) => {
+  const token = socket.handshake.auth.token;
+  if (!token) return next(new Error("No token provided"));
+
+  const exists = await redis.get(token);
+  console.log("exists: ", exists);
+  if (exists === 0) {
+    return next(new Error("Invalid session"));
+  }
+
+  next();
+});
 
 io.on("connection", (socket) => {
   console.log("user connected: ", socket.id);
 });
 
 server.listen(port, async () => {
-  console.log("The server is running")
+  console.log("The server is running");
 });
