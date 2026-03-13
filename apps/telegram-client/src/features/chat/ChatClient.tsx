@@ -10,6 +10,7 @@ import { ReactNode, useEffect } from "react";
 import { useSidebarRouterStore } from "@/components/SidebarRouter/providers/sidebar-routes-provider";
 import { useSocketStore } from "@/providers/socket-store-provider";
 import { cn } from "@/lib/utils";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 //  the use of useChatStore and useHomeChatsStore feels a little weird
 // because the useChatStore almost plays almost the same role as the useHomechatsStore but for single user
@@ -21,32 +22,46 @@ import { cn } from "@/lib/utils";
 export default function ChatClient() {
   const { messages } = useMessageStore((state) => state);
   const { clear } = useSidebarRouterStore((state) => state);
-  console.log("messages: ", messages);
 
   const { matches, prev } = useMediaQuery("(max-width: 1024px)");
-
   useEffect(() => {
     if (matches && matches !== prev) clear();
   }, [matches, prev, clear]);
-
-  const socket = useSocketStore((state) => state.socket);
-
-  console.log("socket in chat: ", socket);
 
   return (
     <div className="w-full h-full flex">
       <div className="h-full flex-1">
         <ChatHeader />
-        <div className="h-full w-full flex flex-col">
-          <ChatContent />
+        <div className="h-full">
+          <ChatContent /> 
           <ChatInput />
         </div>
       </div>
+
+      {/* <div className="h-full flex-1">  
+        <ChatHeader />
+        <div className="h-[calc(100%-56px-56px)] flex flex-col justify-end">
+          <div className="overflow-y-auto h-fit max-h-full w-full">
+            <Messages />
+            <Messages />
+            <Messages />
+            <Messages />
+            <Messages />
+            <Messages />
+          </div>
+        </div>
+        <ChatInput />
+      </div> */}
+
       <div>
         <SidebarRouter animate={false} routesMap={privateSidebarRoutesMap} />
       </div>
     </div>
   );
+}
+
+function Messages() {
+  return <div className="size-32 bg-pink-600">fwehewauefhwa</div>;
 }
 
 export function ChatBodyWrapper({

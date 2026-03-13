@@ -9,21 +9,25 @@ import { MessageStoreProvider } from "./providers/messageStoreProvider";
 import { headers } from "next/headers";
 import ChatClient from "./ChatClient";
 import { SidebarRouterProvider } from "@/components/SidebarRouter/providers/sidebar-routes-provider";
+import { MessageInputStoreProvider } from "./providers/messageInputStoreProvider";
+import {v4 as uuidv4} from 'uuid'
 
 export async function ChatServer({ paramsId }: { paramsId: string }) {
   const user = await auth.api.getSession({ headers: await headers() });
   const chat = await handleChatFetch(paramsId, user!.user.id);
 
-  console.log(chat)
+  console.log(chat);
 
   if (!chat.canAccess) redirect("/");
-  if(!chat.chat && !chat.chatter) redirect("/")
-  
+  if (!chat.chat && !chat.chatter) redirect("/");
+
   const messages: (typeof message.$inferSelect)[] = chat.chat?.id
     ? await getMessagesDB(chat.chat.id)
     : [];
 
-    console.log("Fetched current chat: ", chat)
+  console.log("Fetched current chat: ", chat);
+
+  console.log("fetched messages: ", messages)
 
   return (
     <SidebarRouterProvider>
@@ -34,7 +38,18 @@ export async function ChatServer({ paramsId }: { paramsId: string }) {
         chatter={chat.chatter}
       >
         <MessageStoreProvider value={messages}>
-          <ChatClient />
+          <MessageInputStoreProvider
+            message={{
+              id: uuidv4(),
+              chatId: chat.chat!.id,
+              senderId: user!.user.id,
+              text: "",
+              forwardedFromMessageId: null,
+              replyToMessageId: null,
+            }}
+          >
+            <ChatClient />
+          </MessageInputStoreProvider>
         </MessageStoreProvider>
       </ChatStoreProvider>
     </SidebarRouterProvider>
