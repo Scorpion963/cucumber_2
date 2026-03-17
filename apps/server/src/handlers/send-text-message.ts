@@ -1,8 +1,9 @@
 import type { Server, Socket } from "socket.io";
 import emitError from "../utils/sockets/emitErrot";
-import { db, message } from "../db";
+import { chats, db, message } from "../db";
 import z from "zod";
 import { SOCKET_EMITS, SOCKET_EVENTS } from "../event-listener-names";
+import { eq } from "drizzle-orm";
 
 type MessageItemType = Required<
   Pick<typeof message.$inferInsert, "senderId" | "chatId" | "text">
@@ -17,7 +18,7 @@ const messageItemSchema = z.object({
   text: z.string(),
   forwardedFromMessageId: z.string().nullish(),
   replyToMessageId: z.string().nullish(),
-  id: z.string().optional()
+  id: z.string().optional(),
 });
 
 export default async function sendTextMessageHandler(
@@ -27,9 +28,8 @@ export default async function sendTextMessageHandler(
 ) {
   const { success, data } = messageItemSchema.safeParse(requestData);
 
-
   if (!success) {
-    console.log("Error validating")
+    console.log("Error validating");
     emitError(socket, "send_text_message", {
       code: "",
       message: "Invalid text message",
@@ -38,10 +38,7 @@ export default async function sendTextMessageHandler(
   }
 
   try {
-    const [newMessage] = await db
-      .insert(message)
-      .values({ ...data })
-      .returning();
+    const newMessage = await createAndUpdateLatestMessage(data);
 
     if (!newMessage) {
       emitError(socket, SOCKET_EVENTS.SEND_TEXT_MESSAGE, {
@@ -51,11 +48,34 @@ export default async function sendTextMessageHandler(
       return;
     }
 
-    io.to(`room:${newMessage.chatId}`).emit(SOCKET_EMITS.MESSAGE_CREATED, newMessage);
+    console.log("Success")
+
+    io.to(`room:${newMessage.chatId}`).emit(
+      SOCKET_EMITS.MESSAGE_CREATED,
+      newMessage,
+    );
   } catch {
     emitError(socket, "send_text_message", {
       code: "",
       message: "Internal Server Error: failed db insert",
     });
   }
+}
+
+function createAndUpdateLatestMessage(data: z.infer<typeof messageItemSchema>) {
+  return db.transaction(async (ctx) => {
+    const [newMessage] = await ctx
+      .insert(message)
+      .values({ ...data })
+      .returning();
+
+    if (!newMessage) return null;
+
+    await ctx
+      .update(chats)
+      .set({ lastMessageId: newMessage.id })
+      .where(eq(chats.id, newMessage.chatId));
+
+    return newMessage;
+  });
 }

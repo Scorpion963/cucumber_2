@@ -2,6 +2,7 @@
 
 import { getImageUrlS3 } from "@/actions/getSignedUrl";
 import {
+  HomeChatsLastMessageType,
   HomeChatsType,
   UserWithContactType,
 } from "@/providers/types/user-store-provider-types";
@@ -53,6 +54,7 @@ type DisplayChats = {
   chatName: string | null;
   isImagePublic: boolean;
   imageProvider: ImageProviderTypes;
+  lastMessage: HomeChatsLastMessageType | null
 };
 
 export function getRelevantChat(
@@ -64,6 +66,7 @@ export function getRelevantChat(
     // If user exists it shouldn't be null, but what if it is though
     // TODO: I feel like I need to add a fallback fetch, so that in case it is null or undefined i fetch
     // and add it to the users, but it should never happen though
+
     const user = users.get(userId ?? "");
     if (!user)
       return {
@@ -72,6 +75,7 @@ export function getRelevantChat(
         imageUrl: null,
         isImagePublic: false,
         imageProvider: "aws",
+        lastMessage: null
       };
 
     const image: Pick<
@@ -91,6 +95,7 @@ export function getRelevantChat(
 
     return {
       chatName: getChatName(user),
+      lastMessage: chat.lastMessage,
       id: user.id,
       ...image,
     };
@@ -102,6 +107,7 @@ export function getRelevantChat(
     imageUrl: chat.imageUrl,
     isImagePublic: false,
     imageProvider: "aws",
+    lastMessage: chat.lastMessage
   };
 }
 

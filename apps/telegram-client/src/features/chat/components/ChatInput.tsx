@@ -12,6 +12,7 @@ import { useButtonShortcut } from "../hooks/useButtonShortcut";
 import { useChatScrollArea } from "../providers/chatScrollAreaProvider";
 import { ChatBodyWrapper } from "./ChatBodyWrapper";
 import { SOCKET_EMITS } from "@/types/socket-events-types";
+import { useHomeChatsStore } from "@/providers/user-store-provider";
 
 export default function ChatInput() {
   const socket = useSocketStore((state) => state.socket);
@@ -19,6 +20,7 @@ export default function ChatInput() {
   const { inputMessage, updateInputMessage, resetInputMessage } =
     useMessageInputStore((state) => state);
   const {scrollToBottom} = useChatScrollArea()
+  const updateLastMessage = useHomeChatsStore(state => state.updateLastMessage)
 
   useButtonShortcut("Enter", handleSendMessage);
 
@@ -31,6 +33,7 @@ export default function ChatInput() {
       createdAt: new Date(),
       updatedAt: new Date(),
     });
+    updateLastMessage(inputMessage.chatId, {id: inputMessage.id, text: inputMessage.text, updatedAt: new Date()})
     socket.emit(SOCKET_EMITS.SEND_TEXT_MESSAGE, inputMessage);
     resetInputMessage();
     scrollToBottom()

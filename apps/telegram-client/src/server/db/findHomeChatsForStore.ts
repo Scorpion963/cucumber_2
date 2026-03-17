@@ -1,6 +1,6 @@
 import { ConctactInfo } from "@/providers/types/user-store-provider-types";
 import { chatMember, chats, contact, db, message, user } from "db";
-import { and, eq, ne } from "drizzle-orm";
+import { and, desc, eq, ne } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 
 export type FindHomeChatsReturnType = {
@@ -9,23 +9,25 @@ export type FindHomeChatsReturnType = {
   name: string | null;
   imageUrl: string | null;
   baseChatter: typeof user.$inferSelect | null;
-  contactInfo: typeof contact.$inferSelect | null
+  contactInfo: typeof contact.$inferSelect | null;
   lastMessage: {
-    id: string,
+    id: string;
     text: string | null;
     updatedAt: Date;
   } | null;
 };
 
 export type BasicContact = {
-    id: string;
-    imageUrl: string | null;
-    name: string | null;
-    lastName: string | null;
-    notes: string | null;
-}
+  id: string;
+  imageUrl: string | null;
+  name: string | null;
+  lastName: string | null;
+  notes: string | null;
+};
 
-export default function findHomeChatsForStore(currentUserId: string): Promise<FindHomeChatsReturnType[]> {
+export default function findHomeChatsForStore(
+  currentUserId: string,
+): Promise<FindHomeChatsReturnType[]> {
   const chatMemberAlias = alias(chatMember, "other_members");
 
   return db
@@ -62,5 +64,5 @@ export default function findHomeChatsForStore(currentUserId: string): Promise<Fi
       ),
     )
     .where(eq(chatMember.userId, currentUserId))
-    .orderBy(chats.updatedAt);
+    .orderBy(desc(chats.updatedAt));
 }

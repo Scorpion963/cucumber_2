@@ -1,5 +1,5 @@
 import removeUndefined from "@/lib/removeUndefined";
-import { HomeChatsType, UserWithContactType } from "@/providers/types/user-store-provider-types";
+import { HomeChatsLastMessageType, HomeChatsType, UserWithContactType } from "@/providers/types/user-store-provider-types";
 import { contact } from "db";
 import { createStore } from "zustand/vanilla";
 
@@ -14,7 +14,8 @@ export type HomeChatsActions = {
     users: Partial<Pick<typeof contact.$inferSelect, | "id" | "imageUrl" | "lastName" | "notes" | "name">>
   ) => void;
   addUser: (contact: UserWithContactType) => void;
-  addChat: (chat: HomeChatsType) => void
+  addChat: (chat: HomeChatsType) => void;
+  updateLastMessage: (chatId: string, chat: HomeChatsLastMessageType) => void
 };
 
 export type HomeChatsStore = HomeChatsState & HomeChatsActions;
@@ -58,5 +59,16 @@ export const createHomeChatsStore = (
 
         return { ...state, users };
       }),
+    
+    updateLastMessage: (chatId, lastMesage) => {
+      set(state => {
+        const chatExists = state.chats.get(chatId)
+        if(!chatExists) return {...state}
+
+        const newMap = new Map(state.chats)
+        newMap.set(chatId, {...chatExists, lastMessage: lastMesage ?? chatExists.lastMessage})
+        return {...state, chats: newMap}
+      })
+    }
   }));
 };

@@ -4,11 +4,14 @@ import { useCurrentUserStore } from "@/providers/current-user-store-provider";
 import { ChatBodyWrapper } from "./ChatBodyWrapper";
 import useReceiveSocketEvent from "@/hooks/useReceiveSocketEvent";
 import Message from "./Message";
+import formatMesesageTime from "@/lib/formaters/formatMessageTime";
+import { useHomeChatsStore } from "@/providers/user-store-provider";
 
 export default function ChatContent() {
   const { messages, setMessages } = useMessageStore(
     (state) => state,
   );
+  const updateLastMessage = useHomeChatsStore(state => state.updateLastMessage)
   const { currentUser } = useCurrentUserStore((state) => state);
 
   useReceiveSocketEvent("MESSAGE_CREATED", handleMessageCreated);
@@ -25,6 +28,8 @@ export default function ChatContent() {
         updatedAt: new Date(data.updatedAt),
       },
     ]);
+
+    updateLastMessage(data.chatId, data)
   }
 
   return (
@@ -37,11 +42,7 @@ export default function ChatContent() {
           <ChatBodyWrapper>
             <Message
               content={item.text!}
-              date={item.createdAt.toLocaleTimeString("en-US", {
-                hour: "numeric",
-                minute: "2-digit",
-                hour12: true,
-              })}
+              date={formatMesesageTime(item.updatedAt)}
               isOwned={currentUser.id === item.senderId}
               isRead={false}
             />

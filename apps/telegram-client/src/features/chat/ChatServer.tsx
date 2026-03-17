@@ -25,9 +25,9 @@ export async function ChatServer({ paramsId }: { paramsId: string }) {
     ? await getMessagesDB(chat.chat.id)
     : [];
 
-  console.log("Fetched current chat: ", chat);
+  // console.log("Fetched current chat: ", chat);
 
-  console.log("fetched messages: ", messages)
+  // console.log("fetched messages: ", messages)
 
   return (
     <SidebarRouterProvider>

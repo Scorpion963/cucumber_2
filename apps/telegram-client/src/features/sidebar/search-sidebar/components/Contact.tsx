@@ -1,8 +1,10 @@
+import formatMesesageTime from "@/lib/formaters/formatMessageTime";
+import { HomeChatsLastMessageType } from "@/providers/types/user-store-provider-types";
 import Image from "next/image";
 import Link from "next/link";
 import { FaUserAlt } from "react-icons/fa";
 
-export default function Contact({ imageUrl, name, id }: { imageUrl: string | null, name: string | null; id: string }) {
+export default function Contact({ imageUrl, name, id, lastMessage }: { imageUrl: string | null, name: string | null; id: string, lastMessage: HomeChatsLastMessageType | null }) {
   return (
     <Link
       href={`/@${id}`}
@@ -15,12 +17,11 @@ export default function Contact({ imageUrl, name, id }: { imageUrl: string | nul
         <div className="min-w-0">
           <div className="font-semibold text-sm">{name ? name : "User deleted"}</div>
           <div className="text-sm text-muted-foreground truncate w-full max-w-[500px] inline-block whitespace-nowrap overflow-hidden">
-            This is my last message This is my last message This is my last
-            message This is my last message
+            {lastMessage ? lastMessage.text : "No messages"}
           </div>
         </div>
       </div>
-      <div className="self-start text-muted-foreground text-xs">21:00</div>
+      <div className="self-start text-muted-foreground text-xs">{lastMessage && formatMesesageTime(lastMessage.updatedAt)}</div>
     </Link>
   );
 }
