@@ -3,38 +3,45 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Send } from "lucide-react";
-import { ChatBodyWrapper } from "../ChatClient";
 import { useMessageStore } from "../providers/messageStoreProvider";
-import { ComponentProps, useState } from "react";
+import { ComponentProps } from "react";
 import { useSocketStore } from "@/providers/socket-store-provider";
 import { cn } from "@/lib/utils";
 import { useMessageInputStore } from "../providers/messageInputStoreProvider";
 import { SOCKET_EMITS } from "./ChatContent";
+import { useButtonShortcut } from "../hooks/useButtonShortcut";
+import { authClient } from "@/lib/auth-client";
+import { useChatScrollArea } from "../providers/chatScrollAreaProvider";
+import { ChatBodyWrapper } from "./ChatBodyWrapper";
 
 export default function ChatInput() {
-  const { messages, addMessage } = useMessageStore((state) => state);
   const socket = useSocketStore((state) => state.socket);
-  const { message, updateInputMessage, resetInputMessage } =
+  const { messages, addMessage } = useMessageStore((state) => state);
+  const { inputMessage, updateInputMessage, resetInputMessage } =
     useMessageInputStore((state) => state);
+  const {scrollToBottom} = useChatScrollArea()
+
+  useButtonShortcut("Enter", handleSendMessage);
 
   function handleSendMessage() {
-    if (message.text.trim().length < 1 || !socket) return;
+    if (inputMessage.text.trim().length < 1 || !socket) return;
 
     addMessage({
-      ...message,
-      text: message.text,
+      ...inputMessage,
+      text: inputMessage.text,
       createdAt: new Date(),
       updatedAt: new Date(),
     });
-    socket.emit(SOCKET_EMITS.SEND_TEXT_MESSAGE, message);
+    socket.emit(SOCKET_EMITS.SEND_TEXT_MESSAGE, inputMessage);
     resetInputMessage();
+    scrollToBottom()
   }
 
   return (
     <ChatBodyWrapper>
       <div className="w-full h-full pt-2 flex gap-2">
         <Input
-          value={message.text}
+          value={inputMessage.text}
           onChange={(e) => updateInputMessage({ text: e.target.value })}
           className="rounded-full"
         />

@@ -21,7 +21,7 @@ export function MessageInputStoreProvider({
   children,
   message,
 }: MessageInputStoreProviderProps) {
-  const [store] = useState(() => createMessageInputStore({ message }));
+  const [store] = useState(() => createMessageInputStore({ inputMessage: message }));
 
   return (
     <MessageInputStoreContext.Provider value={store}>

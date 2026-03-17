@@ -17,7 +17,7 @@ type OptionalInputValues = Omit<
 export type MessageInputType = RequiredInputValues & OptionalInputValues;
 
 export type MessageInputState = {
-  message: MessageInputType;
+  inputMessage: MessageInputType;
 };
 
 export type MessageInputActions = {
@@ -37,8 +37,8 @@ export const createMessageInputStore = (props: MessageInputState) => {
     updateInputMessage: (values) =>
       set((state) => ({
         ...state,
-        message: {
-          ...state.message,
+        inputMessage: {
+          ...state.inputMessage,
           text: values.text,
           replyToMessageId: values.replyToMessageId ?? null,
         },
@@ -47,8 +47,8 @@ export const createMessageInputStore = (props: MessageInputState) => {
     resetInputMessage: () =>
       set((state) => ({
         ...state,
-        message: {
-          ...state.message,
+        inputMessage: {
+          ...state.inputMessage,
           id: uuidv4(),
           forwardedFromMessageId: null,
           replyToMessageId: null,

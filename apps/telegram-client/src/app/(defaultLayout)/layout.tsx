@@ -1,10 +1,11 @@
 import ResizablePanels from "@/components/ResizablePanels/ResizablePanels";
 import Sidebar from "@/features/sidebar/Sidebar";
 import { auth } from "@/lib/auth";
-import { SocketStoreProvider } from "@/providers/socket-store-provider";
+import { CurrentUserStoreProvider } from "@/providers/current-user-store-provider";
 import { HomeChatsProvider } from "@/providers/user-store-provider";
 import findHomeChatsForStore from "@/server/db/findHomeChatsForStore";
 import { mapChatsToStore } from "@/server/mappers/mapChatsToStore";
+import { user } from "db";
 import { headers } from "next/headers";
 import { ReactNode } from "react";
 
@@ -21,15 +22,21 @@ export default async function Layout({ children }: { children: ReactNode }) {
   console.log("HOMECHATS: ", homeChats);
 
   const { mappedUsers, mappedChatInfo } = mapChatsToStore(homeChats);
-
   console.log("mapped: ", mappedChatInfo, mappedUsers);
+  
+  // I can't match the types that are in drizzle and better auth, they are slightly out of sync, because the unprovided types 
+  // in drizzle are null by default, but better auth doesn't know that, so it assigns them possible undefined which breaks the ts
+  const currentUser = session.user as typeof user.$inferSelect
+
   return (
     <div>
+      <CurrentUserStoreProvider currentUser={currentUser}>
         <HomeChatsProvider chats={mappedChatInfo} users={mappedUsers}>
           <div className="w-full h-screen">
             <ResizablePanels sidebar={<Sidebar />}>{children}</ResizablePanels>
           </div>
         </HomeChatsProvider>
+      </CurrentUserStoreProvider>
     </div>
   );
 }

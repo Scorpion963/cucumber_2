@@ -1,14 +1,16 @@
 import { ScrollArea } from "@/components/ui/scroll-area";
 import ChatScrollArea from "./ChatScrollArea";
-import { ChatBodyWrapper } from "../ChatClient";
 import { Check } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useSocketStore } from "@/providers/socket-store-provider";
 import { useEffect } from "react";
 import { useMessageStore } from "../providers/messageStoreProvider";
 import { message } from "db";
+import { authClient } from "@/lib/auth-client";
+import { useCurrentUserStore } from "@/providers/current-user-store-provider";
+import { ChatBodyWrapper } from "./ChatBodyWrapper";
 
-function useReceiveSocketEvent(event: string, handler: () => void) {
+function useReceiveSocketEvent<T>(event: string, handler: (data: T) => void) {
   const socket = useSocketStore((state) => state.socket);
 
   useEffect(() => {
@@ -34,42 +36,50 @@ export enum SOCKET_EVENTS {
 }
 
 export default function ChatContent() {
-  const { messages, addMessage, setMessages } = useMessageStore((state) => state);
+  const { messages, addMessage, setMessages } = useMessageStore(
+    (state) => state,
+  );
   const socket = useSocketStore((state) => state.socket);
+  const { currentUser } = useCurrentUserStore((state) => state);
 
-  useEffect(() => {
-    if (!socket) return;
+  useReceiveSocketEvent(SOCKET_EVENTS.MESSAGE_CREATED, handleMessageCreated);
 
-    function handleMessageCreated(data: typeof message.$inferSelect) {
-      const updatedMessages = messages.filter(item => item.id !== data.id)
-      console.log("updated", data , messages)
-      console.log("updated messages: ", updatedMessages)
-      setMessages([...updatedMessages, {...data, createdAt: new Date(data.createdAt), updatedAt: new Date(data.updatedAt)}])
-    }
-
-    socket.on(SOCKET_EVENTS.MESSAGE_CREATED, (data) =>
-      handleMessageCreated(data),
-    );
-
-    return () => {
-      socket.off(SOCKET_EVENTS.MESSAGE_CREATED);
-    };
-  }, [socket, messages]);
+  function handleMessageCreated(data: typeof message.$inferSelect) {
+    const updatedMessages = messages.filter((item) => item.id !== data.id);
+    console.log("updated", data, messages);
+    console.log("updated messages: ", updatedMessages);
+    setMessages([
+      ...updatedMessages,
+      {
+        ...data,
+        createdAt: new Date(data.createdAt),
+        updatedAt: new Date(data.updatedAt),
+      },
+    ]);
+  }
 
   return (
-    <ChatScrollArea className="h-full">
-      <ChatBodyWrapper className="h-full flex flex-col justify-end gap-4">
-        {messages.map((item) => (
-          <Message
-            content={item.text!}
-            date={item.createdAt.toLocaleTimeString("en-US", {hour: "numeric", minute: '2-digit', hour12: true})}
-            isOwned={false}
-            isRead={false}
-            key={item.id}
-          />
-        ))}
-      </ChatBodyWrapper>
-    </ChatScrollArea>
+    <>
+      {messages.map((item, index) => (
+        <div
+          className={`w-full h-full ${item.id === currentUser.id ? "mt-1" : "mt-2"} ${index === messages.length - 1 && "mb-1"}`}
+          key={item.id}
+        >
+          <ChatBodyWrapper>
+            <Message
+              content={item.text!}
+              date={item.createdAt.toLocaleTimeString("en-US", {
+                hour: "numeric",
+                minute: "2-digit",
+                hour12: true,
+              })}
+              isOwned={currentUser.id === item.senderId}
+              isRead={false}
+            />
+          </ChatBodyWrapper>
+        </div>
+      ))}
+    </>
   );
 }
 
