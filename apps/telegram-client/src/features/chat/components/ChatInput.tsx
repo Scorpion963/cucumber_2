@@ -8,15 +8,14 @@ import { ComponentProps } from "react";
 import { useSocketStore } from "@/providers/socket-store-provider";
 import { cn } from "@/lib/utils";
 import { useMessageInputStore } from "../providers/messageInputStoreProvider";
-import { SOCKET_EMITS } from "./ChatContent";
 import { useButtonShortcut } from "../hooks/useButtonShortcut";
-import { authClient } from "@/lib/auth-client";
 import { useChatScrollArea } from "../providers/chatScrollAreaProvider";
 import { ChatBodyWrapper } from "./ChatBodyWrapper";
+import { SOCKET_EMITS } from "@/types/socket-events-types";
 
 export default function ChatInput() {
   const socket = useSocketStore((state) => state.socket);
-  const { messages, addMessage } = useMessageStore((state) => state);
+  const { addMessage } = useMessageStore((state) => state);
   const { inputMessage, updateInputMessage, resetInputMessage } =
     useMessageInputStore((state) => state);
   const {scrollToBottom} = useChatScrollArea()

@@ -20,14 +20,6 @@ export default function ChatScrollArea({
     rootRef: scrollAreaRef,
   });
   const [scrollToBottom, setScrollToBottom] = useState(false)
-  // const [height, setHeight] = useState<number>();
-  // useEffect(() => {
-  //   if (!scrollAreaRef.current) return;
-
-  //   setHeight(scrollAreaRef.current.clientHeight);
-  // }, []);
-
-  // console.log("Height: ", height)
 
   useLayoutEffect(() => {
     if(!ref.current) return
@@ -55,3 +47,12 @@ export default function ChatScrollArea({
   );
 }
 
+
+  // const [height, setHeight] = useState<number>();
+  // useEffect(() => {
+  //   if (!scrollAreaRef.current) return;
+
+  //   setHeight(scrollAreaRef.current.clientHeight);
+  // }, []);
+
+  // console.log("Height: ", height)
