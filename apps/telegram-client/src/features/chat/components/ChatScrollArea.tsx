@@ -1,10 +1,18 @@
 "use client";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { createContext, ReactNode, useEffect, useLayoutEffect, useRef, useState } from "react";
+import {
+  createContext,
+  ReactNode,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
 import useIntersection from "../hooks/useIntersection";
 import { cn } from "@/lib/utils";
 import { ChatScrollAreaProvider } from "../providers/chatScrollAreaProvider";
 import ChatInput from "./ChatInput";
+import useMounted from "@/hooks/useMounted";
 
 export default function ChatScrollArea({
   children,
@@ -19,14 +27,22 @@ export default function ChatScrollArea({
     observeRef: ref,
     rootRef: scrollAreaRef,
   });
-  const [scrollToBottom, setScrollToBottom] = useState(false)
+  const [scrollToBottom, setScrollToBottom] = useState(false);
+  const [isReady, setIsReady] = useState(false)
 
   useLayoutEffect(() => {
     if(!ref.current) return
+
     ref.current?.scrollIntoView({behavior: "smooth"})
     setScrollToBottom(false)
   }, [scrollToBottom])
 
+  useLayoutEffect(() => {
+    if(!ref.current) return
+
+    ref.current.scrollIntoView({behavior: "instant", block: "end"})
+    setIsReady(true)
+  }, [])
 
   return (
     <ChatScrollAreaProvider scrollToBottom={() => setScrollToBottom(true)}>
@@ -39,20 +55,23 @@ export default function ChatScrollArea({
           className,
         )}
       >
-        <div className={`h-full`}>{children}</div>
+        <div className={`h-full ${isReady ? "visible" : "invisible"}`}>{children}</div>
         <div ref={ref} className="w-full h-px"></div>
       </ScrollArea>
+      {/* <div ref={scrollAreaRef} className="overflow-y-auto h-full max-h-[calc(100%-53px-53px)] w-full overflow-hidden border-b">
+        <div className={cn("invisible", isReady && "visible")}>{children}</div>
+        <div ref={ref} className="w-full h-px"></div>
+      </div> */}
       <ChatInput />
     </ChatScrollAreaProvider>
   );
 }
 
+// const [height, setHeight] = useState<number>();
+// useEffect(() => {
+//   if (!scrollAreaRef.current) return;
 
-  // const [height, setHeight] = useState<number>();
-  // useEffect(() => {
-  //   if (!scrollAreaRef.current) return;
+//   setHeight(scrollAreaRef.current.clientHeight);
+// }, []);
 
-  //   setHeight(scrollAreaRef.current.clientHeight);
-  // }, []);
-
-  // console.log("Height: ", height)
+// console.log("Height: ", height)
