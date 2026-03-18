@@ -1,8 +1,6 @@
 "use client";
 import ChatHeader from "./components/ChatHeader";
 import ChatContent from "./components/ChatContent";
-import ChatInput from "./components/ChatInput";
-import { useMessageStore } from "./providers/messageStoreProvider";
 import SidebarRouter from "@/components/SidebarRouter/SidebarRouter";
 import { privateSidebarRoutesMap } from "./components/EllipsisMenuManager";
 import useMediaQuery from "./hooks/useMediaQuery";

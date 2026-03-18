@@ -50,6 +50,8 @@ export default async function sendTextMessageHandler(
 
     console.log("Success")
 
+    socket.emit("")
+
     io.to(`room:${newMessage.chatId}`).emit(
       SOCKET_EMITS.MESSAGE_CREATED,
       newMessage,
