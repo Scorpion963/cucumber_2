@@ -1,6 +1,5 @@
 "use server";
 import { auth } from "@/lib/auth";
-import { message } from "db";
 import { redirect } from "next/navigation";
 import handleChatFetch from "./server/getChatBasedOnPrefix";
 import getMessagesDB from "./server/db/getMessagesDB";
@@ -27,10 +26,6 @@ export async function ChatServer({ paramsId }: { paramsId: string }) {
         status: "sent",
       }))
     : [];
-
-  // console.log("Fetched current chat: ", chat);
-
-  // console.log("fetched messages: ", messages)
 
   return (
     <SidebarRouterProvider>

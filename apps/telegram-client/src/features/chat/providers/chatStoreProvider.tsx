@@ -44,13 +44,16 @@ export function ChatStoreProvider({
         console.log("Adding chatter to the store: ");
         addUser({ ...chatter });
       }
+
       if (!chat) return;
 
       if (chat.type === "private") {
         addChat({
           type: "private",
           id: chat.id,
-          lastMessage: chat.lastMessage,
+          lastMessage: chat.lastMessage
+            ? { ...chat.lastMessage, status: "sent" }
+            : null,
           userId: chatter?.id ?? null,
         });
       } else {
@@ -58,14 +61,16 @@ export function ChatStoreProvider({
           type: "group",
           id: chat.id,
           imageUrl: chat.imageUrl,
-          lastMessage: chat.lastMessage,
+          lastMessage: chat.lastMessage
+            ? { ...chat.lastMessage, status: "sent" }
+            : null,
           name: chat.name,
         });
       }
     }
 
     handleAddingUserAndChats();
-  }, [addChat, addUser, chatter, chat ]);
+  }, [addChat, addUser, chatter, chat]);
 
   return (
     <ChatStoreContext.Provider value={store}>

@@ -1,17 +1,15 @@
+import DisplayMessageStatus from "@/components/message/DisplayMessageStatus";
 import { cn } from "@/lib/utils";
 import { MessageStatusType } from "@/providers/types/user-store-provider-types";
-import { Check, Clock } from "lucide-react";
 
 export default function Message({
   content,
   date,
   isOwned,
-  isRead,
   status,
 }: {
   content: string;
   date: string;
-  isRead: boolean;
   isOwned: boolean;
   status: MessageStatusType;
 }) {
@@ -25,27 +23,11 @@ export default function Message({
 
           <span className="float-right text-xs py-1 relative flex gap-1 items-end top-1.25 ml-4 select-none right-1">
             <span>{date}</span>
-            <div className="relative">
-              {isRead ? (
-                <>
-                  <Check size={12} className="absolute left-1" />
-                  <Check size={12} />
-                </>
-              ) : status === "sending" ? (
-                <>
-                <Clock size={12} />
-                </>
-              ) : (
-                status === "sent" && (
-                  <>
-                    <Check size={12} />
-                  </>
-                )
-              )}
-            </div>
+            <DisplayMessageStatus status={status} />
           </span>
         </div>
       </div>
     </div>
   );
 }
+

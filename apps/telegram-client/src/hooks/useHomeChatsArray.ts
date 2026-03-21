@@ -28,6 +28,7 @@ export default function useHomeChatsArray() {
       const fetchedImages = await Promise.all(
         arrayChats.map(async (item) => {
           try {
+            console.log("item: ", item)
             const imageUrl = item.isImagePublic
               ? getPublicAssetUrl(item.imageUrl, item.imageProvider)
               : item.imageUrl && (await getImageUrlS3(item.imageUrl));

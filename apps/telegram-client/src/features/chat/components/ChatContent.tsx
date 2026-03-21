@@ -22,7 +22,6 @@ export default function ChatContent() {
               content={item.text!}
               date={formatMesesageTime(new Date(item.updatedAt))}
               isOwned={currentUser.id === item.senderId}
-              isRead={false}
               status={item.status}
             />
           </ChatBodyWrapper>
