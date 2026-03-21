@@ -60,13 +60,13 @@ export const createHomeChatsStore = (
         return { ...state, users };
       }),
     
-    updateLastMessage: (chatId, lastMesage) => {
+    updateLastMessage: (chatId, lastMessage) => {
       set(state => {
         const chatExists = state.chats.get(chatId)
         if(!chatExists) return {...state}
 
         const newMap = new Map(state.chats)
-        newMap.set(chatId, {...chatExists, lastMessage: lastMesage ?? chatExists.lastMessage})
+        newMap.set(chatId, {...chatExists, lastMessage: lastMessage ?? chatExists.lastMessage})
         return {...state, chats: newMap}
       })
     }

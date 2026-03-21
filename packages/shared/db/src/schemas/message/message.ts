@@ -26,7 +26,7 @@ export const message = pgTable("messages", {
   ),
 
   text: text(),
-
+  
   createdAt,
   updatedAt,
 });

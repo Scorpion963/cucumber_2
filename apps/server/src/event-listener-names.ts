@@ -1,6 +1,8 @@
 export enum SOCKET_EVENTS {
-  SEND_TEXT_MESSAGE = "send_text_message",
+  SEND_TEXT_MESSAGE = "SEND_TEXT_MESSAGE",
 }
+
 export enum SOCKET_EMITS {
-  MESSAGE_CREATED = "message_created",
+  MESSAGE_CREATED = "MESSAGE_CREATED",
+  ACK_MESSAGE_CREATED = "ACK_MESSAGE_CREATED",
 }

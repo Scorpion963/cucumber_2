@@ -32,8 +32,9 @@ export default function ChatInput() {
       text: inputMessage.text,
       createdAt: new Date(),
       updatedAt: new Date(),
+      status: "sending"
     });
-    updateLastMessage(inputMessage.chatId, {id: inputMessage.id, text: inputMessage.text, updatedAt: new Date()})
+    updateLastMessage(inputMessage.chatId, {id: inputMessage.id, text: inputMessage.text, updatedAt: new Date(), status: "sending"})
     socket.emit(SOCKET_EMITS.SEND_TEXT_MESSAGE, inputMessage);
     resetInputMessage();
     scrollToBottom()

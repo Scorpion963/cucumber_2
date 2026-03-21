@@ -29,6 +29,7 @@ export function mapChatsToStore(chatInfo: FindHomeChatsReturnType[]): {
           typeof row.lastMessage?.text === "undefined"
             ? null
             : {
+                status: "sent",
                 id: row.lastMessage.id,
                 text: row.lastMessage.text ?? "No messages yet",
                 updatedAt: row.lastMessage.updatedAt,
@@ -44,6 +45,7 @@ export function mapChatsToStore(chatInfo: FindHomeChatsReturnType[]): {
           userId: null,
           lastMessage: row.lastMessage?.text
             ? {
+                status: "sent",
                 id: row.lastMessage.id,
                 text: row.lastMessage.text,
                 updatedAt: row.lastMessage.updatedAt,
@@ -62,6 +64,7 @@ export function mapChatsToStore(chatInfo: FindHomeChatsReturnType[]): {
           typeof row.lastMessage?.text === "undefined"
             ? null
             : {
+                status: "sent",
                 id: row.lastMessage.id,
                 text: row.lastMessage.text ?? "No messages yet",
                 updatedAt: row.lastMessage.updatedAt,

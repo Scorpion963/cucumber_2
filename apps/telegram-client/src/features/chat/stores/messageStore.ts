@@ -1,13 +1,16 @@
+import { MessageStatusType } from "@/providers/types/user-store-provider-types";
 import { message } from "db";
 import { createStore } from 'zustand/vanilla'
 
+export type MessageType = typeof message.$inferSelect & {status: MessageStatusType}
+
 export type MessageState = {
-  messages: (typeof message.$inferSelect)[];
+  messages: MessageType[];
 };
 
 export type MessageActions = {
-  addMessage: (messageToAdd: typeof message.$inferSelect) => void;
-  setMessages: (messagesToSet: (typeof message.$inferSelect)[]) => void;
+  addMessage: (messageToAdd: MessageType) => void;
+  setMessages: (messagesToSet: MessageType[]) => void;
 };
 
 export type MessageStore = MessageState & MessageActions;

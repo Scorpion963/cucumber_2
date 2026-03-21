@@ -12,14 +12,15 @@ import useIntersection from "../hooks/useIntersection";
 import { cn } from "@/lib/utils";
 import { ChatScrollAreaProvider } from "../providers/chatScrollAreaProvider";
 import ChatInput from "./ChatInput";
-import useMounted from "@/hooks/useMounted";
 
 export default function ChatScrollArea({
   children,
   className,
+  scrollBottomCondition = true
 }: {
   children: React.ReactNode;
   className?: string;
+  scrollBottomCondition?: boolean
 }) {
   const ref = useRef<null | HTMLDivElement>(null);
   const scrollAreaRef = useRef<null | HTMLDivElement>(null);
@@ -38,11 +39,11 @@ export default function ChatScrollArea({
   }, [scrollToBottom])
 
   useLayoutEffect(() => {
-    if(!ref.current) return
+    if(!ref.current || !scrollBottomCondition) return
 
     ref.current.scrollIntoView({behavior: "instant", block: "end"})
     setIsReady(true)
-  }, [])
+  }, [scrollBottomCondition])
 
   return (
     <ChatScrollAreaProvider scrollToBottom={() => setScrollToBottom(true)}>

@@ -2,7 +2,7 @@
 import { createContext, ReactNode, useContext, useState } from "react";
 import { message } from "db";
 import { useStore } from "zustand";
-import { createMessageStore, MessageStore } from "../stores/messageStore";
+import { createMessageStore, MessageStore, MessageType } from "../stores/messageStore";
 
 
 export type MessageStoreApi = ReturnType<typeof createMessageStore>;
@@ -11,12 +11,12 @@ export const MessageStoreContext = createContext<null | MessageStoreApi>(null);
 
 export type MessageStoreProviderProps = {
   children: ReactNode;
-  value: (typeof message.$inferSelect)[];
+  value?: MessageType[];
 };
 
 export function MessageStoreProvider({
   children,
-  value,
+  value = [],
 }: MessageStoreProviderProps) {
   const [store] = useState(() => createMessageStore({ messages: value }));
 

@@ -8,6 +8,8 @@ import { mapChatsToStore } from "@/server/mappers/mapChatsToStore";
 import { user } from "db";
 import { headers } from "next/headers";
 import { ReactNode } from "react";
+import { SocketEventGlobalReceiver } from "./page";
+import { MessageStoreProvider } from "@/features/chat/providers/messageStoreProvider";
 
 // TODO: Sidebar doesn't disappear when in mobile
 
@@ -23,18 +25,23 @@ export default async function Layout({ children }: { children: ReactNode }) {
 
   const { mappedUsers, mappedChatInfo } = mapChatsToStore(homeChats);
   console.log("mapped: ", mappedChatInfo, mappedUsers);
-  
-  // I can't match the types that are in drizzle and better auth, they are slightly out of sync, because the unprovided types 
+
+  // I can't match the types that are in drizzle and better auth, they are slightly out of sync, because the unprovided types
   // in drizzle are null by default, but better auth doesn't know that, so it assigns them possible undefined which breaks the ts
-  const currentUser = session.user as typeof user.$inferSelect
+  const currentUser = session.user as typeof user.$inferSelect;
 
   return (
     <div>
       <CurrentUserStoreProvider currentUser={currentUser}>
         <HomeChatsProvider chats={mappedChatInfo} users={mappedUsers}>
-          <div className="w-full h-screen">
-            <ResizablePanels sidebar={<Sidebar />}>{children}</ResizablePanels>
-          </div>
+          <MessageStoreProvider>
+            <div className="w-full h-screen">
+              <ResizablePanels sidebar={<Sidebar />}>
+                {children}
+              </ResizablePanels>
+            </div>
+            <SocketEventGlobalReceiver />
+          </MessageStoreProvider>
         </HomeChatsProvider>
       </CurrentUserStoreProvider>
     </div>

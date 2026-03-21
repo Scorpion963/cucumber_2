@@ -5,24 +5,12 @@ import Contact from "./Contact";
 import { useSearchStore } from "../providers/search-store-provider";
 import useHomeChatsArray from "@/hooks/useHomeChatsArray";
 import { getPublicAssetUrl } from "@/services/s3/lib/helpers";
-import useReceiveSocketEvent from "@/hooks/useReceiveSocketEvent";
-import { message } from "db";
-import { useHomeChatsStore } from "@/providers/user-store-provider";
 
 // TODO: memoize chats and contacts
 
 export default function ContactList() {
   const { usersFound, searchValue, error } = useSearchStore((state) => state);
-  const updateLastMessage = useHomeChatsStore(
-    (state) => state.updateLastMessage,
-  );
   const chats = useHomeChatsArray();
-
-  useReceiveSocketEvent("MESSAGE_CREATED", handleMessageCreated);
-
-  function handleMessageCreated(data: typeof message.$inferSelect) {
-    updateLastMessage(data.chatId, data);
-  }
 
   if (error) {
     return (

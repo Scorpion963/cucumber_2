@@ -1,6 +1,10 @@
 import { contact, message, user } from "db";
 
-export type HomeChatsLastMessageType = Pick<typeof message.$inferSelect, "id" | "text" | "updatedAt">
+export type MessageStatusType = "sent" | "sending"
+
+export type HomeChatsLastMessageType = Pick<typeof message.$inferSelect, "id" | "text" | "updatedAt"> & {
+  status: MessageStatusType
+}
 
 export type HomeChatsPrivateType = {
   id: string;

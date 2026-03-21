@@ -21,7 +21,7 @@ export default function Contact({ imageUrl, name, id, lastMessage }: { imageUrl:
           </div>
         </div>
       </div>
-      <div className="self-start text-muted-foreground text-xs">{lastMessage && formatMesesageTime(lastMessage.updatedAt)}</div>
+      <div className="self-start text-muted-foreground text-xs">{lastMessage && formatMesesageTime(new Date(lastMessage.updatedAt))}</div>
     </Link>
   );
 }
