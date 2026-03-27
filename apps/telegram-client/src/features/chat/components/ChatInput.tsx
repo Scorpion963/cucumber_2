@@ -13,31 +13,45 @@ import { useChatScrollArea } from "../providers/chatScrollAreaProvider";
 import { ChatBodyWrapper } from "./ChatBodyWrapper";
 import { SOCKET_EMITS } from "@/types/socket-events-types";
 import { useHomeChatsStore } from "@/providers/user-store-provider";
+import { idb } from "@/db/db";
+import { MessageType } from "../stores/messageStore";
 
 export default function ChatInput() {
   const socket = useSocketStore((state) => state.socket);
   const { addMessage } = useMessageStore((state) => state);
   const { inputMessage, updateInputMessage, resetInputMessage } =
     useMessageInputStore((state) => state);
-  const {scrollToBottom} = useChatScrollArea()
-  const updateLastMessage = useHomeChatsStore(state => state.updateLastMessage)
+  const { scrollToBottom } = useChatScrollArea();
+  const updateLastMessage = useHomeChatsStore(
+    (state) => state.updateLastMessage,
+  );
 
   useButtonShortcut("Enter", handleSendMessage);
 
-  function handleSendMessage() {
+  async function handleSendMessage() {
     if (inputMessage.text.trim().length < 1 || !socket) return;
 
-    addMessage({
+    const optimisticMessage: MessageType = {
       ...inputMessage,
       text: inputMessage.text,
       createdAt: new Date(),
       updatedAt: new Date(),
-      status: "sending"
+      status: "sending",
+    };
+
+    addMessage(optimisticMessage);
+
+    await idb.messages.put(optimisticMessage);
+
+    updateLastMessage(inputMessage.chatId, {
+      id: inputMessage.id,
+      text: inputMessage.text,
+      updatedAt: new Date(),
+      status: "sending",
     });
-    updateLastMessage(inputMessage.chatId, {id: inputMessage.id, text: inputMessage.text, updatedAt: new Date(), status: "sending"})
     socket.emit(SOCKET_EMITS.SEND_TEXT_MESSAGE, inputMessage);
     resetInputMessage();
-    scrollToBottom()
+    scrollToBottom();
   }
 
   return (

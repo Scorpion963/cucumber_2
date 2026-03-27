@@ -1,6 +1,8 @@
 import DisplayMessageStatus from "@/components/message/DisplayMessageStatus";
+import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { MessageStatusType } from "@/providers/types/user-store-provider-types";
+import { RotateCcw } from "lucide-react";
 
 export default function Message({
   content,
@@ -14,9 +16,23 @@ export default function Message({
   status: MessageStatusType;
 }) {
   return (
-    <div className={cn("flex w-full justify-start", isOwned && "justify-end")}>
+    <div
+      className={cn(
+        "flex w-full justify-start items-center gap-2",
+        isOwned && "justify-end",
+      )}
+    >
+      {status === "error" && (
+        <div className="h-full">
+          <Button variant={"ghost"} className="rounded-full cursor-pointer">
+            <RotateCcw size={16} />
+          </Button>
+        </div>
+      )}
       <div
-        className={`max-w-[66%] ${isOwned ? "bg-secondary" : "bg-secondary/50"} w-fit pb-1.5 px-2 rounded-lg pt-1.25`}
+        className={cn(
+          `max-w-[66%] ${isOwned ? "bg-secondary" : "bg-secondary/50"} w-fit pb-1.5 px-2 rounded-lg pt-1.25`,
+        )}
       >
         <div className="w-fit break-all flow-root" draggable={false}>
           {content}
@@ -30,4 +46,3 @@ export default function Message({
     </div>
   );
 }
-

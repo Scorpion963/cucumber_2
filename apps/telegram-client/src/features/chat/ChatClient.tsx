@@ -7,9 +7,12 @@ import useMediaQuery from "./hooks/useMediaQuery";
 import { useEffect, useState } from "react";
 import { useSidebarRouterStore } from "@/components/SidebarRouter/providers/sidebar-routes-provider";
 import ChatScrollArea from "./components/ChatScrollArea";
-import { message } from "db";
 import { useMessageStore } from "./providers/messageStoreProvider";
 import { MessageType } from "./stores/messageStore";
+import { useLiveQuery } from "dexie-react-hooks";
+import { idb } from "@/db/db";
+import { useChatStore } from "./providers/chatStoreProvider";
+import Dexie from "dexie";
 
 //  the use of useChatStore and useHomeChatsStore feels a little weird
 // because the useChatStore almost plays almost the same role as the useHomechatsStore but for single user
@@ -18,15 +21,29 @@ import { MessageType } from "./stores/messageStore";
 // i could just just pass this user down the props and add it the homeChatsStore
 // and in case i need to display info i could creete hooks that would return just the data
 
-export default function ChatClient({messages}: {messages: MessageType[]}) {
+export default function ChatClient({ messages }: { messages: MessageType[] }) {
   const { clear } = useSidebarRouterStore((state) => state);
   const { matches, prev } = useMediaQuery("(max-width: 1024px)");
-  const setMessages = useMessageStore(state => state.setMessages)
-  const renderMessages = useMessageStore(state => state.messages)
+  const setMessages = useMessageStore((state) => state.setMessages);
+  const renderMessages = useMessageStore((state) => state.messages);
+  const chatId = useChatStore((state) => state.currentChatId);
 
   useEffect(() => {
-    setMessages(messages)
-  }, [messages, setMessages])
+    idb.messages.bulkPut(messages);
+  }, [messages, setMessages]);
+
+  useEffect(() => {
+    async function fetchLocalMessages() {
+      if (!chatId) return;
+      const localMessages = await idb.messages
+        .where("[chatId+createdAt]")
+        .between([chatId, Dexie.minKey], [chatId, Dexie.maxKey])
+        .toArray();
+      setMessages(localMessages);
+      console.log("local messages: ", localMessages);
+    }
+    fetchLocalMessages();
+  }, [messages, chatId, setMessages]);
 
   useEffect(() => {
     if (matches && matches !== prev) clear();
@@ -36,7 +53,7 @@ export default function ChatClient({messages}: {messages: MessageType[]}) {
     <div className="w-full h-full flex">
       <div className="h-full flex-1">
         <ChatHeader />
-        <ChatScrollArea scrollBottomCondition={renderMessages.length !== 0} >
+        <ChatScrollArea scrollBottomCondition={renderMessages.length !== 0}>
           <ChatContent />
         </ChatScrollArea>
       </div>

@@ -6,24 +6,30 @@ export default function DisplayMessageStatus({
 }: {
   status: MessageStatusType;
 }) {
-  return (
-    <div className="relative">
-      {status === "read" ? (
-        <>
-          <Check size={12} className="absolute left-1" />
-          <Check size={12} />
-        </>
-      ) : status === "sending" ? (
-        <>
-          <Clock size={12} />
-        </>
-      ) : (
-        status === "sent" && (
+  function handleStatuses() {
+    switch (status) {
+      case "error":
+        return <></>;
+      case "read":
+        return (
+          <>
+            <Check size={12} className="absolute left-1" />
+            <Check size={12} className="" />
+          </>
+        );
+      case "sent":
+        return (
           <>
             <Check size={12} />
           </>
-        )
-      )}
-    </div>
-  );
+        );
+      case "sending":
+        return (
+          <>
+            <Clock size={12} />
+          </>
+        );
+    }
+  }
+  return <div className="relative">{handleStatuses()}</div>;
 }

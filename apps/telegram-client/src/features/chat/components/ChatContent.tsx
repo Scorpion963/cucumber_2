@@ -5,14 +5,12 @@ import Message from "./Message";
 import formatMesesageTime from "@/lib/formaters/formatMessageTime";
 
 export default function ChatContent() {
-  const { messages, setMessages } = useMessageStore(
-    (state) => state,
-  );
+  const { messages, setMessages } = useMessageStore((state) => state);
   const { currentUser } = useCurrentUserStore((state) => state);
 
   return (
     <>
-      {messages.map((item, index) => (
+      {messages?.map((item, index) => (
         <div
           className={`w-full h-full ${item.id === currentUser.id ? "mt-1" : "mt-2"} ${index === messages.length - 1 && "mb-1"}`}
           key={item.id}
@@ -30,4 +28,3 @@ export default function ChatContent() {
     </>
   );
 }
-

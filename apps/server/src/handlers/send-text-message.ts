@@ -39,18 +39,22 @@ export default async function sendTextMessageHandler(
 
   try {
     const newMessage = await createAndUpdateLatestMessage(data);
-
     if (!newMessage) {
       emitError(socket, SOCKET_EVENTS.SEND_TEXT_MESSAGE, {
         code: "",
         message: "Internal Server Error: failed db insert",
       });
+      socket.emit(SOCKET_EVENTS.SEND_TEXT_MESSAGE, {
+        ...data,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      });
       return;
     }
 
-    console.log("Success")
+    console.log("Success");
 
-    socket.emit(SOCKET_EMITS.ACK_MESSAGE_CREATED, newMessage.id)
+    socket.emit(SOCKET_EMITS.ACK_MESSAGE_CREATED, newMessage.id);
 
     io.to(`room:${newMessage.chatId}`).emit(
       SOCKET_EMITS.MESSAGE_CREATED,
@@ -60,6 +64,12 @@ export default async function sendTextMessageHandler(
     emitError(socket, "send_text_message", {
       code: "",
       message: "Internal Server Error: failed db insert",
+    });
+
+    socket.emit(SOCKET_EVENTS.SEND_TEXT_MESSAGE, {
+      ...data,
+      createdAt: new Date(),
+      updatedAt: new Date(),
     });
   }
 }

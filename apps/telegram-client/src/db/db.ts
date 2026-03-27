@@ -1,7 +1,7 @@
+import { MessageType } from "@/features/chat/stores/messageStore"
 import { message } from "db"
 import { Dexie, type EntityTable } from "dexie"
 
-type MessageType = typeof message.$inferSelect
 
 const idb = new Dexie("FriendsDatabase") as Dexie & {
   messages: EntityTable<
@@ -11,7 +11,7 @@ const idb = new Dexie("FriendsDatabase") as Dexie & {
 }
 
 idb.version(1).stores({
-  messages: "id, chatId, senderId", 
+  messages: "id, chatId, senderId, status, createdAt, [chatId+createdAt]", 
 })
 
 export { idb }
