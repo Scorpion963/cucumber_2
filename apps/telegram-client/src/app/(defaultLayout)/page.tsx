@@ -87,7 +87,7 @@ function useSocketMessageCreatedError() {
         status: "error",
       },
     ]);
-    const response = await idb.messages.put({...data, status: "error"});
+    const response = await idb.messages.put({...data, status: "error", createdAt: new Date(data.createdAt), updatedAt: new Date(data.updatedAt)});
     console.log("Dexie response: ", response)
   }
 

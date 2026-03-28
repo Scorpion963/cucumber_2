@@ -39,6 +39,7 @@ export default async function sendTextMessageHandler(
 
   try {
     const newMessage = await createAndUpdateLatestMessage(data);
+
     if (!newMessage) {
       emitError(socket, SOCKET_EVENTS.SEND_TEXT_MESSAGE, {
         code: "",
