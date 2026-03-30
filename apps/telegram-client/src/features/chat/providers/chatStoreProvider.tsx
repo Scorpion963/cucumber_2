@@ -19,19 +19,19 @@ export type ChatStoreApi = ReturnType<typeof createChatStore>;
 export const ChatStoreContext = createContext<null | ChatStoreApi>(null);
 
 export type ChatStoreProviderProps = {
-  currentChatId: string | null;
-  currentChatterId: string | null;
-  chat: HomeChatsType | null;
-  chatter: UserWithContactType | null;
+  currentChatId?: string | null;
+  currentChatterId?: string | null;
+  chat?: HomeChatsType | null;
+  chatter?: UserWithContactType | null;
   children: ReactNode;
 };
 
 export function ChatStoreProvider({
   children,
-  currentChatId,
-  chat,
-  chatter,
-  currentChatterId,
+  currentChatId = null,
+  chat = null,
+  chatter = null,
+  currentChatterId = null,
 }: ChatStoreProviderProps) {
   const [store] = useState(() =>
     createChatStore({ currentChatId, currentChatterId }),
@@ -77,6 +77,47 @@ export function ChatStoreProvider({
       {children}
     </ChatStoreContext.Provider>
   );
+}
+
+export function useHandleAddUserAndChats({
+  chat,
+  chatter,
+}: Omit<ChatStoreProviderProps, "children" | "currentChatId" | "currentChatterId">) {
+  const { addChat, addUser } = useHomeChatsStore((state) => state);
+
+  useEffect(() => {
+    function handleAddingUserAndChats() {
+      if (chatter) {
+        console.log("Adding chatter to the store: ");
+        addUser({ ...chatter });
+      }
+
+      if (!chat) return;
+
+      if (chat.type === "private") {
+        addChat({
+          type: "private",
+          id: chat.id,
+          lastMessage: chat.lastMessage
+            ? { ...chat.lastMessage, status: "sent" }
+            : null,
+          userId: chatter?.id ?? null,
+        });
+      } else {
+        addChat({
+          type: "group",
+          id: chat.id,
+          imageUrl: chat.imageUrl,
+          lastMessage: chat.lastMessage
+            ? { ...chat.lastMessage, status: "sent" }
+            : null,
+          name: chat.name,
+        });
+      }
+    }
+
+    handleAddingUserAndChats();
+  }, [addChat, addUser, chatter, chat]);
 }
 
 export function useChatStore<T>(selector: (store: ChatStore) => T): T {

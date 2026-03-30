@@ -29,27 +29,33 @@ export async function ChatServer({ paramsId }: { paramsId: string }) {
 
   return (
     <SidebarRouterProvider>
-      <ChatStoreProvider
+      {/* <ChatStoreProvider
         currentChatterId={chat.chatter?.id ?? null}
         currentChatId={chat.chat?.id ?? null}
         chat={chat.chat}
         chatter={chat.chatter}
+      > */}
+      {/* <MessageStoreProvider value={messages}> */}
+      <MessageInputStoreProvider
+        message={{
+          id: uuidv4(),
+          chatId: chat.chat?.id ?? uuidv4(),
+          senderId: user!.user.id,
+          text: "",
+          forwardedFromMessageId: null,
+          replyToMessageId: null,
+        }}
       >
-        {/* <MessageStoreProvider value={messages}> */}
-        <MessageInputStoreProvider
-          message={{
-            id: uuidv4(),
-            chatId: chat.chat!.id,
-            senderId: user!.user.id,
-            text: "",
-            forwardedFromMessageId: null,
-            replyToMessageId: null,
-          }}
-        >
-          <ChatClient messages={messages} />
-        </MessageInputStoreProvider>
-        {/* </MessageStoreProvider> */}
-      </ChatStoreProvider>
+        <ChatClient
+          currentChatterId={chat.chatter?.id ?? null}
+          currentChatId={chat.chat?.id ?? null}
+          chat={chat.chat}
+          chatter={chat.chatter}
+          messages={messages}
+        />
+      </MessageInputStoreProvider>
+      {/* </MessageStoreProvider> */}
+      {/* </ChatStoreProvider> */}
     </SidebarRouterProvider>
   );
 }

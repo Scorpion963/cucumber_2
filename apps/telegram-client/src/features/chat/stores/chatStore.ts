@@ -6,8 +6,8 @@ type ChatState = {
 }
 
 export type ChatActions = {
-  setCurrentChatId: (chatId: string) => void;
-  setCurrentChatterId: (chatterId: string) => void
+  setCurrentChatId: (chatId: string | null) => void;
+  setCurrentChatterId: (chatterId: string | null) => void
 };
 
 export type ChatStore = ChatState & ChatActions;

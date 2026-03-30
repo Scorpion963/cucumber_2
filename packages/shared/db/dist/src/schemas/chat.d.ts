@@ -46,7 +46,7 @@ export declare const chats: import("drizzle-orm/pg-core").PgTableWithColumns<{
             columnType: "PgVarchar";
             data: string;
             driverParam: string;
-            notNull: true;
+            notNull: false;
             hasDefault: false;
             isPrimaryKey: false;
             isAutoincrement: false;

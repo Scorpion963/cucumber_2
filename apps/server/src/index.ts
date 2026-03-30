@@ -8,6 +8,7 @@ import { chatMember, chats, db, message } from "./db";
 import { alias } from "drizzle-orm/pg-core";
 import sendTextMessageHandler from "./handlers/send-text-message";
 import { SOCKET_EVENTS } from "./event-listener-names";
+import { createChatroomHandler } from "./handlers/create-new-chatroom-with-message";
 
 const app = express();
 const port = 3001;
@@ -41,6 +42,8 @@ io.use(async (socket, next) => {
   }
 
   userId = data.user.id;
+  socket.join(userId);
+
   results = await getChatroomsAndMembersIds(userId);
 
   results.forEach((chatroom) => {
@@ -70,11 +73,13 @@ io.on("connection", (socket) => {
   //     });
   // });
 
-  socket.on(SOCKET_EVENTS.SEND_TEXT_MESSAGE, (data) => sendTextMessageHandler(socket, io, data))
-
-
+  socket.on(SOCKET_EVENTS.SEND_TEXT_MESSAGE, (data) =>
+    sendTextMessageHandler(socket, io, data),
+  );
+  socket.on(SOCKET_EVENTS.CREATE_CHATROOM, (data) =>
+    createChatroomHandler(socket, io, data),
+  );
 });
-
 
 server.listen(port, async () => {
   console.log("The server is running");

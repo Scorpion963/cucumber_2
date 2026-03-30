@@ -1,14 +1,18 @@
 "use client";
 
 import { idb } from "@/db/db";
+import { useChatStore } from "@/features/chat/providers/chatStoreProvider";
 import { useMessageStore } from "@/features/chat/providers/messageStoreProvider";
 import { MessageType } from "@/features/chat/stores/messageStore";
 import useReceiveSocketEvent from "@/hooks/useReceiveSocketEvent";
+import { useCurrentUserStore } from "@/providers/current-user-store-provider";
 import { useSocketStore } from "@/providers/socket-store-provider";
+import { UserWithContactType } from "@/providers/types/user-store-provider-types";
 import { useHomeChatsStore } from "@/providers/user-store-provider";
 import { SOCKET_EMITS } from "@/types/socket-events-types";
-import { message } from "db";
+import { chats, contact, message, user } from "db";
 import { useLiveQuery } from "dexie-react-hooks";
+import { eq } from "drizzle-orm";
 import { useEffect } from "react";
 
 export function SocketEventGlobalReceiver() {
@@ -16,8 +20,121 @@ export function SocketEventGlobalReceiver() {
   useHandleMessageCreated();
   useHandleMessageAck();
   useSocketMessageCreatedError();
+  useHandleChatCreated();
 
   return null;
+}
+
+type CreatorReturnPayload = {
+  tempId: string;
+  chat: typeof chats.$inferSelect;
+  message: typeof message.$inferSelect;
+  isCreator: true;
+  userId: string;
+};
+
+type CreatorType = typeof user.$inferSelect & {
+  contactInfo: typeof contact.$inferSelect | null;
+};
+
+type ReturnPayload = ReceiverReturnPayload | CreatorReturnPayload;
+
+type ReceiverReturnPayload = {
+  chat: typeof chats.$inferSelect;
+  message: typeof message.$inferSelect;
+  isCreator: false;
+  creator: CreatorType;
+};
+
+function useHandleChatCreated() {
+  const { replaceChat, addChat, users, addUser } = useHomeChatsStore(
+    (state) => state,
+  );
+  const messages = useMessageStore((state) => state.messages);
+  const setMessages = useMessageStore((state) => state.setMessages);
+  const { currentUser } = useCurrentUserStore((state) => state);
+  const { currentChatterId, setCurrentChatId } = useChatStore((state) => state);
+
+  async function handleChatRoomCreated(data: ReturnPayload) {
+    console.log("chat: ", data.chat);
+
+    if (data.isCreator) {
+      replaceChat(data.tempId, {
+        id: data.chat.id,
+        type: "private",
+        lastMessage: {
+          id: data.message.id,
+          status: "sent",
+          text: data.message.text,
+          updatedAt: data.message.updatedAt,
+        },
+        userId: data.userId,
+      });
+
+      const id = await idb.messages.delete(data.tempId);
+      const updatedId = await idb.messages.put({
+        ...data.message,
+        status: "sent",
+      });
+
+      console.log("deleted id: ", id);
+      console.log("updated id: ", updatedId);
+
+      if (currentChatterId === data.userId) {
+        setCurrentChatId(data.chat.id);
+
+        const updatedMessages = messages.filter(
+          (item) => item.id !== data.message.id,
+        );
+
+        setMessages([
+          ...updatedMessages,
+          {
+            ...data.message,
+            status: "sent",
+          },
+        ]);
+      }
+    } else {
+      addChat({
+        id: data.chat.id,
+        type: "private",
+        lastMessage: {
+          id: data.message.id,
+          status: "sent",
+          text: data.message.text,
+          updatedAt: data.message.updatedAt,
+        },
+        userId: data.creator.id,
+      });
+      addUser({ ...data.creator });
+
+      const id = await idb.messages.put({ ...data.message, status: "sent" });
+      console.log("receiver idb id: ", id);
+
+      console.log("CurrentChatterId: ", currentChatterId)
+      console.log("Creator id: ", data.creator.id)
+      console.log(currentChatterId === data.creator.id)
+
+      if (currentChatterId === data.creator.id) {
+        setCurrentChatId(data.chat.id);
+
+        const updatedMessages = messages.filter(
+          (item) => item.id !== data.message.id,
+        );
+
+        setMessages([
+          ...updatedMessages,
+          {
+            ...data.message,
+            status: "sent",
+          },
+        ]);
+      }
+    }
+  }
+
+  useReceiveSocketEvent("NEW_CHAT_ROOM_CREATED", handleChatRoomCreated);
 }
 
 function useHandleMessageCreated() {
@@ -37,7 +154,7 @@ function useHandleMessageCreated() {
         status: "sent",
       },
     ]);
-
+    console.log("message received");
     updateLastMessage(data.chatId, { ...data, status: "sent" });
     const id = await idb.messages.put({ ...data, status: "sent" });
     console.log("i'm here: ", id);
@@ -87,8 +204,13 @@ function useSocketMessageCreatedError() {
         status: "error",
       },
     ]);
-    const response = await idb.messages.put({...data, status: "error", createdAt: new Date(data.createdAt), updatedAt: new Date(data.updatedAt)});
-    console.log("Dexie response: ", response)
+    const response = await idb.messages.put({
+      ...data,
+      status: "error",
+      createdAt: new Date(data.createdAt),
+      updatedAt: new Date(data.updatedAt),
+    });
+    console.log("Dexie response: ", response);
   }
 
   useReceiveSocketEvent("SEND_TEXT_MESSAGE", handleError);

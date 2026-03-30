@@ -1,9 +1,9 @@
 import type { Server, Socket } from "socket.io";
 import emitError from "../utils/sockets/emitErrot";
-import { chats, db, message } from "../db";
-import z from "zod";
+import { chatMember, chats, db, message } from "../db";
+import z, { string } from "zod";
 import { SOCKET_EMITS, SOCKET_EVENTS } from "../event-listener-names";
-import { eq } from "drizzle-orm";
+import { and, eq, or } from "drizzle-orm";
 
 type MessageItemType = Required<
   Pick<typeof message.$inferInsert, "senderId" | "chatId" | "text">
@@ -12,7 +12,7 @@ type MessageItemType = Required<
     typeof message.$inferInsert,
     "forwardedFromMessageId" | "replyToMessageId"
   >;
-const messageItemSchema = z.object({
+export const messageItemSchema = z.object({
   senderId: z.string(),
   chatId: z.string(),
   text: z.string(),
@@ -20,6 +20,9 @@ const messageItemSchema = z.object({
   replyToMessageId: z.string().nullish(),
   id: z.string().optional(),
 });
+
+// TODO: send better errors
+
 
 export default async function sendTextMessageHandler(
   socket: Socket,
@@ -38,7 +41,10 @@ export default async function sendTextMessageHandler(
   }
 
   try {
-    const newMessage = await createAndUpdateLatestMessage(data);
+    const newMessage = await createAndUpdateLatestMessage({
+      ...data,
+      chatId: data.chatId,
+    });
 
     if (!newMessage) {
       emitError(socket, SOCKET_EVENTS.SEND_TEXT_MESSAGE, {
@@ -75,7 +81,8 @@ export default async function sendTextMessageHandler(
   }
 }
 
-function createAndUpdateLatestMessage(data: z.infer<typeof messageItemSchema>) {
+
+export function createAndUpdateLatestMessage(data: typeof message.$inferInsert) {
   return db.transaction(async (ctx) => {
     const [newMessage] = await ctx
       .insert(message)

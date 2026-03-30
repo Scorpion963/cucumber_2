@@ -21,7 +21,7 @@ export const metadata: Metadata = {
 
 // TODO: Move the fetching logic out of the layout, so that the layout is not dynamic
 
-export default async function RootLayout({
+export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
@@ -35,6 +35,7 @@ export default async function RootLayout({
           {children}
           <Toaster position="top-center" />
         </SocketStoreProvider>
+
       </body>
     </html>
   );

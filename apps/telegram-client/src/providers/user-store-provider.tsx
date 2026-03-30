@@ -34,7 +34,7 @@ export function useHomeChatsStore<T>(
 ): T {
   const homeChatsStoreContext = useContext(HomeChatsStoreContext);
   if (!homeChatsStoreContext)
-    throw new Error("useUserStore must be used within UserStoreProvider");
+    throw new Error("useHomeChatsStore must be used within UserStoreProvider");
 
   return useStore(homeChatsStoreContext, selector);
 }

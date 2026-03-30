@@ -19,7 +19,7 @@ export const ChatTypeEnum = pgEnum("chat_type", CHAT_TYPES);
 export const chats = pgTable("chats", {
   id: uuid("id").primaryKey().notNull().defaultRandom(),
   type: ChatTypeEnum().notNull(),
-  name: varchar("name", { length: 100 }).notNull(),
+  name: varchar("name", { length: 100 }),
   imageUrl: text("image_url"),
   lastMessageId: uuid("message_id").references((): AnyPgColumn => message.id, {
     onDelete: "set null",

@@ -10,6 +10,7 @@ import { headers } from "next/headers";
 import { ReactNode } from "react";
 import { SocketEventGlobalReceiver } from "./page";
 import { MessageStoreProvider } from "@/features/chat/providers/messageStoreProvider";
+import { ChatStoreProvider } from "@/features/chat/providers/chatStoreProvider";
 
 // TODO: Sidebar doesn't disappear when in mobile
 
@@ -34,14 +35,16 @@ export default async function Layout({ children }: { children: ReactNode }) {
     <div>
       <CurrentUserStoreProvider currentUser={currentUser}>
         <HomeChatsProvider chats={mappedChatInfo} users={mappedUsers}>
-          <MessageStoreProvider>
-            <div className="w-full h-screen">
-              <ResizablePanels sidebar={<Sidebar />}>
-                {children}
-              </ResizablePanels>
-            </div>
-            <SocketEventGlobalReceiver />
-          </MessageStoreProvider>
+          <ChatStoreProvider>
+            <MessageStoreProvider>
+              <div className="w-full h-screen">
+                <ResizablePanels sidebar={<Sidebar />}>
+                  {children}
+                </ResizablePanels>
+              </div>
+              <SocketEventGlobalReceiver />
+            </MessageStoreProvider>
+          </ChatStoreProvider>
         </HomeChatsProvider>
       </CurrentUserStoreProvider>
     </div>

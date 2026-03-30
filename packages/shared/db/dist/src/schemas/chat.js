@@ -8,7 +8,7 @@ export var ChatTypeEnum = pgEnum("chat_type", CHAT_TYPES);
 export var chats = pgTable("chats", {
     id: uuid("id").primaryKey().notNull().defaultRandom(),
     type: ChatTypeEnum().notNull(),
-    name: varchar("name", { length: 100 }).notNull(),
+    name: varchar("name", { length: 100 }),
     imageUrl: text("image_url"),
     lastMessageId: uuid("message_id").references(function () { return message.id; }, {
         onDelete: "set null",

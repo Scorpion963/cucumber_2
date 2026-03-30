@@ -15,6 +15,8 @@ import { SOCKET_EMITS } from "@/types/socket-events-types";
 import { useHomeChatsStore } from "@/providers/user-store-provider";
 import { idb } from "@/db/db";
 import { MessageType } from "../stores/messageStore";
+import { useChatStore } from "../providers/chatStoreProvider";
+import { useCurrentUserStore } from "@/providers/current-user-store-provider";
 
 export default function ChatInput() {
   const socket = useSocketStore((state) => state.socket);
@@ -25,6 +27,10 @@ export default function ChatInput() {
   const updateLastMessage = useHomeChatsStore(
     (state) => state.updateLastMessage,
   );
+  const { currentChatterId, currentChatId, setCurrentChatId } = useChatStore(
+    (state) => state,
+  );
+  const { addChat, addUser } = useHomeChatsStore((state) => state);
 
   useButtonShortcut("Enter", handleSendMessage);
 
@@ -43,13 +49,30 @@ export default function ChatInput() {
 
     await idb.messages.put(optimisticMessage);
 
+    if (!currentChatId) {
+      socket.emit(SOCKET_EMITS.CREATE_CHATROOM, {
+        ...inputMessage,
+        chatId: inputMessage.chatId,
+        receiverId: currentChatterId,
+      });
+      addChat({
+        type: "private",
+        lastMessage: null,
+        id: inputMessage.chatId,
+        userId: currentChatterId,
+      });
+      setCurrentChatId(inputMessage.chatId);
+    } else {
+      socket.emit(SOCKET_EMITS.SEND_TEXT_MESSAGE, { ...inputMessage, chatId: currentChatId });
+    }
+
     updateLastMessage(inputMessage.chatId, {
       id: inputMessage.id,
       text: inputMessage.text,
       updatedAt: new Date(),
       status: "sending",
     });
-    socket.emit(SOCKET_EMITS.SEND_TEXT_MESSAGE, inputMessage);
+
     resetInputMessage();
     scrollToBottom();
   }
