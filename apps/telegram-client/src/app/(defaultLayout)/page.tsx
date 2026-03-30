@@ -3,16 +3,13 @@
 import { idb } from "@/db/db";
 import { useChatStore } from "@/features/chat/providers/chatStoreProvider";
 import { useMessageStore } from "@/features/chat/providers/messageStoreProvider";
-import { MessageType } from "@/features/chat/stores/messageStore";
 import useReceiveSocketEvent from "@/hooks/useReceiveSocketEvent";
 import { useCurrentUserStore } from "@/providers/current-user-store-provider";
 import { useSocketStore } from "@/providers/socket-store-provider";
-import { UserWithContactType } from "@/providers/types/user-store-provider-types";
 import { useHomeChatsStore } from "@/providers/user-store-provider";
 import { SOCKET_EMITS } from "@/types/socket-events-types";
 import { chats, contact, message, user } from "db";
 import { useLiveQuery } from "dexie-react-hooks";
-import { eq } from "drizzle-orm";
 import { useEffect } from "react";
 
 export function SocketEventGlobalReceiver() {
@@ -111,10 +108,6 @@ function useHandleChatCreated() {
 
       const id = await idb.messages.put({ ...data.message, status: "sent" });
       console.log("receiver idb id: ", id);
-
-      console.log("CurrentChatterId: ", currentChatterId)
-      console.log("Creator id: ", data.creator.id)
-      console.log(currentChatterId === data.creator.id)
 
       if (currentChatterId === data.creator.id) {
         setCurrentChatId(data.chat.id);

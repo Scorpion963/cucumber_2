@@ -1,14 +1,16 @@
 import type { Server, Socket } from "socket.io";
 import z from "zod";
 import emitError from "../utils/sockets/emitErrot";
-import { alias } from "drizzle-orm/pg-core";
 import { chatMember, chats, contact, db, message, user } from "../db";
-import { and, eq, inArray, sql } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import {
   createAndUpdateLatestMessage,
   messageItemSchema,
 } from "./send-text-message";
-import { SOCKET_EMITS } from "../event-listener-names";
+import { SOCKET_EMITS, SOCKET_ERRORS } from "../event-listener-names";
+
+// TODO: Fixe race condition
+// TODO: Check the senderId
 
 const requestSchema = messageItemSchema.extend({
   senderId: z.string().trim().min(1),
@@ -20,7 +22,7 @@ type CreatorReturnPayload = {
   chat: typeof chats.$inferSelect;
   message: typeof message.$inferSelect;
   isCreator: true;
-  userId: string
+  userId: string;
 };
 
 type CreatorType = typeof user.$inferSelect & {
@@ -42,94 +44,115 @@ export async function createChatroomHandler(
   const { data, success, error } = requestSchema.safeParse(requestData);
 
   if (!success) {
-    console.log("invalid data");
-    console.log("error: ", error);
-    emitError(socket, "idk", { code: "", message: "" });
+    console.error("invalid data");
+    console.error("error: ", error);
+    emitError(socket, SOCKET_ERRORS.CHAT_CREATION_FAILED, {
+      code: "CHAT_INVALID_DATA",
+      message: "Error: Invalid request data",
+    });
     return;
   }
 
-  let chat = await findOrCreatePrivateChat(data.receiverId, data.senderId);
-
-  if (!chat) {
-    console.log("Error inside createChatHandler: unable to create chat");
-    // emitError()
-    return;
-  }
-
-  const newMessage = await createAndUpdateLatestMessage({
-    ...data,
-    chatId: chat.id,
-  });
-  if (!newMessage) {
-    console.log("Error message wasn't created in createChatroomHandler");
-    return;
-  }
-
-  // joining all the active users to the room
-  console.log("success");
-  const [creator] = await db
-    .select({ user, contactInfo: contact })
-    .from(user)
-    .leftJoin(contact, eq(contact.ownerId, data.receiverId))
-    .where(eq(user.id, data.senderId))
-    .limit(1);
-
-  console.log("creator: ", creator);
-
-  const memberSockets = await io.in(data.receiverId).fetchSockets();
-  memberSockets.forEach((singleSocket) => {
-    singleSocket.join(`room:${chat.id}`);
-    if (creator?.user) {
-      const receiverPayload: ReceiverReturnPayload = {
-        chat: chat,
-        message: newMessage,
-        isCreator: false,
-        creator: { ...creator.user, contactInfo: creator.contactInfo ?? null },
-      };
-
-      singleSocket.emit(SOCKET_EMITS.NEW_CHAT_ROOM_CREATED, {
-        ...receiverPayload,
+  try {
+    const receiver = await db.query.user.findFirst({
+      where: eq(user.id, data.receiverId),
+      columns: { id: true },
+    });
+    if (!receiver) {
+      console.log("Invalid receiver");
+      emitError(socket, SOCKET_ERRORS.CHAT_CREATION_FAILED, {
+        code: "INVALID_RECEIVER",
+        message: "The chatter you're trying interact with doesn't exist",
       });
+      return;
     }
-  });
 
-  socket.join(`room:${chat.id}`);
-  const creatorPayload: CreatorReturnPayload = {
-    userId: data.receiverId,
-    chat: chat,
-    isCreator: true,
-    message: newMessage,
-    tempId: data.chatId,
-  };
+    let chat = await findOrCreatePrivateChat(data.receiverId, data.senderId);
 
-  socket.emit(SOCKET_EMITS.NEW_CHAT_ROOM_CREATED, {
-    ...creatorPayload,
-  });
+    const newMessage = await createAndUpdateLatestMessage({
+      ...data,
+      chatId: chat.id,
+    });
+
+    if (!newMessage) {
+      console.error("Error message wasn't created in createChatroomHandler");
+      throw new Error("Message creation failed");
+    }
+
+    // joining all the active users to the room
+    const [creator] = await db
+      .select({ user, contactInfo: contact })
+      .from(user)
+      .leftJoin(contact, eq(contact.ownerId, data.receiverId))
+      .where(eq(user.id, data.senderId))
+      .limit(1);
+
+    const memberSockets = await io.in(data.receiverId).fetchSockets();
+    memberSockets.forEach((singleSocket) => {
+      singleSocket.join(`room:${chat.id}`);
+      if (creator?.user) {
+        const receiverPayload: ReceiverReturnPayload = {
+          chat: chat,
+          message: newMessage,
+          isCreator: false,
+          creator: {
+            ...creator.user,
+            contactInfo: creator.contactInfo ?? null,
+          },
+        };
+
+        singleSocket.emit(SOCKET_EMITS.NEW_CHAT_ROOM_CREATED, {
+          ...receiverPayload,
+        });
+      }
+    });
+
+    socket.join(`room:${chat.id}`);
+    const creatorPayload: CreatorReturnPayload = {
+      userId: data.receiverId,
+      chat: chat,
+      isCreator: true,
+      message: newMessage,
+      tempId: data.chatId,
+    };
+
+    socket.emit(SOCKET_EMITS.NEW_CHAT_ROOM_CREATED, {
+      ...creatorPayload,
+    });
+  } catch (err) {
+    console.error(
+      "Error inside createChatHandler: unable to create chat: ",
+      err,
+    );
+    emitError(socket, SOCKET_ERRORS.CHAT_CREATION_FAILED, {
+      code: "CHAT_CREATION_FAILED",
+      message: "Error: Could not create chat",
+    });
+    return;
+  }
+}
+
+function createPrivateKey(first: string, second: string) {
+  return [first, second].sort().join("_");
 }
 
 async function findOrCreatePrivateChat(
   firstMemberId: string,
   secondMemberId: string,
 ) {
+  const privateKey = createPrivateKey(firstMemberId, secondMemberId);
   let [chat] = await db
     .select({ chat: chats })
-    .from(chatMember)
-    .innerJoin(chats, eq(chats.id, chatMember.chatId))
-    .where(
-      and(
-        inArray(chatMember.userId, [firstMemberId, secondMemberId]),
-        eq(chats.type, "private"),
-      ),
-    )
-    .groupBy(chats.id)
-    .having(sql`COUNT(DISTINCT ${chatMember.userId}) = 2`);
+    .from(chats)
+    .where(eq(chats.privateKey, privateKey));
 
   if (!chat) {
     const res = await createPrivateChatWithMembers(
       firstMemberId,
       secondMemberId,
     );
-    return res?.chat ?? null;
+
+    return res.chat;
   }
 
   return chat.chat;
@@ -137,26 +160,24 @@ async function findOrCreatePrivateChat(
 
 function createPrivateChatWithMembers(firstId: string, secondId: string) {
   return db.transaction(async (ctx) => {
-    try {
-      const [newChat] = await db
-        .insert(chats)
-        .values({ type: "private" })
-        .returning();
-      if (!newChat) {
-        return null;
-      }
-      const members = await db
-        .insert(chatMember)
-        .values([
-          { chatId: newChat.id, userId: firstId },
-          { chatId: newChat.id, userId: secondId },
-        ])
-        .returning();
+    const privateKey = createPrivateKey(firstId, secondId);
 
-      return { chat: newChat, members: members };
-    } catch {
-      console.log("Server error happened");
-      return null;
-    }
+    const [newChat] = await ctx
+      .insert(chats)
+      .values({ type: "private", privateKey: privateKey })
+      .onConflictDoNothing()
+      .returning();
+
+    if (!newChat) throw new Error("Error: Chat could not be inserted");
+
+    const members = await ctx
+      .insert(chatMember)
+      .values([
+        { chatId: newChat.id, userId: firstId },
+        { chatId: newChat.id, userId: secondId },
+      ])
+      .returning();
+
+    return { chat: newChat, members: members };
   });
 }

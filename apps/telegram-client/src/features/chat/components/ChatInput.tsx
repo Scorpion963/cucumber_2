@@ -16,7 +16,6 @@ import { useHomeChatsStore } from "@/providers/user-store-provider";
 import { idb } from "@/db/db";
 import { MessageType } from "../stores/messageStore";
 import { useChatStore } from "../providers/chatStoreProvider";
-import { useCurrentUserStore } from "@/providers/current-user-store-provider";
 
 export default function ChatInput() {
   const socket = useSocketStore((state) => state.socket);

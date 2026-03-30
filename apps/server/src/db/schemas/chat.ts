@@ -24,6 +24,7 @@ export const chats = pgTable("chats", {
   lastMessageId: uuid("message_id").references((): AnyPgColumn => message.id, {
     onDelete: "set null",
   }),
+  privateKey: text("private_key").unique(),
   createdAt,
   updatedAt,
 });

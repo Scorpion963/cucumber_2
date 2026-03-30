@@ -1,6 +1,5 @@
 "use client"
-import { createContext, ReactNode, useContext, useEffect, useState } from "react";
-import { message } from "db";
+import { createContext, ReactNode, useContext, useState } from "react";
 import { useStore } from "zustand";
 import { createMessageStore, MessageStore, MessageType } from "../stores/messageStore";
 import { usePathname } from "next/navigation";

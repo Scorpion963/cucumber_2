@@ -21,6 +21,7 @@ export const chats = pgTable("chats", {
   type: ChatTypeEnum().notNull(),
   name: varchar("name", { length: 100 }),
   imageUrl: text("image_url"),
+  privateKey: text("private_key").unique(),
   lastMessageId: uuid("message_id").references((): AnyPgColumn => message.id, {
     onDelete: "set null",
   }),

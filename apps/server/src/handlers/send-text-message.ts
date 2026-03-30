@@ -2,7 +2,7 @@ import type { Server, Socket } from "socket.io";
 import emitError from "../utils/sockets/emitErrot";
 import { chatMember, chats, db, message } from "../db";
 import z, { string } from "zod";
-import { SOCKET_EMITS, SOCKET_EVENTS } from "../event-listener-names";
+import { SOCKET_EMITS, SOCKET_ERRORS, SOCKET_EVENTS } from "../event-listener-names";
 import { and, eq, or } from "drizzle-orm";
 
 type MessageItemType = Required<
@@ -23,7 +23,6 @@ export const messageItemSchema = z.object({
 
 // TODO: send better errors
 
-
 export default async function sendTextMessageHandler(
   socket: Socket,
   io: Server,
@@ -33,8 +32,8 @@ export default async function sendTextMessageHandler(
 
   if (!success) {
     console.log("Error validating");
-    emitError(socket, "send_text_message", {
-      code: "",
+    emitError(socket, SOCKET_ERRORS.MESSAGE_CREATION_ERROR, {
+      code: "INVALID_DATA",
       message: "Invalid text message",
     });
     return;
@@ -46,20 +45,7 @@ export default async function sendTextMessageHandler(
       chatId: data.chatId,
     });
 
-    if (!newMessage) {
-      emitError(socket, SOCKET_EVENTS.SEND_TEXT_MESSAGE, {
-        code: "",
-        message: "Internal Server Error: failed db insert",
-      });
-      socket.emit(SOCKET_EVENTS.SEND_TEXT_MESSAGE, {
-        ...data,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      });
-      return;
-    }
-
-    console.log("Success");
+    if (!newMessage) throw new Error("Could not insert message")
 
     socket.emit(SOCKET_EMITS.ACK_MESSAGE_CREATED, newMessage.id);
 
