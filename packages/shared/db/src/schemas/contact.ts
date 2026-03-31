@@ -1,7 +1,7 @@
 import { relations } from "drizzle-orm";
 import { pgTable, text, unique, uuid, varchar } from "drizzle-orm/pg-core";
-import { user } from "./auth-schema";
-import { createdAt, updatedAt } from "../schemaUtils";
+import { user } from "./auth-schema.js";
+import { createdAt, updatedAt } from "../schemaUtils.js";
 
 export const contact = pgTable(
   "contacts",

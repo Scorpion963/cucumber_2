@@ -9,10 +9,10 @@ import {
   varchar,
   pgEnum,
 } from "drizzle-orm/pg-core";
-import { chatMember } from "./chatMember";
-import { contact } from "./contact";
-import { message } from "./message/message";
-import { reaction } from "./message/reaction";
+import { chatMember } from "./chatMember.js";
+import { contact } from "./contact.js";
+import { message } from "./message/message.js";
+import { reaction } from "./message/reaction.js";
 
 export const IMAGE_PROVIDERS = ["google", "github", "aws"] as const;
 export type ImageProviderTypes = (typeof IMAGE_PROVIDERS)[number];

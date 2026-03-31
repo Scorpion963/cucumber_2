@@ -1,8 +1,8 @@
 import { boolean, pgTable, unique, uuid } from "drizzle-orm/pg-core";
-import { chats } from "./chat";
+import { chats } from "./chat.js";
 import { relations } from "drizzle-orm";
-import { user } from "./auth-schema";
-import { createdAt, updatedAt } from "../schemaUtils";
+import { user } from "./auth-schema.js";
+import { createdAt, updatedAt } from "../schemaUtils.js";
 
 export const chatMember = pgTable(
   "chat_member",

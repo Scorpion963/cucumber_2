@@ -1,8 +1,8 @@
 import { pgTable, primaryKey, uuid, varchar } from "drizzle-orm/pg-core";
-import { user } from "../auth-schema";
-import { createdAt, updatedAt } from "../../schemaUtils";
+import { user } from "../auth-schema.js";
+import { createdAt, updatedAt } from "../../schemaUtils.js";
 import { relations } from "drizzle-orm";
-import { message } from "./message";
+import { message } from "./message.js";
 
 export const reaction = pgTable(
   "reactions",

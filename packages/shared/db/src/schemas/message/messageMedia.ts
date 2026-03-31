@@ -1,6 +1,6 @@
 import { integer, pgEnum, pgTable, text, uuid, varchar } from "drizzle-orm/pg-core";
-import { message } from "./message";
-import { createdAt, updatedAt } from "../../schemaUtils";
+import { message } from "./message.js";
+import { createdAt, updatedAt } from "../../schemaUtils.js";
 import { relations } from "drizzle-orm";
 
 export const MEDIA_TYPES = ["video", "audio", "image"] as const;

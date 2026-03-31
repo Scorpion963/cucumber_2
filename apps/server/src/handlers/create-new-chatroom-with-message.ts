@@ -1,7 +1,7 @@
 import type { Server, Socket } from "socket.io";
 import z from "zod";
 import emitError from "../utils/sockets/emitErrot";
-import { chatMember, chats, contact, db, message, user } from "../db";
+import { chatMember, chats, contact, db, message, user } from "db";
 import { eq } from "drizzle-orm";
 import {
   createAndUpdateLatestMessage,

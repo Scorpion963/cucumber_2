@@ -1,6 +1,6 @@
 import { relations } from "drizzle-orm";
+import type { AnyPgColumn } from "drizzle-orm/pg-core";
 import {
-  AnyPgColumn,
   pgEnum,
   pgTable,
   text,
@@ -8,9 +8,9 @@ import {
   uuid,
   varchar,
 } from "drizzle-orm/pg-core";
-import { chatMember } from "./chatMember";
-import { createdAt, updatedAt } from "../schemaUtils";
-import { message } from "./message/message";
+import { chatMember } from "./chatMember.js";
+import { createdAt, updatedAt } from "../schemaUtils.js";
+import { message } from "./message/message.js";
 
 export const CHAT_TYPES = ["private", "group"] as const;
 export type ChatType = (typeof CHAT_TYPES)[number];

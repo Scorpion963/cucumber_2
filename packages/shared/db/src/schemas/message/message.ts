@@ -1,10 +1,11 @@
-import { AnyPgColumn, pgTable, text, uuid } from "drizzle-orm/pg-core";
-import { chats } from "../chat";
-import { user } from "../auth-schema";
-import { createdAt, updatedAt } from "../../schemaUtils";
+import { pgTable, text, uuid } from "drizzle-orm/pg-core";
+import type { AnyPgColumn } from "drizzle-orm/pg-core";
+import { chats } from "../chat.js";
+import { user } from "../auth-schema.js";
+import { createdAt, updatedAt } from "../../schemaUtils.js";
 import { relations } from "drizzle-orm";
-import { reaction } from "./reaction";
-import { messageMedia } from "./messageMedia";
+import { reaction } from "./reaction.js";
+import { messageMedia } from "./messageMedia.js";
 
 export const message = pgTable("messages", {
   id: uuid("id").primaryKey().notNull().defaultRandom(),
@@ -18,15 +19,15 @@ export const message = pgTable("messages", {
     (): AnyPgColumn => message.id,
     {
       onDelete: "set null",
-    }
+    },
   ),
   forwardedFromMessageId: uuid("forwarded_from_message_id").references(
     (): AnyPgColumn => message.id,
-    { onDelete: "set null" }
+    { onDelete: "set null" },
   ),
 
   text: text(),
-  
+
   createdAt,
   updatedAt,
 });
@@ -36,7 +37,7 @@ export const messageRelations = relations(message, ({ one, many }) => ({
   chat: one(chats, {
     fields: [message.chatId],
     references: [chats.id],
-    relationName: "messages"
+    relationName: "messages",
   }),
   sender: one(user, {
     fields: [message.senderId],

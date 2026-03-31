@@ -13,15 +13,13 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@types/pg": "^8.15.6",
     "@upstash/redis": "^1.35.7",
     "dotenv": "^17.2.3",
-    "drizzle-kit": "^0.31.7",
     "express": "^5.2.1",
     "install": "^0.13.0",
-    "pg": "^8.16.3",
     "socket.io": "^4.8.1",
-    "zod": "^4.1.13"
+    "zod": "^4.1.13",
+    "db": "workspace:*"
   },
   "devDependencies": {
     "@types/express": "^5.0.6",

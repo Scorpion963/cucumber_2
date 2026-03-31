@@ -1,9 +1,9 @@
 import { timestamp } from "drizzle-orm/pg-core";
-
 export const createdAt = timestamp({ withTimezone: true })
-  .notNull()
-  .defaultNow();
+    .notNull()
+    .defaultNow();
 export const updatedAt = timestamp({ withTimezone: true })
-  .notNull()
-  .defaultNow()
-  .$onUpdate(() => new Date());
+    .notNull()
+    .defaultNow()
+    .$onUpdate(() => new Date());
+//# sourceMappingURL=schemaUtils.js.map

@@ -1,6 +1,6 @@
 import type { Server, Socket } from "socket.io";
 import emitError from "../utils/sockets/emitErrot";
-import { chatMember, chats, db, message } from "../db";
+import { chatMember, chats, db, message } from "db";
 import z, { string } from "zod";
 import { SOCKET_EMITS, SOCKET_ERRORS, SOCKET_EVENTS } from "../event-listener-names";
 import { and, eq, or } from "drizzle-orm";

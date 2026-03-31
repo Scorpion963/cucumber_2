@@ -3,12 +3,12 @@ import { createServer } from "http";
 import { Server, Socket } from "socket.io";
 import { redis } from "./services/redis/redis";
 import z from "zod";
-import { and, eq, ne, sql } from "drizzle-orm";
-import { chatMember, chats, db, message } from "./db";
-import { alias } from "drizzle-orm/pg-core";
 import sendTextMessageHandler from "./handlers/send-text-message";
 import { SOCKET_EVENTS } from "./event-listener-names";
 import { createChatroomHandler } from "./handlers/create-new-chatroom-with-message";
+import { chatMember, chats, db } from "db";
+import {and, eq, ne, sql} from 'drizzle-orm'
+import { alias } from "drizzle-orm/pg-core";
 
 const app = express();
 const port = 3001;
