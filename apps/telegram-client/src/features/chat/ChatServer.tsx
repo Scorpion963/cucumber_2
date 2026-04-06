@@ -39,7 +39,6 @@ export async function ChatServer({ paramsId }: { paramsId: string }) {
       <MessageInputStoreProvider
         message={{
           id: uuidv4(),
-          chatId: chat.chat?.id ?? uuidv4(),
           senderId: user!.user.id,
           text: "",
           forwardedFromMessageId: null,

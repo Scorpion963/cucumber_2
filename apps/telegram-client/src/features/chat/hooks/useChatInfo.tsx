@@ -6,9 +6,10 @@ import {
   HomeChatsType,
   UserWithContactType,
 } from "@/providers/types/user-store-provider-types";
-import { ImageProviderTypes } from "db";
+import { chats, ImageProviderTypes } from "db";
 import useS3Image from "./useS3Image";
 import { getChatName } from "@/hooks/useHomeChatsArray";
+import { useEffect } from "react";
 
 type useChatInfoReturnType = {
   chat: null | HomeChatsType;
@@ -25,8 +26,18 @@ type ImageProps = {
 
 export default function useChatInfo(): useChatInfoReturnType {
   const { currentChatId, currentChatterId } = useChatStore((state) => state);
-  const currentChat = useHomeChatsStore(state => currentChatId ? state.chats.get(currentChatId) : null)
-  const currentChatter = useHomeChatsStore(state => currentChatterId ? state.users.get(currentChatterId) : null)
+  const chats = useHomeChatsStore(state => state.chats)
+  const currentChat = currentChatId ? chats.get(currentChatId) : null
+
+  const chatters = useHomeChatsStore(state => state.users)
+  const currentChatter = currentChatterId ? chatters.get(currentChatterId) : null
+
+  useEffect(() => {
+    console.log("updated chatters")
+
+    console.log(chatters)
+
+  }, [chats, chatters])
 
   console.log("CurrentChatId: ", currentChatterId)
   console.log("Current Chatter: ", currentChatter)

@@ -2,6 +2,8 @@ import { contact, message, user } from "db";
 
 export type MessageStatusType = "sent" | "sending" | "read" | "error"
 
+export type ChatStatusType = "active" | "pending" | "error" | "local"
+
 export type HomeChatsLastMessageType = Pick<typeof message.$inferSelect, "id" | "text" | "updatedAt"> & {
   status: MessageStatusType
 }
@@ -11,6 +13,7 @@ export type HomeChatsPrivateType = {
   userId: string | null; // it's possible that the user deleted their account, then we want to show blank user and the chat with messages
   type: "private";
   lastMessage: HomeChatsLastMessageType | null;
+  status: ChatStatusType
 };
 
 export type HomeChatsGroupType = {
@@ -19,6 +22,7 @@ export type HomeChatsGroupType = {
   name: string;
   imageUrl: string | null;
   lastMessage: HomeChatsLastMessageType | null;
+  status: ChatStatusType
 };
 
 export type HomeChatsType = HomeChatsGroupType | HomeChatsPrivateType;

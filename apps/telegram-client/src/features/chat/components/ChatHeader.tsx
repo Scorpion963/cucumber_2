@@ -12,11 +12,14 @@ export default function ChatHeader() {
   const { chat, chatter, chatImageUrl, chatName } = useChatInfo();
 
   if (!chatter && !chat) return null;
+  
+  console.log("Chat Header: ", chat)
 
   return (
     <div className="w-full flex py-1 border-b items-center px-2">
       <div className="w-full flex gap-2   items-center">
         <BackButton />
+
 
         <Avatar className="size-9">
           <AvatarImage src={chatImageUrl ?? undefined} alt="" className="" />

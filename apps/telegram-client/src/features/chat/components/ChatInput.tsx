@@ -29,7 +29,8 @@ export default function ChatInput() {
   const { currentChatterId, currentChatId, setCurrentChatId } = useChatStore(
     (state) => state,
   );
-  const { addChat, addUser } = useHomeChatsStore((state) => state);
+  const chats = useHomeChatsStore((state) => state.chats);
+  const { updateChat } = useHomeChatsStore((state) => state);
 
   useButtonShortcut("Enter", handleSendMessage);
 
@@ -42,35 +43,40 @@ export default function ChatInput() {
       createdAt: new Date(),
       updatedAt: new Date(),
       status: "sending",
+      chatId: currentChatId!,
     };
 
     addMessage(optimisticMessage);
 
     await idb.messages.put(optimisticMessage);
 
-    if (!currentChatId) {
+    const chatExists = chats.get(currentChatId!);
+
+    console.log("chat Exists: ", chatExists)
+
+    if (!chatExists || chatExists.status !== 'active') {
+    console.log("i'm here")
       socket.emit(SOCKET_EMITS.CREATE_CHATROOM, {
-        ...inputMessage,
-        chatId: inputMessage.chatId,
+        ...optimisticMessage,
         receiverId: currentChatterId,
       });
-      addChat({
-        type: "private",
-        lastMessage: null,
-        id: inputMessage.chatId,
-        userId: currentChatterId,
-      });
-      setCurrentChatId(inputMessage.chatId);
+      
+      updateChat(currentChatId!, { status: "pending" });
+      await idb.chats.update(currentChatId!, {status: "pending"})
     } else {
-      socket.emit(SOCKET_EMITS.SEND_TEXT_MESSAGE, { ...inputMessage, chatId: currentChatId });
+      socket.emit(SOCKET_EMITS.SEND_TEXT_MESSAGE, {
+        ...optimisticMessage,
+      });
     }
 
-    updateLastMessage(inputMessage.chatId, {
+    updateLastMessage(optimisticMessage.chatId, {
       id: inputMessage.id,
       text: inputMessage.text,
       updatedAt: new Date(),
       status: "sending",
     });
+
+    await idb.messages.put(optimisticMessage)
 
     resetInputMessage();
     scrollToBottom();

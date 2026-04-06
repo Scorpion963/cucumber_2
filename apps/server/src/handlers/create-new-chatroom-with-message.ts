@@ -1,6 +1,6 @@
 import type { Server, Socket } from "socket.io";
 import z from "zod";
-import emitError from "../utils/sockets/emitErrot";
+import emitError, { ErrorPayload } from "../utils/sockets/emitErrot";
 import { chatMember, chats, contact, db, message, user } from "db";
 import { eq } from "drizzle-orm";
 import {
@@ -17,12 +17,18 @@ const requestSchema = messageItemSchema.extend({
   receiverId: z.string().trim().min(1),
 });
 
+const requestErrorSchema = requestSchema.pick({
+  receiverId: true,
+  id: true,
+  chatId: true,
+});
+
 type CreatorReturnPayload = {
   tempId: string;
   chat: typeof chats.$inferSelect;
   message: typeof message.$inferSelect;
   isCreator: true;
-  userId: string;
+  receiverId: string;
 };
 
 type CreatorType = typeof user.$inferSelect & {
@@ -36,19 +42,34 @@ type ReceiverReturnPayload = {
   creator: CreatorType;
 };
 
+type ErrorDataType = {
+  tempId: string;
+  receiverId: string;
+};
+
+type ChatCreationErroPayload = ErrorPayload<ErrorDataType>;
+
 export async function createChatroomHandler(
   socket: Socket,
   io: Server,
   requestData: unknown,
 ) {
   const { data, success, error } = requestSchema.safeParse(requestData);
-
+  console.log("hello");
   if (!success) {
+    const {
+      success: errorSucces,
+      data: errorData,
+      error: errorError,
+    } = requestErrorSchema.safeParse(requestData);
+
     console.error("invalid data");
     console.error("error: ", error);
-    emitError(socket, SOCKET_ERRORS.CHAT_CREATION_FAILED, {
+
+    emitError(socket, "CHAT_CREATION_FAILED", {
       code: "CHAT_INVALID_DATA",
       message: "Error: Invalid request data",
+      data: errorSucces ? errorData : null,
     });
     return;
   }
@@ -58,12 +79,19 @@ export async function createChatroomHandler(
       where: eq(user.id, data.receiverId),
       columns: { id: true },
     });
+
     if (!receiver) {
       console.log("Invalid receiver");
-      emitError(socket, SOCKET_ERRORS.CHAT_CREATION_FAILED, {
+      const payload: ChatCreationErroPayload = {
         code: "INVALID_RECEIVER",
         message: "The chatter you're trying interact with doesn't exist",
-      });
+        data: {
+          receiverId: data.receiverId,
+          tempId: data.chatId,
+        },
+      };
+
+      emitError(socket, "CHAT_CREATION_FAILED", payload);
       return;
     }
 
@@ -109,7 +137,7 @@ export async function createChatroomHandler(
 
     socket.join(`room:${chat.id}`);
     const creatorPayload: CreatorReturnPayload = {
-      userId: data.receiverId,
+      receiverId: data.receiverId,
       chat: chat,
       isCreator: true,
       message: newMessage,
@@ -119,15 +147,19 @@ export async function createChatroomHandler(
     socket.emit(SOCKET_EMITS.NEW_CHAT_ROOM_CREATED, {
       ...creatorPayload,
     });
+
+    console.log("success");
   } catch (err) {
     console.error(
       "Error inside createChatHandler: unable to create chat: ",
       err,
     );
-    emitError(socket, SOCKET_ERRORS.CHAT_CREATION_FAILED, {
+    const payload: ChatCreationErroPayload = {
+      data: { receiverId: data.receiverId, tempId: data.chatId },
       code: "CHAT_CREATION_FAILED",
       message: "Error: Could not create chat",
-    });
+    };
+    emitError(socket, "CHAT_CREATION_FAILED", payload);
     return;
   }
 }

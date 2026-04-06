@@ -11,9 +11,15 @@ import { useMessageStore } from "./providers/messageStoreProvider";
 import { MessageType } from "./stores/messageStore";
 import { useLiveQuery } from "dexie-react-hooks";
 import { idb } from "@/db/db";
-import { useChatStore, useHandleAddUserAndChats } from "./providers/chatStoreProvider";
+import {
+  useChatStore,
+  useHandleAddUserAndChats,
+} from "./providers/chatStoreProvider";
 import Dexie from "dexie";
-import { HomeChatsType, UserWithContactType } from "@/providers/types/user-store-provider-types";
+import {
+  HomeChatsType,
+  UserWithContactType,
+} from "@/providers/types/user-store-provider-types";
 import { usePathname } from "next/navigation";
 
 //  the use of useChatStore and useHomeChatsStore feels a little weird
@@ -27,32 +33,38 @@ export default function ChatClient({
   messages,
   currentChatterId,
   currentChatId,
+  chatExists,
   chat,
   chatter,
 }: {
   messages: MessageType[];
-  currentChatterId: string | null,
-  chat: HomeChatsType | null,
-  currentChatId: string | null,
-  chatter: UserWithContactType | null
+  currentChatterId: string | null;
+  chat: HomeChatsType | null;
+  currentChatId: string | null;
+  chatter: UserWithContactType | null;
 }) {
   const { clear } = useSidebarRouterStore((state) => state);
   const { matches, prev } = useMediaQuery("(max-width: 1024px)");
   const setMessages = useMessageStore((state) => state.setMessages);
   const renderMessages = useMessageStore((state) => state.messages);
   const chatId = useChatStore((state) => state.currentChatId);
-  const {setCurrentChatId, setCurrentChatterId} = useChatStore(state => state)
-  useHandleAddUserAndChats({chat: chat, chatter: chatter})
-  const pathname = usePathname()
+  // const { setCurrentChatId, setCurrentChatterId } = useChatStore(
+  //   (state) => state,
+  // );
+
+  console.log("chatId", chatId)
+
+  useHandleAddUserAndChats({ chat: chat, chatter: chatter });
+  const pathname = usePathname();
 
   useEffect(() => {
-    setMessages([])
-  }, [pathname, setMessages])
-
-  useEffect(() => {
-    setCurrentChatId(chat?.id ?? null)
-    setCurrentChatterId(chatter?.id ?? null)
-  }, [chat?.id, chatter?.id, setCurrentChatId, setCurrentChatterId])
+    setMessages([]);
+  }, [pathname, setMessages]);
+ 
+  // useEffect(() => {
+  //   setCurrentChatId(chat?.id ?? null);
+  //   setCurrentChatterId(chatter?.id ?? null);
+  // }, [chat?.id, chatter?.id, setCurrentChatId, setCurrentChatterId]);
 
   useEffect(() => {
     idb.messages.bulkPut(messages);
@@ -61,12 +73,14 @@ export default function ChatClient({
   useEffect(() => {
     async function fetchLocalMessages() {
       if (!chatId) return;
+      console.log("runs here: ", chatId)
+
       const localMessages = await idb.messages
         .where("[chatId+createdAt]")
         .between([chatId, Dexie.minKey], [chatId, Dexie.maxKey])
         .toArray();
       setMessages(localMessages);
-      console.log("local messages chatId: ", chatId)
+      console.log("local messages chatId: ", chatId);
       console.log("local messages: ", localMessages);
     }
     fetchLocalMessages();

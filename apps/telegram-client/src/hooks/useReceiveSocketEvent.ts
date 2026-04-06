@@ -1,10 +1,12 @@
 "use client"
 
 import { useSocketStore } from "@/providers/socket-store-provider";
-import { SOCKET_EMITS, SOCKET_EVENTS } from "@/types/socket-events-types";
+import { SOCKET_EMITS, SOCKET_ERRORS, SOCKET_EVENTS } from "@/types/socket-events-types";
 import { useEffect } from "react";
 
-export default function useReceiveSocketEvent<T>(event: keyof typeof SOCKET_EVENTS | keyof typeof SOCKET_EMITS, handler: (data: T) => Promise<void> | void) {
+type EventTypes = keyof typeof SOCKET_EVENTS | keyof typeof SOCKET_EMITS | keyof typeof SOCKET_ERRORS
+
+export default function useReceiveSocketEvent<T>(event: EventTypes, handler: (data: T) => Promise<void> | void) {
   const socket = useSocketStore((state) => state.socket);
 
   useEffect(() => {

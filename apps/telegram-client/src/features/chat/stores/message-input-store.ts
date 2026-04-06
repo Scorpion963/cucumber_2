@@ -3,7 +3,6 @@ import { createStore } from "zustand/vanilla";
 import {v4 as uuidv4} from 'uuid'
 
 type RequiredInputValues = {
-  chatId: string;
   text: string;
   senderId: string;
   id: string;
@@ -11,7 +10,7 @@ type RequiredInputValues = {
 
 type OptionalInputValues = Omit<
   typeof message.$inferSelect,
-  "chatId" | "senderId" | "text" | "id" | "createdAt" | "updatedAt"
+  "chatId" | "senderId" | "text" | "id" | "createdAt" | "updatedAt" | "chatId"
 >;
 
 export type MessageInputType = RequiredInputValues & OptionalInputValues;

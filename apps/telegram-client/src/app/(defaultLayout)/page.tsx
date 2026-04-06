@@ -3,14 +3,17 @@
 import { idb } from "@/db/db";
 import { useChatStore } from "@/features/chat/providers/chatStoreProvider";
 import { useMessageStore } from "@/features/chat/providers/messageStoreProvider";
+import { MessageType } from "@/features/chat/stores/messageStore";
 import useReceiveSocketEvent from "@/hooks/useReceiveSocketEvent";
 import { useCurrentUserStore } from "@/providers/current-user-store-provider";
 import { useSocketStore } from "@/providers/socket-store-provider";
+import { HomeChatsType } from "@/providers/types/user-store-provider-types";
 import { useHomeChatsStore } from "@/providers/user-store-provider";
 import { SOCKET_EMITS } from "@/types/socket-events-types";
 import { chats, contact, message, user } from "db";
 import { useLiveQuery } from "dexie-react-hooks";
 import { useEffect } from "react";
+import { toast } from "sonner";
 
 export function SocketEventGlobalReceiver() {
   useSocketInitialized();
@@ -18,6 +21,13 @@ export function SocketEventGlobalReceiver() {
   useHandleMessageAck();
   useSocketMessageCreatedError();
   useHandleChatCreated();
+  useHandleChatCreationError();
+
+  const chats = useHomeChatsStore((state) => state.chats);
+
+  useEffect(() => {
+    console.log("chats changed: ", chats);
+  }, [chats]);
 
   return null;
 }
@@ -27,7 +37,7 @@ type CreatorReturnPayload = {
   chat: typeof chats.$inferSelect;
   message: typeof message.$inferSelect;
   isCreator: true;
-  userId: string;
+  receiverId: string;
 };
 
 type CreatorType = typeof user.$inferSelect & {
@@ -53,81 +63,94 @@ function useHandleChatCreated() {
   const { currentChatterId, setCurrentChatId } = useChatStore((state) => state);
 
   async function handleChatRoomCreated(data: ReturnPayload) {
-    console.log("chat: ", data.chat);
-
-    if (data.isCreator) {
-      replaceChat(data.tempId, {
-        id: data.chat.id,
-        type: "private",
-        lastMessage: {
-          id: data.message.id,
-          status: "sent",
-          text: data.message.text,
-          updatedAt: data.message.updatedAt,
-        },
-        userId: data.userId,
-      });
-
-      const id = await idb.messages.delete(data.tempId);
-      const updatedId = await idb.messages.put({
+    const isActiveChat = data.isCreator
+      ? data.receiverId === currentChatterId
+      : data.creator.id;
+    const sentMessage: MessageType = {
+      ...data.message,
+      status: "sent",
+    };
+    const chatPayload: HomeChatsType = {
+      status: "active",
+      ...data.chat,
+      type: "private",
+      lastMessage: {
         ...data.message,
         status: "sent",
-      });
+      },
+      userId: data.isCreator ? data.receiverId : data.creator.id,
+    };
 
-      console.log("deleted id: ", id);
-      console.log("updated id: ", updatedId);
-
-      if (currentChatterId === data.userId) {
-        setCurrentChatId(data.chat.id);
-
-        const updatedMessages = messages.filter(
-          (item) => item.id !== data.message.id,
-        );
-
-        setMessages([
-          ...updatedMessages,
-          {
-            ...data.message,
-            status: "sent",
-          },
-        ]);
-      }
-    } else {
-      addChat({
+    if (data.isCreator) {
+      await idb.messages.update(data.tempId, { chatId: data.chat.id });
+      await idb.chats.update(data.tempId, {
         id: data.chat.id,
-        type: "private",
-        lastMessage: {
-          id: data.message.id,
-          status: "sent",
-          text: data.message.text,
-          updatedAt: data.message.updatedAt,
-        },
-        userId: data.creator.id,
+        status: "active",
+        lastMessage: { ...data.message, status: "sent" },
       });
-      addUser({ ...data.creator });
+    }
 
-      const id = await idb.messages.put({ ...data.message, status: "sent" });
-      console.log("receiver idb id: ", id);
+    if (isActiveChat) {
+      setCurrentChatId(data.chat.id);
 
-      if (currentChatterId === data.creator.id) {
-        setCurrentChatId(data.chat.id);
+      const filteredMessages = messages.filter(
+        (item) => item.id !== sentMessage.id,
+      );
+      setMessages([...filteredMessages, sentMessage]);
 
-        const updatedMessages = messages.filter(
-          (item) => item.id !== data.message.id,
-        );
-
-        setMessages([
-          ...updatedMessages,
-          {
-            ...data.message,
-            status: "sent",
-          },
-        ]);
+      if (data.isCreator) {
+        replaceChat(data.tempId, chatPayload);
+      } else {
+        addUser(data.creator);
+        addChat(chatPayload);
       }
     }
+
+    const id = await idb.messages.put({ ...data.message, status: "sent" });
   }
 
   useReceiveSocketEvent("NEW_CHAT_ROOM_CREATED", handleChatRoomCreated);
+}
+
+type SocketErrorPayloadType<T> = {
+  code: string;
+  message: string;
+  data: T | null;
+};
+
+function useHandleChatCreationError() {
+  const messages = useMessageStore((state) => state.messages);
+  const setMessages = useMessageStore((state) => state.setMessages);
+  const currentChatterId = useChatStore((state) => state.currentChatterId);
+  const currentChatId = useChatStore((state) => state.currentChatId);
+  const updateChats = useHomeChatsStore((state) => state.updateChat);
+
+  async function handler(
+    data: SocketErrorPayloadType<{
+      id: string;
+      receiverId: string;
+      chatId: string;
+    }>,
+  ) {
+    console.log("Received the error");
+    toast.error(data.message);
+    const payload = data.data;
+    if (!payload) return;
+
+    if (currentChatId === payload.chatId) {
+      const newMessages: MessageType[] = messages.map((item) =>
+        item.id === payload.id ? { ...item, status: "error" } : item,
+      );
+
+      setMessages(newMessages);
+      updateChats(currentChatId!, { status: "error" });
+    }
+
+    await idb.messages.update(payload.id, { status: "error" });
+    await idb.chats.update(payload.chatId, { status: "error" });
+  }
+
+  useReceiveSocketEvent("CHAT_CREATION_FAILED", handler);
 }
 
 function useHandleMessageCreated() {
@@ -189,14 +212,11 @@ function useSocketMessageCreatedError() {
   const setMessages = useMessageStore((state) => state.setMessages);
 
   async function handleError(data: typeof message.$inferSelect) {
-    const updatedMessages = messages.filter((item) => item.id !== data.id);
-    setMessages([
-      ...updatedMessages,
-      {
-        ...data,
-        status: "error",
-      },
-    ]);
+    const updatedMessages: MessageType[] = messages.map((item) => {
+      return item.id === data.id ? { ...item, status: "error" } : item;
+    });
+    setMessages(updatedMessages);
+
     const response = await idb.messages.put({
       ...data,
       status: "error",

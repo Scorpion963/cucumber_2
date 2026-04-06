@@ -1,6 +1,6 @@
 import removeUndefined from "@/lib/removeUndefined";
 import { HomeChatsLastMessageType, HomeChatsType, UserWithContactType } from "@/providers/types/user-store-provider-types";
-import { contact } from "db";
+import { ChatType, contact } from "db";
 import { produce } from "immer";
 import { createStore } from "zustand/vanilla";
 
@@ -17,7 +17,8 @@ export type HomeChatsActions = {
   addUser: (contact: UserWithContactType) => void;
   addChat: (chat: HomeChatsType) => void;
   updateLastMessage: (chatId: string, chat: HomeChatsLastMessageType) => void
-  replaceChat: (id: string, chat: HomeChatsType) => void
+  replaceChat: (id: string, chat: HomeChatsType) => void,
+  updateChat: (id: string,  chatValues: Partial<Omit<HomeChatsType, "type">>) => void
 };
 
 export type HomeChatsStore = HomeChatsState & HomeChatsActions;
@@ -78,6 +79,19 @@ export const createHomeChatsStore = (
 
         const newMap = new Map(state.chats)
         newMap.set(chatId, {...chatExists, lastMessage: lastMessage ?? chatExists.lastMessage})
+        return {...state, chats: newMap}
+      })
+    },
+
+    updateChat: (chatId, chatValues) => {
+      set(state => {
+        const chatExists = state.chats.get(chatId)
+        if(!chatExists) return state
+
+        const {type: _ignored, ...rest} = removeUndefined(chatValues)
+        const newMap = new Map(state.chats)
+
+        newMap.set(chatId, {...chatExists, ...rest})
         return {...state, chats: newMap}
       })
     }

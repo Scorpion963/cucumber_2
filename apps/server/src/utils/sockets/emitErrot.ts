@@ -1,13 +1,14 @@
 import type { Socket } from "socket.io";
+import { SOCKET_ERRORS } from "../../event-listener-names";
 
-type ErrorType = {
-  message: string;
-  code: string;
-};
+export type ErrorPayload<T> = {
+  message: string,
+  code: string,
+  data: T | null
+}
 
-export default function emitError(socket: Socket, eventName: string, error: ErrorType) {
-  socket.emit("error", {
-    event: eventName,
-    error: { message: error.message, code: error.code },
-  });
+type EventType = keyof typeof SOCKET_ERRORS
+
+export default function emitError<T>(socket: Socket, eventName: EventType, error: ErrorPayload<T>) {
+  socket.emit(eventName, error);
 }

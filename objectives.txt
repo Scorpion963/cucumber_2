@@ -1,0 +1,15 @@
+TODO:
+
+1. Refactor
+2. Add online status display
+3. Delete messages
+4. Delete chats
+5. Handle errors
+6. Group chats
+
+COMPLETED
+
+1. Sign up/log in users
+2. Sending messages
+3. Customizing contacts
+4. Searching contacts
