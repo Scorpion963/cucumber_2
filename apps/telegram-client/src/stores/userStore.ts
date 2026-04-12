@@ -18,7 +18,8 @@ export type HomeChatsActions = {
   addChat: (chat: HomeChatsType) => void;
   updateLastMessage: (chatId: string, chat: HomeChatsLastMessageType) => void
   replaceChat: (id: string, chat: HomeChatsType) => void,
-  updateChat: (id: string,  chatValues: Partial<Omit<HomeChatsType, "type">>) => void
+  updateChat: (id: string,  chatValues: Partial<Omit<HomeChatsType, "type">>) => void,
+  removeChat: (id: string) => void
 };
 
 export type HomeChatsStore = HomeChatsState & HomeChatsActions;
@@ -34,6 +35,14 @@ export const createHomeChatsStore = (
   console.log("RECREATED")
   return createStore<HomeChatsStore>()((set) => ({
     ...initState,
+    removeChat: (id) => {
+      set(state => {
+        const newMap = new Map(state.chats);
+        newMap.delete(id);
+        return {...state, chats: newMap}
+      })
+    },
+    
     updateContactInfoById: (id, user) => {
       set((state) => {
         const contactExists = state.users.get(id);

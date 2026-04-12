@@ -83,11 +83,12 @@ export function PopupContent({
     if (typeof document === "undefined") return;
 
     const listener = (e: MouseEvent) => {
-      const target = e.target as Node;
+      // const target = e.target as Node;
 
-      if (!ref.current?.contains(target)) {
-        setSelectedItem(null);
-      }
+      // if (!ref.current?.contains(target)) {
+      //   setSelectedItem(null);
+      // }
+      setSelectedItem(null)
     };
 
     document.addEventListener("click", listener);

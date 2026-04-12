@@ -9,8 +9,13 @@ import {
   ContextMenuPopup,
   ContextMenuTrigger,
   PopupContent,
+  useContextMenuPopup,
 } from "@/components/ContextMenuPopup/ContextMenuPopup";
 import { Button } from "@/components/ui/button";
+import { Socket } from "socket.io-client";
+import { useSocketStore } from "@/providers/socket-store-provider";
+import { SOCKET_EMITS } from "@/types/socket-events-types";
+import { useHomeChatsStore } from "@/providers/user-store-provider";
 
 // TODO: memoize chats and contacts
 
@@ -39,13 +44,13 @@ export default function ContactList() {
         <HomeChatsSidebarContent />
       ) : (
         usersFound.map((user) => (
-            <Contact
-              lastMessage={null}
-              imageUrl={getPublicAssetUrl(user.image, user.imageProvider)}
-              id={user.id}
-              key={user.id}
-              name={user.name}
-            />
+          <Contact
+            lastMessage={null}
+            imageUrl={getPublicAssetUrl(user.image, user.imageProvider)}
+            id={user.id}
+            key={user.id}
+            name={user.name}
+          />
         ))
       )}
     </ScrollArea>
@@ -58,9 +63,9 @@ function HomeChatsSidebarContent() {
   return (
     <ContextMenuPopup>
       {chats.map((item) => (
-        <ContextMenuTrigger key={item.id} id={item.id}>
+        <ContextMenuTrigger key={item.urlId} id={item.chatId}>
           <Contact
-            id={item.id}
+            id={item.urlId}
             imageUrl={item.imageUrl}
             lastMessage={item.lastMessage}
             name={item.chatName}
@@ -68,8 +73,27 @@ function HomeChatsSidebarContent() {
         </ContextMenuTrigger>
       ))}
       <PopupContent>
-        <Button>hello</Button>
+        <SidebarPopupButtons />
       </PopupContent>
     </ContextMenuPopup>
+  );
+}
+
+function SidebarPopupButtons() {
+  const {selectedItem} = useContextMenuPopup()
+  const socket = useSocketStore(state => state.socket)
+
+  function handleDeleteChat(){
+    if(!socket) return
+
+    socket.emit(SOCKET_EMITS.DELETE_CHATROOM, {id: selectedItem})
+  }
+
+  return (
+    <>
+      <Button variant={"default"} onClick={handleDeleteChat}>
+        Delete
+      </Button>
+    </>
   );
 }

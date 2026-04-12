@@ -50,12 +50,13 @@ export default function useHomeChatsArray() {
 }
 
 type DisplayChats = {
-  id: string;
+  urlId: string;
   imageUrl: string | null;
   chatName: string | null;
   isImagePublic: boolean;
   imageProvider: ImageProviderTypes;
-  lastMessage: HomeChatsLastMessageType | null
+  lastMessage: HomeChatsLastMessageType | null;
+  chatId: string
 };
 
 export function getRelevantChat(
@@ -72,11 +73,12 @@ export function getRelevantChat(
     if (!user)
       return {
         chatName: null,
-        id: chat.id,
+        urlId: chat.id,
         imageUrl: null,
         isImagePublic: false,
         imageProvider: "aws",
-        lastMessage: null
+        lastMessage: null,
+        chatId: chat.id
       };
 
     const image: Pick<
@@ -97,14 +99,16 @@ export function getRelevantChat(
     return {
       chatName: getChatName(user),
       lastMessage: chat.lastMessage,
-      id: user.id,
+      urlId: user.id,
+      chatId: chat.id,
       ...image,
     };
   }
 
   return {
     chatName: chat.name,
-    id: chat.id,
+    chatId: chat.id,
+    urlId: chat.id,
     imageUrl: chat.imageUrl,
     isImagePublic: false,
     imageProvider: "aws",

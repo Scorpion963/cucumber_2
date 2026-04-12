@@ -14,7 +14,6 @@ import {
   UserWithContactType,
 } from "./types/user-store-provider-types";
 import { idb } from "@/db/db";
-import { FindHomeChatsReturnType } from "@/server/db/findHomeChatsForStore";
 
 export type HomeChatsApi = ReturnType<typeof createHomeChatsStore>;
 

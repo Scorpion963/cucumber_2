@@ -7,8 +7,9 @@ import sendTextMessageHandler from "./handlers/send-text-message";
 import { SOCKET_EVENTS } from "./event-listener-names";
 import { createChatroomHandler } from "./handlers/create-new-chatroom-with-message";
 import { chatMember, chats, db } from "db";
-import {and, eq, ne, sql} from 'drizzle-orm'
+import { and, eq, ne, sql } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
+import deleteChatroomHandler from "./handlers/delete-chatroom";
 
 const app = express();
 const port = 3001;
@@ -43,6 +44,7 @@ io.use(async (socket, next) => {
 
   userId = data.user.id;
   socket.join(userId);
+  socket.data.userId = userId;
 
   results = await getChatroomsAndMembersIds(userId);
 
@@ -78,6 +80,9 @@ io.on("connection", (socket) => {
   );
   socket.on(SOCKET_EVENTS.CREATE_CHATROOM, (data) =>
     createChatroomHandler(socket, io, data),
+  );
+  socket.on(SOCKET_EVENTS.DELETE_CHATROOM, (data) =>
+    deleteChatroomHandler(socket, io, data),
   );
 });
 

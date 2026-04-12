@@ -22,6 +22,8 @@ export function SocketEventGlobalReceiver() {
   useSocketMessageCreatedError();
   useHandleChatCreated();
   useHandleChatCreationError();
+  useHandleChatroomDeleted()
+  useHandleChatroomDeletedError()
 
   const chats = useHomeChatsStore((state) => state.chats);
 
@@ -30,6 +32,34 @@ export function SocketEventGlobalReceiver() {
   }, [chats]);
 
   return null;
+}
+
+function useHandleChatroomDeleted(){
+  const {removeChat} = useHomeChatsStore(state => state)
+  const {currentChatId, currentChatterId} = useChatStore(state => state)
+
+  async function chatDeletedHandler(data: {id: string, userId?: string}){
+    console.log("event received")
+    await idb.chats.delete(data.id)
+    await idb.messages.delete(data.id)
+
+    const isActiveChat = currentChatId === data.id || currentChatterId === data.userId 
+    if(isActiveChat){
+      removeChat(data.id) 
+    }
+  }
+
+  useReceiveSocketEvent("CHATROOM_DELETED", chatDeletedHandler)
+}
+
+// I'm not using optimistic updates for deleting chats cause i'm tired and it's pointless
+
+function useHandleChatroomDeletedError(){
+  async function handler(){
+    toast.error("Chatroom deletion failed")
+  } 
+
+  useReceiveSocketEvent("CHAT_DELETION_FAILED", handler)
 }
 
 type CreatorReturnPayload = {
