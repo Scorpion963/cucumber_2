@@ -24,6 +24,8 @@ export default async function Layout({ children }: { children: ReactNode }) {
 
   console.log("HOMECHATS: ", homeChats);
 
+  const ids = homeChats.map(item => item.id)
+
   const { mappedUsers, mappedChatInfo } = mapChatsToStore(homeChats);
   console.log("mapped: ", mappedChatInfo, mappedUsers);
 
@@ -34,7 +36,7 @@ export default async function Layout({ children }: { children: ReactNode }) {
   return (
     <div>
       <CurrentUserStoreProvider currentUser={currentUser}>
-        <HomeChatsProvider chats={mappedChatInfo} users={mappedUsers}>
+        <HomeChatsProvider chatIds={ids} chats={mappedChatInfo} users={mappedUsers}>
           <ChatStoreProvider>
             <MessageStoreProvider>
               <div className="w-full h-screen">

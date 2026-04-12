@@ -91,12 +91,14 @@ export default async function handleChatFetch(
                 ...chat.chat,
                 type: "private",
                 userId: chatterObject.id,
-                lastMessage: chat?.message ? { ...chat.message } : null,
+                lastMessage: chat?.message ? { ...chat.message, status: "sent" } : null,
+                status: "active",
               }
             : null,
           chatter: chatterObject,
         };
-      } catch {
+      } catch (e) {
+        console.log("Error inside of handleChatFetch: ", e)
         return {
           canAccess: false,
           error: {

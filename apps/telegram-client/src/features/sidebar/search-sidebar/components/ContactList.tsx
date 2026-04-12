@@ -39,7 +39,6 @@ export default function ContactList() {
         <HomeChatsSidebarContent />
       ) : (
         usersFound.map((user) => (
-          <>
             <Contact
               lastMessage={null}
               imageUrl={getPublicAssetUrl(user.image, user.imageProvider)}
@@ -47,7 +46,6 @@ export default function ContactList() {
               key={user.id}
               name={user.name}
             />
-          </>
         ))
       )}
     </ScrollArea>

@@ -14,7 +14,7 @@ const idb = new Dexie("FriendsDatabase") as Dexie & {
 
 idb.version(1).stores({
   messages: "id, chatId, senderId, status, createdAt, [chatId+createdAt]", 
-  chats: "id, userId"
+  chats: "id, userId, status"
 })
 
 export { idb }

@@ -1,5 +1,5 @@
 import { relations } from "drizzle-orm";
-import { pgEnum, pgTable, text, timestamp, uuid, varchar, } from "drizzle-orm/pg-core";
+import { boolean, pgEnum, pgTable, text, timestamp, uuid, varchar, } from "drizzle-orm/pg-core";
 import { chatMember } from "./chatMember.js";
 import { createdAt, updatedAt } from "../schemaUtils.js";
 import { message } from "./message/message.js";
