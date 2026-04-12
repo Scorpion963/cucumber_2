@@ -5,6 +5,12 @@ import Contact from "./Contact";
 import { useSearchStore } from "../providers/search-store-provider";
 import useHomeChatsArray from "@/hooks/useHomeChatsArray";
 import { getPublicAssetUrl } from "@/services/s3/lib/helpers";
+import {
+  ContextMenuPopup,
+  ContextMenuTrigger,
+  PopupContent,
+} from "@/components/ContextMenuPopup/ContextMenuPopup";
+import { Button } from "@/components/ui/button";
 
 // TODO: memoize chats and contacts
 
@@ -30,28 +36,42 @@ export default function ContactList() {
   return (
     <ScrollArea className="h-full w-full">
       {searchValue.trim().length === 0 ? (
-        <>
-          {chats.map((v) => (
-            <Contact
-              lastMessage={v.lastMessage}
-              imageUrl={v.imageUrl}
-              id={v.id}
-              name={v.chatName}
-              key={v.id}
-            />
-          ))}
-        </>
+        <HomeChatsSidebarContent />
       ) : (
         usersFound.map((user) => (
-          <Contact
-            lastMessage={null}
-            imageUrl={getPublicAssetUrl(user.image, user.imageProvider)}
-            id={user.id}
-            key={user.id}
-            name={user.name}
-          />
+          <>
+            <Contact
+              lastMessage={null}
+              imageUrl={getPublicAssetUrl(user.image, user.imageProvider)}
+              id={user.id}
+              key={user.id}
+              name={user.name}
+            />
+          </>
         ))
       )}
     </ScrollArea>
+  );
+}
+
+function HomeChatsSidebarContent() {
+  const chats = useHomeChatsArray();
+
+  return (
+    <ContextMenuPopup>
+      {chats.map((item) => (
+        <ContextMenuTrigger key={item.id} id={item.id}>
+          <Contact
+            id={item.id}
+            imageUrl={item.imageUrl}
+            lastMessage={item.lastMessage}
+            name={item.chatName}
+          />
+        </ContextMenuTrigger>
+      ))}
+      <PopupContent>
+        <Button>hello</Button>
+      </PopupContent>
+    </ContextMenuPopup>
   );
 }
