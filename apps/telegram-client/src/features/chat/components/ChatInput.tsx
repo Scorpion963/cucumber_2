@@ -11,11 +11,11 @@ import { useMessageInputStore } from "../providers/messageInputStoreProvider";
 import { useButtonShortcut } from "../hooks/useButtonShortcut";
 import { useChatScrollArea } from "../providers/chatScrollAreaProvider";
 import { ChatBodyWrapper } from "./ChatBodyWrapper";
-import { SOCKET_EMITS } from "@/types/socket-events-types";
 import { useHomeChatsStore } from "@/providers/user-store-provider";
 import { idb } from "@/db/db";
 import { MessageType } from "../stores/messageStore";
 import { useChatStore } from "../providers/chatStoreProvider";
+import {ClientToServerEvents} from 'types'
 
 export default function ChatInput() {
   const socket = useSocketStore((state) => state.socket);
@@ -56,7 +56,7 @@ export default function ChatInput() {
 
     if (!chatExists || chatExists.status !== 'active') {
     console.log("i'm here")
-      socket.emit(SOCKET_EMITS.CREATE_CHATROOM, {
+      socket.emit(ClientToServerEvents.CREATE_CHATROOM, {
         ...optimisticMessage,
         receiverId: currentChatterId,
       });
@@ -64,7 +64,7 @@ export default function ChatInput() {
       updateChat(currentChatId!, { status: "pending" });
       await idb.chats.update(currentChatId!, {status: "pending"})
     } else {
-      socket.emit(SOCKET_EMITS.SEND_TEXT_MESSAGE, {
+      socket.emit(ClientToServerEvents.SEND_TEXT_MESSAGE, {
         ...optimisticMessage,
       });
     }

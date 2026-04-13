@@ -2,7 +2,7 @@ import type { Server, Socket } from "socket.io";
 import emitError from "../utils/sockets/emitErrot";
 import { chatMember, chats, db, message } from "db";
 import z, { string } from "zod";
-import { SOCKET_EMITS, SOCKET_ERRORS, SOCKET_EVENTS } from "../event-listener-names";
+import {ServerToClientErrors, ServerToClientEvents} from 'types'
 import { and, eq, or } from "drizzle-orm";
 
 type MessageItemType = Required<
@@ -12,6 +12,7 @@ type MessageItemType = Required<
     typeof message.$inferInsert,
     "forwardedFromMessageId" | "replyToMessageId"
   >;
+
 export const messageItemSchema = z.object({
   senderId: z.string(),
   chatId: z.string(),
@@ -31,10 +32,12 @@ export default async function sendTextMessageHandler(
   const { success, data } = messageItemSchema.safeParse(requestData);
 
   if (!success) {
+    // TODO: Validate that message Id exists and send it back, so that the client can delete the message in local db
     console.log("Error validating");
-    emitError(socket, SOCKET_ERRORS.MESSAGE_CREATION_ERROR, {
-      code: "INVALID_DATA",
-      message: "Invalid text message",
+    emitError(socket, ServerToClientErrors.MESSAGE_CREATION_ERROR, {
+      code: "",
+      data: null,
+      message: "Error: Invalid Data"
     });
     return;
   }
@@ -47,23 +50,26 @@ export default async function sendTextMessageHandler(
 
     if (!newMessage) throw new Error("Could not insert message")
 
-    socket.emit(SOCKET_EMITS.ACK_MESSAGE_CREATED, newMessage.id);
+    socket.emit(ServerToClientEvents.ACK_MESSAGE_CREATED, newMessage.id);
 
     io.to(`room:${newMessage.chatId}`).emit(
-      SOCKET_EMITS.MESSAGE_CREATED,
+      ServerToClientEvents.MESSAGE_CREATED,
       newMessage,
     );
   } catch {
-    emitError(socket, "send_text_message", {
+    emitError(socket, "MESSAGE_CREATION_ERROR", {
       code: "",
-      message: "Internal Server Error: failed db insert",
+      data: {...data, createdAt: new Date(), updatedAt: new Date()},
+      message: "Internal Server Error"
     });
 
-    socket.emit(SOCKET_EVENTS.SEND_TEXT_MESSAGE, {
-      ...data,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    });
+    // TODO: Send the object as an error
+
+    // socket.emit(SOCKET_EVENTS.SEND_TEXT_MESSAGE, {
+    //   ...data,
+    //   createdAt: new Date(),
+    //   updatedAt: new Date(),
+    // });
   }
 }
 

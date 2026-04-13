@@ -7,7 +7,8 @@ import {
   createAndUpdateLatestMessage,
   messageItemSchema,
 } from "./send-text-message";
-import { SOCKET_EMITS, SOCKET_ERRORS } from "../event-listener-names";
+import { ServerToClientEvents } from "types";
+// import { SOCKET_EMITS, SOCKET_ERRORS } from "../event-listener-names";
 
 // TODO: Fixe race condition
 // TODO: Check the senderId
@@ -129,7 +130,7 @@ export async function createChatroomHandler(
           },
         };
 
-        singleSocket.emit(SOCKET_EMITS.NEW_CHAT_ROOM_CREATED, {
+        singleSocket.emit(ServerToClientEvents.NEW_CHAT_ROOM_CREATED, {
           ...receiverPayload,
         });
       }
@@ -144,7 +145,7 @@ export async function createChatroomHandler(
       tempId: data.chatId,
     };
 
-    socket.emit(SOCKET_EMITS.NEW_CHAT_ROOM_CREATED, {
+    socket.emit(ServerToClientEvents.NEW_CHAT_ROOM_CREATED, {
       ...creatorPayload,
     });
 

@@ -1,5 +1,5 @@
 import type { Socket } from "socket.io";
-import { SOCKET_ERRORS } from "../../event-listener-names";
+import { ServerToClientErrors } from "types";
 
 export type ErrorPayload<T> = {
   message: string,
@@ -7,7 +7,7 @@ export type ErrorPayload<T> = {
   data: T | null
 }
 
-type EventType = keyof typeof SOCKET_ERRORS
+type EventType = keyof typeof ServerToClientErrors
 
 export default function emitError<T>(socket: Socket, eventName: EventType, error: ErrorPayload<T>) {
   socket.emit(eventName, error);

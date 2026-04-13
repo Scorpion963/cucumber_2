@@ -2,9 +2,9 @@
 
 import { idb } from "@/db/db";
 import { useSocketStore } from "@/providers/socket-store-provider";
-import { SOCKET_EMITS } from "@/types/socket-events-types";
 import { useLiveQuery } from "dexie-react-hooks";
 import { useEffect } from "react";
+import { ClientToServerEvents } from "types";
 
 export function useSocketInitialized() {
   const messages = useLiveQuery(async () =>
@@ -19,7 +19,7 @@ export function useSocketInitialized() {
     if (!messages) return;
 
     messages.forEach((item) => {
-      socket.emit(SOCKET_EMITS.SEND_TEXT_MESSAGE, item);
+      socket.emit(ClientToServerEvents.SEND_TEXT_MESSAGE, item);
     });
   }, [socket]);
 

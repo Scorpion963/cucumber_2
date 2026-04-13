@@ -12,10 +12,8 @@ import {
   useContextMenuPopup,
 } from "@/components/ContextMenuPopup/ContextMenuPopup";
 import { Button } from "@/components/ui/button";
-import { Socket } from "socket.io-client";
 import { useSocketStore } from "@/providers/socket-store-provider";
-import { SOCKET_EMITS } from "@/types/socket-events-types";
-import { useHomeChatsStore } from "@/providers/user-store-provider";
+import { ClientToServerEvents } from "types";
 
 // TODO: memoize chats and contacts
 
@@ -86,7 +84,7 @@ function SidebarPopupButtons() {
   function handleDeleteChat(){
     if(!socket) return
 
-    socket.emit(SOCKET_EMITS.DELETE_CHATROOM, {id: selectedItem})
+    socket.emit(ClientToServerEvents.DELETE_CHATROOM, {id: selectedItem})
   }
 
   return (

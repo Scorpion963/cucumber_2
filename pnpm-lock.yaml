@@ -35,6 +35,9 @@ importers:
       socket.io:
         specifier: ^4.8.1
         version: 4.8.1
+      types:
+        specifier: workspace:*
+        version: link:../../packages/shared/types
       zod:
         specifier: ^4.1.13
         version: 4.1.13
@@ -162,6 +165,9 @@ importers:
       tailwind-merge:
         specifier: ^3.4.0
         version: 3.4.0
+      types:
+        specifier: workspace:*
+        version: link:../../packages/shared/types
       uuid:
         specifier: ^13.0.0
         version: 13.0.0
@@ -221,6 +227,12 @@ importers:
       tsx:
         specifier: ^4.21.0
         version: 4.21.0
+
+  packages/shared/types:
+    dependencies:
+      zod:
+        specifier: ^4.3.6
+        version: 4.3.6
 
 packages:
 
@@ -4583,6 +4595,9 @@ packages:
 
   zod@4.3.5:
     resolution: {integrity: sha512-k7Nwx6vuWx1IJ9Bjuf4Zt1PEllcwe7cls3VNzm4CQ1/hgtFUK2bRNG3rvnpPUhFjmqJKAKtjV576KnUkHocg/g==}
+
+  zod@4.3.6:
+    resolution: {integrity: sha512-rftlrkhHZOcjDwkGlnUtZZkvaPHCsDATp4pGpuOOMDaTdDDXF91wuVDJoWoPsKX/3YPQ5fHuF3STjcYyKr+Qhg==}
 
   zustand@5.0.9:
     resolution: {integrity: sha512-ALBtUj0AfjJt3uNRQoL1tL2tMvj6Gp/6e39dnfT6uzpelGru8v1tPOGBzayOWbPJvujM8JojDk3E1LxeFisBNg==}
@@ -9787,6 +9802,8 @@ snapshots:
   zod@4.1.13: {}
 
   zod@4.3.5: {}
+
+  zod@4.3.6: {}
 
   zustand@5.0.9(@types/react@19.2.7)(immer@11.0.1)(react@19.2.0)(use-sync-external-store@1.6.0(react@19.2.0)):
     optionalDependencies:
