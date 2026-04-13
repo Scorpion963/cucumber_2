@@ -56,7 +56,7 @@ export async function createChatroomHandler(
   requestData: unknown,
 ) {
   const { data, success, error } = requestSchema.safeParse(requestData);
-  console.log("hello");
+  
   if (!success) {
     const {
       success: errorSucces,
@@ -133,7 +133,7 @@ export async function createChatroomHandler(
         singleSocket.emit(ServerToClientEvents.NEW_CHAT_ROOM_CREATED, {
           ...receiverPayload,
         });
-      }
+      } 
     });
 
     socket.join(`room:${chat.id}`);

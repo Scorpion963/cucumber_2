@@ -2,7 +2,7 @@ import type { Server, Socket } from "socket.io";
 import emitError from "../utils/sockets/emitErrot";
 import { chatMember, chats, db, message } from "db";
 import z, { string } from "zod";
-import {ServerToClientErrors, ServerToClientEvents} from 'types'
+import { ServerToClientErrors, ServerToClientEvents } from "types";
 import { and, eq, or } from "drizzle-orm";
 
 type MessageItemType = Required<
@@ -34,10 +34,16 @@ export default async function sendTextMessageHandler(
   if (!success) {
     // TODO: Validate that message Id exists and send it back, so that the client can delete the message in local db
     console.log("Error validating");
+    const { success: errorSuccess, data: errorData } = messageItemSchema
+      .pick({
+        id: true,
+      })
+      .safeParse(requestData);
+
     emitError(socket, ServerToClientErrors.MESSAGE_CREATION_ERROR, {
       code: "",
-      data: null,
-      message: "Error: Invalid Data"
+      data: errorSuccess ? errorData : null,
+      message: "Error: Invalid Data",
     });
     return;
   }
@@ -48,7 +54,7 @@ export default async function sendTextMessageHandler(
       chatId: data.chatId,
     });
 
-    if (!newMessage) throw new Error("Could not insert message")
+    if (!newMessage) throw new Error("Could not insert message");
 
     socket.emit(ServerToClientEvents.ACK_MESSAGE_CREATED, newMessage.id);
 
@@ -59,8 +65,8 @@ export default async function sendTextMessageHandler(
   } catch {
     emitError(socket, "MESSAGE_CREATION_ERROR", {
       code: "",
-      data: {...data, createdAt: new Date(), updatedAt: new Date()},
-      message: "Internal Server Error"
+      data: { id: data.id },
+      message: "Internal Server Error",
     });
 
     // TODO: Send the object as an error
@@ -73,8 +79,9 @@ export default async function sendTextMessageHandler(
   }
 }
 
-
-export function createAndUpdateLatestMessage(data: typeof message.$inferInsert) {
+export function createAndUpdateLatestMessage(
+  data: typeof message.$inferInsert,
+) {
   return db.transaction(async (ctx) => {
     const [newMessage] = await ctx
       .insert(message)

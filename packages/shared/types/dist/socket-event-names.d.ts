@@ -14,4 +14,9 @@ export declare const ServerToClientErrors: {
     readonly MESSAGE_CREATION_ERROR: "MESSAGE_CREATION_ERROR";
     readonly CHAT_DELETION_FAILED: "CHAT_DELETION_FAILED";
 };
+export type ErrorPayload<T> = {
+    code: string;
+    message: string;
+    data: T;
+};
 //# sourceMappingURL=socket-event-names.d.ts.map

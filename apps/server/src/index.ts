@@ -4,12 +4,12 @@ import { Server, Socket } from "socket.io";
 import { redis } from "./services/redis/redis";
 import z from "zod";
 import sendTextMessageHandler from "./handlers/send-text-message";
-import { SOCKET_EVENTS } from "./event-listener-names";
 import { createChatroomHandler } from "./handlers/create-new-chatroom-with-message";
 import { chatMember, chats, db } from "db";
 import { and, eq, ne, sql } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 import deleteChatroomHandler from "./handlers/delete-chatroom";
+import { ClientToServerEvents } from "types";
 
 const app = express();
 const port = 3001;
@@ -75,13 +75,13 @@ io.on("connection", (socket) => {
   //     });
   // });
 
-  socket.on(SOCKET_EVENTS.SEND_TEXT_MESSAGE, (data) =>
+  socket.on(ClientToServerEvents.SEND_TEXT_MESSAGE, (data) =>
     sendTextMessageHandler(socket, io, data),
   );
-  socket.on(SOCKET_EVENTS.CREATE_CHATROOM, (data) =>
+  socket.on(ClientToServerEvents.CREATE_CHATROOM, (data) =>
     createChatroomHandler(socket, io, data),
   );
-  socket.on(SOCKET_EVENTS.DELETE_CHATROOM, (data) =>
+  socket.on(ClientToServerEvents.DELETE_CHATROOM, (data) =>
     deleteChatroomHandler(socket, io, data),
   );
 });

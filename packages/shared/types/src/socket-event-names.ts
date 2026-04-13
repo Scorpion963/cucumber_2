@@ -17,4 +17,9 @@ export const ServerToClientErrors = {
   CHAT_DELETION_FAILED: "CHAT_DELETION_FAILED",
 } as const;
 
+export type ErrorPayload<T> = {
+  code: string;
+  message: string;
+  data: T
+}
 
