@@ -20,7 +20,6 @@ export default async function deleteChatroomHandler(socket: Socket, io: Server, 
 
     try{
         const deletedChat = await db.delete(chats).where(eq(chats.id, data.id)).returning()
-        const room = io.sockets.adapter.rooms.get(data.id)
         io.to(`room:${data.id}`).emit(SOCKET_EMITS.CHATROOM_DELETED, {id: data.id})
     }catch (e){
         console.error("Error inside of deleteChatroomhandler: ", e)

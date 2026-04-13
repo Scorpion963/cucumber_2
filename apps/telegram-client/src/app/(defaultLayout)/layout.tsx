@@ -8,9 +8,9 @@ import { mapChatsToStore } from "@/server/mappers/mapChatsToStore";
 import { user } from "db";
 import { headers } from "next/headers";
 import { ReactNode } from "react";
-import { SocketEventGlobalReceiver } from "./page";
 import { MessageStoreProvider } from "@/features/chat/providers/messageStoreProvider";
 import { ChatStoreProvider } from "@/features/chat/providers/chatStoreProvider";
+import { SocketEventGlobalReceiver } from "@/features/socket/SocketEventGlobalReceiver";
 
 // TODO: Sidebar doesn't disappear when in mobile
 
